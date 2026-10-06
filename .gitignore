@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 Thumbs.db
 .plans/
@@ -85,6 +87,8 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 ios/Firebase/
 lib/firebase_options.dart
+firebase.json
+*firebase_app_id_file.json
 
 # Keystores and signing certificates
 *.keystore
