@@ -1,4 +1,4 @@
-package com.example.bulk_tempo
+package com.bulktempo.app
 
 import io.flutter.embedding.android.FlutterActivity
 
