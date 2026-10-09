@@ -424,24 +424,24 @@ class RouterRefreshNotifier extends ChangeNotifier {
 
 #### Automated
 
-- [x] 2.1 UserEntity domain unit tests pass
-- [x] 2.2 UserDto serialization and mapping unit tests pass
-- [x] 2.3 AuthRepositoryImpl repository unit tests with exception mapping pass
-- [x] 2.4 FakeAuthRepository passes contract sanity tests
-- [x] 2.5 Static analysis of auth domain and data layers passes
+- [x] 2.1 UserEntity domain unit tests pass — 4d5e046
+- [x] 2.2 UserDto serialization and mapping unit tests pass — 4d5e046
+- [x] 2.3 AuthRepositoryImpl repository unit tests with exception mapping pass — 4d5e046
+- [x] 2.4 FakeAuthRepository passes contract sanity tests — 4d5e046
+- [x] 2.5 Static analysis of auth domain and data layers passes — 4d5e046
 
 #### Manual
 
-- [x] 2.6 Inspect exception-to-failure mapping table ensuring FirebaseAuthException codes map cleanly
+- [x] 2.6 Inspect exception-to-failure mapping table ensuring FirebaseAuthException codes map cleanly — 4d5e046
 
 ### Phase 3: Auth Presentation Layer (MVVM & UI Screens)
 
 #### Automated
 
-- [ ] 3.1 AuthViewModel session state unit tests pass
-- [ ] 3.2 Login and Register ViewModel form unit tests pass
-- [ ] 3.3 LoginScreen, RegisterScreen, and HomeShellScreen widget tests pass
-- [ ] 3.4 Static analysis of presentation layer passes
+- [x] 3.1 AuthViewModel session state unit tests pass — f10b429
+- [x] 3.2 Login and Register ViewModel form unit tests pass — f10b429
+- [x] 3.3 LoginScreen, RegisterScreen, and HomeShellScreen widget tests pass — f10b429
+- [x] 3.4 Static analysis of presentation layer passes — f10b429
 
 #### Manual
 
