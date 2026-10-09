@@ -411,28 +411,28 @@ class RouterRefreshNotifier extends ChangeNotifier {
 
 #### Automated
 
-- [x] 1.1 Core Result type and pattern matching unit tests pass
-- [x] 1.2 Dependencies resolve cleanly
-- [x] 1.3 Android manifest includes release internet permission
-- [x] 1.4 Static analysis of core files passes without errors
+- [x] 1.1 Core Result type and pattern matching unit tests pass — 5cf2ca1
+- [x] 1.2 Dependencies resolve cleanly — 5cf2ca1
+- [x] 1.3 Android manifest includes release internet permission — 5cf2ca1
+- [x] 1.4 Static analysis of core files passes without errors — 5cf2ca1
 
 #### Manual
 
-- [x] 1.5 Verify pubspec dependencies and versions resolve without version conflicts
+- [x] 1.5 Verify pubspec dependencies and versions resolve without version conflicts — 5cf2ca1
 
 ### Phase 2: Auth Domain & Data Layers
 
 #### Automated
 
-- [ ] 2.1 UserEntity domain unit tests pass
-- [ ] 2.2 UserDto serialization and mapping unit tests pass
-- [ ] 2.3 AuthRepositoryImpl repository unit tests with exception mapping pass
-- [ ] 2.4 FakeAuthRepository passes contract sanity tests
-- [ ] 2.5 Static analysis of auth domain and data layers passes
+- [x] 2.1 UserEntity domain unit tests pass
+- [x] 2.2 UserDto serialization and mapping unit tests pass
+- [x] 2.3 AuthRepositoryImpl repository unit tests with exception mapping pass
+- [x] 2.4 FakeAuthRepository passes contract sanity tests
+- [x] 2.5 Static analysis of auth domain and data layers passes
 
 #### Manual
 
-- [ ] 2.6 Inspect exception-to-failure mapping table ensuring FirebaseAuthException codes map cleanly
+- [x] 2.6 Inspect exception-to-failure mapping table ensuring FirebaseAuthException codes map cleanly
 
 ### Phase 3: Auth Presentation Layer (MVVM & UI Screens)
 
