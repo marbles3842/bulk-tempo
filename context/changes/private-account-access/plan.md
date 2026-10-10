@@ -445,18 +445,18 @@ class RouterRefreshNotifier extends ChangeNotifier {
 
 #### Manual
 
-- [x] 3.5 Verify input validation displays client-side errors for invalid emails or short passwords
-- [x] 3.6 Verify logout confirmation dialog shows Cancel and Log Out actions
+- [x] 3.5 Verify input validation displays client-side errors for invalid emails or short passwords — 0ff2fab
+- [x] 3.6 Verify logout confirmation dialog shows Cancel and Log Out actions — 0ff2fab
 
 ### Phase 4: GoRouter Integration, Route Guards & End-to-End Verification
 
 #### Automated
 
-- [x] 4.1 Router redirection unit and widget tests pass
-- [x] 4.2 Full test suite passes across the entire project
-- [x] 4.3 Code formatting passes with zero diffs
-- [x] 4.4 Static analysis passes with zero warnings or errors
+- [x] 4.1 Router redirection unit and widget tests pass — 0ff2fab
+- [x] 4.2 Full test suite passes across the entire project — 0ff2fab
+- [x] 4.3 Code formatting passes with zero diffs — 0ff2fab
+- [x] 4.4 Static analysis passes with zero warnings or errors — 0ff2fab
 
 #### Manual
 
-- [x] 4.5 End-to-end smoke test on emulator or browser
+- [x] 4.5 End-to-end smoke test on emulator or browser — 0ff2fab
