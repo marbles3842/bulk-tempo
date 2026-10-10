@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid",
+        "weight_entries": {
+          "$date": {
+            ".validate": "newData.hasChildren(['date', 'weightKg', 'updatedAt']) && newData.child('date').isString() && newData.child('date').val() == $date && newData.child('date').val().matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.child('weightKg').isNumber() && newData.child('weightKg').val() >= 20.0 && newData.child('weightKg').val() <= 300.0 && newData.child('updatedAt').isString()"
+          }
+        }
+      }
+    }
+  }
+}
