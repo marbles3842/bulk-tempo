@@ -140,51 +140,45 @@ void main() {
       },
     );
 
-    test(
-      'maps generic AuthException to AuthFailure with original message',
-      () async {
-        when(
-          () => mockDataSource.signInWithEmailAndPassword(
-            email: 'user@test.com',
-            password: 'wrong',
-          ),
-        ).thenThrow(
-          const AuthException('operation-not-allowed', 'Operation not allowed'),
-        );
-
-        final result = await repository.signInWithEmailAndPassword(
+    test('maps generic AuthException to safe fallback message', () async {
+      when(
+        () => mockDataSource.signInWithEmailAndPassword(
           email: 'user@test.com',
           password: 'wrong',
-        );
+        ),
+      ).thenThrow(
+        const AuthException('operation-not-allowed', 'Operation not allowed'),
+      );
 
-        expect(result, isA<Failure<UserEntity, AppFailure>>());
-        final failure = (result as Failure).failure;
-        expect(failure, isA<AuthFailure>());
-        expect(failure.message, 'Operation not allowed');
-      },
-    );
+      final result = await repository.signInWithEmailAndPassword(
+        email: 'user@test.com',
+        password: 'wrong',
+      );
 
-    test(
-      'maps empty message AuthException to default Authentication failed',
-      () async {
-        when(
-          () => mockDataSource.signInWithEmailAndPassword(
-            email: 'user@test.com',
-            password: 'wrong',
-          ),
-        ).thenThrow(const AuthException('unknown', ''));
+      expect(result, isA<Failure<UserEntity, AppFailure>>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<AuthFailure>());
+      expect(failure.message, 'Authentication failed. Please try again.');
+    });
 
-        final result = await repository.signInWithEmailAndPassword(
+    test('maps empty message AuthException to safe fallback message', () async {
+      when(
+        () => mockDataSource.signInWithEmailAndPassword(
           email: 'user@test.com',
           password: 'wrong',
-        );
+        ),
+      ).thenThrow(const AuthException('unknown', ''));
 
-        expect(result, isA<Failure<UserEntity, AppFailure>>());
-        final failure = (result as Failure).failure;
-        expect(failure, isA<AuthFailure>());
-        expect(failure.message, 'Authentication failed');
-      },
-    );
+      final result = await repository.signInWithEmailAndPassword(
+        email: 'user@test.com',
+        password: 'wrong',
+      );
+
+      expect(result, isA<Failure<UserEntity, AppFailure>>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<AuthFailure>());
+      expect(failure.message, 'Authentication failed. Please try again.');
+    });
 
     test('maps NetworkException to NetworkFailure', () async {
       when(
@@ -205,7 +199,7 @@ void main() {
       expect(failure.message, 'No connection');
     });
 
-    test('maps ServerException to ServerFailure', () async {
+    test('maps ServerException to ServerFailure with safe message', () async {
       when(
         () => mockDataSource.signInWithEmailAndPassword(
           email: 'user@test.com',
@@ -223,28 +217,37 @@ void main() {
       expect(result, isA<Failure<UserEntity, AppFailure>>());
       final failure = (result as Failure).failure;
       expect(failure, isA<ServerFailure>());
-      expect(failure.message, 'Server error');
+      expect(
+        failure.message,
+        'A server error occurred. Please try again later.',
+      );
       expect((failure as ServerFailure).statusCode, 500);
     });
 
-    test('maps unexpected exception to UnknownFailure', () async {
-      when(
-        () => mockDataSource.signInWithEmailAndPassword(
+    test(
+      'maps unexpected exception to UnknownFailure with safe message',
+      () async {
+        when(
+          () => mockDataSource.signInWithEmailAndPassword(
+            email: 'user@test.com',
+            password: 'password',
+          ),
+        ).thenThrow(Exception('Unexpected crash'));
+
+        final result = await repository.signInWithEmailAndPassword(
           email: 'user@test.com',
           password: 'password',
-        ),
-      ).thenThrow(Exception('Unexpected crash'));
+        );
 
-      final result = await repository.signInWithEmailAndPassword(
-        email: 'user@test.com',
-        password: 'password',
-      );
-
-      expect(result, isA<Failure<UserEntity, AppFailure>>());
-      final failure = (result as Failure).failure;
-      expect(failure, isA<UnknownFailure>());
-      expect(failure.message, contains('Unexpected crash'));
-    });
+        expect(result, isA<Failure<UserEntity, AppFailure>>());
+        final failure = (result as Failure).failure;
+        expect(failure, isA<UnknownFailure>());
+        expect(
+          failure.message,
+          'An unexpected error occurred. Please try again.',
+        );
+      },
+    );
   });
 
   group('signUpWithEmailAndPassword', () {
@@ -285,7 +288,10 @@ void main() {
         expect(result, isA<Failure<UserEntity, AppFailure>>());
         final failure = (result as Failure).failure;
         expect(failure, isA<AuthFailure>());
-        expect(failure.message, 'An account with this email already exists');
+        expect(
+          failure.message,
+          'Registration failed. Please check your details or try signing in',
+        );
       },
     );
 
@@ -339,7 +345,7 @@ void main() {
       verify(() => mockDataSource.signOut()).called(1);
     });
 
-    test('maps AuthException to AuthFailure', () async {
+    test('maps AuthException to AuthFailure with safe message', () async {
       when(
         () => mockDataSource.signOut(),
       ).thenThrow(const AuthException('signout-failed', 'Failed to sign out'));
@@ -349,7 +355,7 @@ void main() {
       expect(result, isA<Failure<void, AppFailure>>());
       final failure = (result as Failure).failure;
       expect(failure, isA<AuthFailure>());
-      expect(failure.message, 'Failed to sign out');
+      expect(failure.message, 'Authentication failed. Please try again.');
     });
 
     test('maps NetworkException to NetworkFailure', () async {
@@ -362,24 +368,37 @@ void main() {
       expect((result as Failure).failure, isA<NetworkFailure>());
     });
 
-    test('maps ServerException to ServerFailure', () async {
+    test('maps ServerException to ServerFailure with safe message', () async {
       when(() => mockDataSource.signOut())
           .thenThrow(const ServerException(message: 'Sign out server error'));
 
       final result = await repository.signOut();
 
       expect(result, isA<Failure<void, AppFailure>>());
-      expect((result as Failure).failure, isA<ServerFailure>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<ServerFailure>());
+      expect(
+        failure.message,
+        'A server error occurred. Please try again later.',
+      );
     });
 
-    test('maps unexpected exception to UnknownFailure', () async {
-      when(() => mockDataSource.signOut()).thenThrow(Exception('Crash'));
+    test(
+      'maps unexpected exception to UnknownFailure with safe message',
+      () async {
+        when(() => mockDataSource.signOut()).thenThrow(Exception('Crash'));
 
-      final result = await repository.signOut();
+        final result = await repository.signOut();
 
-      expect(result, isA<Failure<void, AppFailure>>());
-      expect((result as Failure).failure, isA<UnknownFailure>());
-    });
+        expect(result, isA<Failure<void, AppFailure>>());
+        final failure = (result as Failure).failure;
+        expect(failure, isA<UnknownFailure>());
+        expect(
+          failure.message,
+          'An unexpected error occurred. Please try again.',
+        );
+      },
+    );
   });
 
   group('currentUser', () {

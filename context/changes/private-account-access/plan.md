@@ -50,7 +50,7 @@ After this plan is complete:
 
 - **Session Initialization Race**: On cold app launch, `FirebaseAuth.currentUser` may initially be null while Firebase initializes the local session from secure storage. `AuthState` must maintain an `isInitializing` state so `SplashScreen` displays until `authStateChanges()` emits the restored user, preventing a momentary flash of the login screen.
 - **Router Refresh Listener Lifecycle**: `RouterRefreshNotifier` must properly dispose its listener on disposal (`ref.onDispose(refreshNotifier.dispose)`) to avoid memory leaks during app reloads or testing.
-- **Error Mapping Security**: `FirebaseAuthException` error codes (`user-not-found`, `wrong-password`, `invalid-credential`) must map to a unified user message ("Invalid email or password") to prevent email enumeration, while `email-already-in-use` explicitly guides returning users to sign in.
+- **Error Mapping Security**: `FirebaseAuthException` error codes (`user-not-found`, `wrong-password`, `invalid-credential`) must map to a unified user message ("Invalid email or password") and `email-already-in-use` must map to a generic registration message ("Registration failed. Please check your details or try signing in") to prevent account enumeration across both sign-in and sign-up flows.
 
 ---
 
@@ -154,7 +154,7 @@ abstract class AuthRepository {
 #### 5. Auth Repository Implementation
 **File**: `bulk_tempo/lib/features/auth/data/repositories/auth_repository_impl.dart`
 **Intent**: Concrete `AuthRepository` translating data source exceptions into `Result<T, AppFailure>`.
-**Contract**: `AuthRepositoryImpl(AuthRemoteDataSource)` implementing `AuthRepository`. Translates `AuthException` codes (`user-not-found`, `wrong-password`, `invalid-credential` -> "Invalid email or password", `email-already-in-use` -> "An account with this email already exists", `too-many-requests` -> "Too many attempts. Please try again later") to `AuthFailure`, and network exceptions to `NetworkFailure`. Exposes `authRepositoryProvider`.
+**Contract**: `AuthRepositoryImpl(AuthRemoteDataSource)` implementing `AuthRepository`. Translates `AuthException` codes (`user-not-found`, `wrong-password`, `invalid-credential` -> "Invalid email or password", `email-already-in-use` -> "Registration failed. Please check your details or try signing in", `too-many-requests` -> "Too many attempts. Please try again later") to `AuthFailure`, and network exceptions to `NetworkFailure`. Exposes `authRepositoryProvider`.
 
 #### 6. Mocktail Mocks Registry
 **File**: `bulk_tempo/test/test_helpers/mocks.dart`
@@ -459,4 +459,4 @@ class RouterRefreshNotifier extends ChangeNotifier {
 
 #### Manual
 
-- [x] 4.5 End-to-end smoke test on emulator or browser — 0ff2fab
+- [x] 4.5 End-to-end smoke test on emulator or browser — 0ff2fab (Platform: macOS / iOS Simulator & Chrome; verified registration, session persistence across restart, and logout confirmation dialog and redirect)

@@ -129,7 +129,9 @@ void main() {
 
     expect(find.byType(SnackBar), findsOneWidget);
     expect(
-      find.text('An account with this email already exists'),
+      find.text(
+        'Registration failed. Please check your details or try signing in',
+      ),
       findsOneWidget,
     );
   });

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
+import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_form_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/widgets/auth_button.dart';
@@ -52,6 +54,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     ref.listen<LoginFormState>(loginViewModelProvider, (previous, next) {
       if (next.status == FormStatus.failure && next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    });
+
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),

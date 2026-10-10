@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 
 class HomeShellScreen extends ConsumerWidget {
@@ -33,6 +34,18 @@ class HomeShellScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    });
+
     final authState = ref.watch(authViewModelProvider);
     final user = authState.user;
 

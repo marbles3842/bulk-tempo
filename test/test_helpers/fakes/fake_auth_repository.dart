@@ -70,7 +70,9 @@ class FakeAuthRepository implements AuthRepository {
 
     if (_users.containsKey(email)) {
       return const Result.failure(
-        AuthFailure('An account with this email already exists'),
+        AuthFailure(
+          'Registration failed. Please check your details or try signing in',
+        ),
       );
     }
 

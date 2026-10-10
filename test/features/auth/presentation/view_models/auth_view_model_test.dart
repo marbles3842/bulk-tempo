@@ -5,7 +5,10 @@ import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 
+import 'package:mocktail/mocktail.dart';
+
 import '../../../../test_helpers/fakes/fake_auth_repository.dart';
+import '../../../../test_helpers/mocks.dart';
 
 void main() {
   late FakeAuthRepository fakeRepository;
@@ -95,4 +98,33 @@ void main() {
     container.read(authViewModelProvider.notifier).clearError();
     expect(container.read(authViewModelProvider).errorMessage, isNull);
   });
+
+  test(
+    'handles stream error by clearing initialization and setting errorMessage',
+    () async {
+      final mockRepo = MockAuthRepository();
+      when(() => mockRepo.currentUser).thenReturn(null);
+      when(() => mockRepo.authStateChanges()).thenAnswer(
+        (_) => Stream<UserEntity?>.error(Exception('Stream failed')),
+      );
+
+      final errorContainer = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(mockRepo)],
+      );
+      addTearDown(errorContainer.dispose);
+
+      final initialState = errorContainer.read(authViewModelProvider);
+      expect(initialState.isInitializing, isTrue);
+
+      await Future<void>.delayed(Duration.zero);
+
+      final state = errorContainer.read(authViewModelProvider);
+      expect(state.isInitializing, isFalse);
+      expect(state.user, isNull);
+      expect(
+        state.errorMessage,
+        equals('Failed to verify authentication status. Please try again.'),
+      );
+    },
+  );
 }

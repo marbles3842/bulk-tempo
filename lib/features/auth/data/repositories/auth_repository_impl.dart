@@ -40,11 +40,24 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
     } on NetworkException catch (e) {
-      return Result.failure(NetworkFailure(e.message));
+      return Result.failure(
+        NetworkFailure(
+          e.message.isNotEmpty
+              ? e.message
+              : 'Network error. Please check your connection.',
+        ),
+      );
     } on ServerException catch (e) {
-      return Result.failure(ServerFailure(e.message, statusCode: e.statusCode));
-    } catch (e) {
-      return Result.failure(UnknownFailure(e.toString()));
+      return Result.failure(
+        ServerFailure(
+          'A server error occurred. Please try again later.',
+          statusCode: e.statusCode,
+        ),
+      );
+    } catch (_) {
+      return const Result.failure(
+        UnknownFailure('An unexpected error occurred. Please try again.'),
+      );
     }
   }
 
@@ -62,11 +75,24 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
     } on NetworkException catch (e) {
-      return Result.failure(NetworkFailure(e.message));
+      return Result.failure(
+        NetworkFailure(
+          e.message.isNotEmpty
+              ? e.message
+              : 'Network error. Please check your connection.',
+        ),
+      );
     } on ServerException catch (e) {
-      return Result.failure(ServerFailure(e.message, statusCode: e.statusCode));
-    } catch (e) {
-      return Result.failure(UnknownFailure(e.toString()));
+      return Result.failure(
+        ServerFailure(
+          'A server error occurred. Please try again later.',
+          statusCode: e.statusCode,
+        ),
+      );
+    } catch (_) {
+      return const Result.failure(
+        UnknownFailure('An unexpected error occurred. Please try again.'),
+      );
     }
   }
 
@@ -78,11 +104,24 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
     } on NetworkException catch (e) {
-      return Result.failure(NetworkFailure(e.message));
+      return Result.failure(
+        NetworkFailure(
+          e.message.isNotEmpty
+              ? e.message
+              : 'Network error. Please check your connection.',
+        ),
+      );
     } on ServerException catch (e) {
-      return Result.failure(ServerFailure(e.message, statusCode: e.statusCode));
-    } catch (e) {
-      return Result.failure(UnknownFailure(e.toString()));
+      return Result.failure(
+        ServerFailure(
+          'A server error occurred. Please try again later.',
+          statusCode: e.statusCode,
+        ),
+      );
+    } catch (_) {
+      return const Result.failure(
+        UnknownFailure('An unexpected error occurred. Please try again.'),
+      );
     }
   }
 
@@ -92,14 +131,12 @@ class AuthRepositoryImpl implements AuthRepository {
       'wrong-password' ||
       'invalid-credential' => const AuthFailure('Invalid email or password'),
       'email-already-in-use' => const AuthFailure(
-        'An account with this email already exists',
+        'Registration failed. Please check your details or try signing in',
       ),
       'too-many-requests' => const AuthFailure(
         'Too many attempts. Please try again later',
       ),
-      _ => AuthFailure(
-        e.message.isNotEmpty ? e.message : 'Authentication failed',
-      ),
+      _ => const AuthFailure('Authentication failed. Please try again.'),
     };
   }
 }
