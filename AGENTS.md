@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Flutter app targeting Android, iOS, and web. Application code currently lives in `lib/main.dart`; place new Dart features under `lib/` and keep platform-specific changes in `android/`, `ios/`, or `web/`. Web icons and the favicon are in `web/icons/` and `web/`. The iOS project includes a placeholder XCTest file at `ios/RunnerTests/RunnerTests.swift`. There is no Dart `test/` directory yet; create one for app tests.
+This is a Flutter app targeting Android, iOS, and web. Feature code lives under `lib/` and unit/widget tests live under `test/`; keep platform-specific changes in `android/`, `ios/`, or `web/`. Web icons and the favicon are in `web/icons/` and `web/`. The iOS project includes a placeholder XCTest file at `ios/RunnerTests/RunnerTests.swift`.
 
 ## Architecture & Technical Documentation
 
@@ -19,4 +19,4 @@ Comprehensive architectural guidelines and specifications are located in `.docum
 
 From the repository root: `flutter pub get`, `flutter run` (`-d chrome` for web), `flutter analyze`, `flutter build apk`, and `flutter build web`.
 
-Run `dart format lib` until `test/` exists; then run `dart format lib test` and `flutter test`.
+Run `dart format lib test` and `flutter test`.

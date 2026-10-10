@@ -1,0 +1,381 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Verify code formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Configure environment and Firebase
+        env:
+          ENV_JSON: ${{ secrets.ENV_JSON }}
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+        run: |
+          if [ -n "$ENV_JSON" ]; then
+            echo "$ENV_JSON" > env.json
+          else
+            echo '{"HEAVY_BASE_URL":"https://api.example.com","HEAVY_API_KEY":"ci_placeholder_key"}' > env.json
+          fi
+
+          if [ -n "$FIREBASE_OPTIONS_DART" ]; then
+            echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+          else
+            cat << 'EOF' > lib/firebase_options.dart
+          // ignore_for_file: type=lint
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              if (kIsWeb) return web;
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return android;
+                case TargetPlatform.iOS:
+                  return ios;
+                default:
+                  throw UnsupportedError('Unsupported platform');
+              }
+            }
+
+            static const FirebaseOptions web = FirebaseOptions(
+              apiKey: 'dummy_web_key',
+              appId: '1:123456789:web:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              authDomain: 'bulk-tempo.firebaseapp.com',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'dummy_android_key',
+              appId: '1:123456789:android:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions ios = FirebaseOptions(
+              apiKey: 'dummy_ios_key',
+              appId: '1:123456789:ios:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+              iosBundleId: 'com.bulktempo.app',
+            );
+          }
+          EOF
+          fi
+
+      - name: Analyze code (linters & strict types)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Run unit and widget tests
+        run: flutter test --coverage
+
+  build-android:
+    name: Build Android APK
+    needs: [verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Configure Android environment and secrets
+        env:
+          ENV_JSON: ${{ secrets.ENV_JSON }}
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$ENV_JSON" ]; then
+            echo "$ENV_JSON" > env.json
+          else
+            echo '{"HEAVY_BASE_URL":"https://api.example.com","HEAVY_API_KEY":"ci_placeholder_key"}' > env.json
+          fi
+
+          if [ -n "$FIREBASE_OPTIONS_DART" ]; then
+            echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+          else
+            cat << 'EOF' > lib/firebase_options.dart
+          // ignore_for_file: type=lint
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              if (kIsWeb) return web;
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return android;
+                case TargetPlatform.iOS:
+                  return ios;
+                default:
+                  throw UnsupportedError('Unsupported platform');
+              }
+            }
+
+            static const FirebaseOptions web = FirebaseOptions(
+              apiKey: 'dummy_web_key',
+              appId: '1:123456789:web:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              authDomain: 'bulk-tempo.firebaseapp.com',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'dummy_android_key',
+              appId: '1:123456789:android:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions ios = FirebaseOptions(
+              apiKey: 'dummy_ios_key',
+              appId: '1:123456789:ios:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+              iosBundleId: 'com.bulktempo.app',
+            );
+          }
+          EOF
+          fi
+
+          mkdir -p android/app
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          else
+            cat << 'EOF' > android/app/google-services.json
+          {
+            "project_info": {
+              "project_number": "123456789",
+              "project_id": "bulk-tempo",
+              "storage_bucket": "bulk-tempo.firebasestorage.app"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789:android:dummy",
+                  "android_client_info": {
+                    "package_name": "com.bulktempo.app"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "dummy_android_key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          fi
+
+      - name: Build Android APK
+        run: flutter build apk --debug --dart-define-from-file=env.json
+
+  build-ios:
+    name: Build iOS App
+    needs: [verify]
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Configure iOS environment and secrets
+        env:
+          ENV_JSON: ${{ secrets.ENV_JSON }}
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: |
+          if [ -n "$ENV_JSON" ]; then
+            echo "$ENV_JSON" > env.json
+          else
+            echo '{"HEAVY_BASE_URL":"https://api.example.com","HEAVY_API_KEY":"ci_placeholder_key"}' > env.json
+          fi
+
+          if [ -n "$FIREBASE_OPTIONS_DART" ]; then
+            echo "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+          else
+            cat << 'EOF' > lib/firebase_options.dart
+          // ignore_for_file: type=lint
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              if (kIsWeb) return web;
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return android;
+                case TargetPlatform.iOS:
+                  return ios;
+                default:
+                  throw UnsupportedError('Unsupported platform');
+              }
+            }
+
+            static const FirebaseOptions web = FirebaseOptions(
+              apiKey: 'dummy_web_key',
+              appId: '1:123456789:web:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              authDomain: 'bulk-tempo.firebaseapp.com',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'dummy_android_key',
+              appId: '1:123456789:android:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+            );
+
+            static const FirebaseOptions ios = FirebaseOptions(
+              apiKey: 'dummy_ios_key',
+              appId: '1:123456789:ios:dummy',
+              messagingSenderId: '123456789',
+              projectId: 'bulk-tempo',
+              databaseURL: 'https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app',
+              storageBucket: 'bulk-tempo.firebasestorage.app',
+              iosBundleId: 'com.bulktempo.app',
+            );
+          }
+          EOF
+          fi
+
+          mkdir -p ios/Runner
+          if [ -n "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+            echo "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
+          else
+            cat << 'EOF' > ios/Runner/GoogleService-Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CLIENT_ID</key>
+            <string>dummy_client_id.apps.googleusercontent.com</string>
+            <key>REVERSED_CLIENT_ID</key>
+            <string>com.googleusercontent.apps.dummy_client_id</string>
+            <key>API_KEY</key>
+            <string>dummy_ios_key</string>
+            <key>GCM_SENDER_ID</key>
+            <string>123456789</string>
+            <key>PLIST_VERSION</key>
+            <string>1</string>
+            <key>BUNDLE_ID</key>
+            <string>com.bulktempo.app</string>
+            <key>PROJECT_ID</key>
+            <string>bulk-tempo</string>
+            <key>STORAGE_BUCKET</key>
+            <string>bulk-tempo.firebasestorage.app</string>
+            <key>IS_ADS_ENABLED</key>
+            <false/>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <false/>
+            <key>DATABASE_URL</key>
+            <string>https://bulk-tempo-default-rtdb.europe-west1.firebasedatabase.app</string>
+          </dict>
+          </plist>
+          EOF
+          fi
+
+      - name: Cache CocoaPods
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Build iOS App
+        run: flutter build ios --debug --no-codesign --dart-define-from-file=env.json
