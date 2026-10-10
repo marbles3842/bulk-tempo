@@ -6,13 +6,18 @@ This document defines the routing and navigation architecture for **Bulk Tempo**
 
 ## 1. Routing Architecture
 
-Routing is centralized in `lib/core/router/` to maintain clean navigation boundaries and support deep linking for mobile platforms:
+Routing composition is placed in `lib/app/router/` to connect features and maintain strict architectural boundaries (keeping `lib/core/` feature-agnostic), while route paths and names reside in `lib/core/router/`:
 
 ```text
-lib/core/router/
-├── app_router.dart          # GoRouter instance and Riverpod provider
-├── route_names.dart         # Static string constants for route names
-└── route_paths.dart         # Static string constants for URL paths
+lib/
+├── app/
+│   └── router/
+│       ├── app_router.dart              # GoRouter instance and Riverpod provider
+│       └── router_refresh_notifier.dart # Bridges Riverpod state updates to GoRouter
+└── core/
+    └── router/
+        ├── route_names.dart             # Static string constants for route names
+        └── route_paths.dart             # Static string constants for URL paths
 ```
 
 ---
@@ -42,7 +47,7 @@ abstract class RouteNames {
 }
 ```
 
-### B. Router Provider (`lib/core/router/app_router.dart`):
+### B. Router Provider (`lib/app/router/app_router.dart`):
 
 ```dart
 import 'package:flutter/material.dart';
@@ -122,7 +127,7 @@ ref.listen<LoginState>(loginViewModelProvider, (previous, next) {
 
 GoRouter's `redirect` callback only executes on navigation transitions by default. To make routing reactively respond to asynchronous Riverpod state changes (such as logging in, logging out, or session expiration), wire a `refreshListenable` bridge:
 
-### A. Reactive Listenable Bridge (`lib/core/router/router_refresh_notifier.dart`)
+### A. Reactive Listenable Bridge (`lib/app/router/router_refresh_notifier.dart`)
 
 ```dart
 import 'package:flutter/foundation.dart';
