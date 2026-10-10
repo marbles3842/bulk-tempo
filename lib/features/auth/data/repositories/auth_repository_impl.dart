@@ -39,13 +39,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Result.success(userDto.toEntity());
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(
@@ -74,13 +70,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Result.success(userDto.toEntity());
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(
@@ -103,13 +95,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Result.success(null);
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(

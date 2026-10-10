@@ -12,13 +12,14 @@ bulk_tempo/
 ├── lib/
 │   ├── app/                             # Application root setup
 │   │   ├── app.dart                     # MaterialApp.router configuration
+│   │   ├── router/                      # GoRouter instance, auth guards, refresh listenable
 │   │   └── app_providers.dart           # Global provider observers / top-level providers
 │   ├── core/                            # Shared, cross-cutting infrastructure
 │   │   ├── constants/                   # App constants, API endpoints, storage keys
 │   │   ├── errors/                      # AppFailure hierarchy and exception mappers
 │   │   ├── network/                     # HTTP/Dio client, interceptors, network info
 │   │   ├── result/                      # Functional Result<T, E> implementation
-│   │   ├── router/                      # GoRouter instance, route paths, route names
+│   │   ├── router/                      # Route paths, route names
 │   │   ├── theme/                       # Color palettes, typography, ThemeData
 │   │   └── utils/                       # General helpers, string & date extensions
 │   ├── features/                        # Self-contained feature slices
@@ -36,9 +37,10 @@ bulk_tempo/
 │   │           └── widgets/             # Reusable UI widgets scoped to this feature
 │   └── main.dart                        # Main entry point (runApp wrapped in ProviderScope)
 ├── test/                                # Mirrors the lib/ directory 1-to-1
-│   ├── core/
-│   │   ├── network/                     # Network client and error parsing tests
+│   ├── app/
 │   │   └── router/                      # Routing & navigation tests
+│   ├── core/
+│   │   └── network/                     # Network client and error parsing tests
 │   ├── features/
 │   │   └── <feature_name>/
 │   │       ├── data/

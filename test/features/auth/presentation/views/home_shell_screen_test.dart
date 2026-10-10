@@ -135,4 +135,41 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.text('Sign out failed'), findsOneWidget);
   });
+
+  testWidgets(
+    'displays error SnackBar again when logout repeatedly fails with same error',
+    (tester) async {
+      fakeRepository.signOutFailure = const ServerFailure('Sign out failed');
+
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+      );
+      await tester.pumpAndSettle();
+
+      // First logout attempt fails
+      await tester.tap(find.byKey(const Key('home_logout_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('confirm_logout_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Sign out failed'), findsOneWidget);
+
+      // Dismiss current SnackBar to verify next presentation
+      ScaffoldMessenger.of(tester.element(find.byType(HomeShellScreen)))
+          .hideCurrentSnackBar();
+      await tester.pumpAndSettle();
+      expect(find.byType(SnackBar), findsNothing);
+
+      // Second logout attempt with same error
+      await tester.tap(find.byKey(const Key('home_logout_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('confirm_logout_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Sign out failed'), findsOneWidget);
+    },
+  );
 }

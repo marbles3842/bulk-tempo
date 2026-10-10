@@ -43,6 +43,7 @@ class HomeShellScreen extends ConsumerWidget {
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
+        ref.read(authViewModelProvider.notifier).clearError();
       }
     });
 

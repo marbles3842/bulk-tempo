@@ -43,6 +43,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> signOut() async {
+    state = state.copyWith(errorMessage: null);
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.signOut();
 

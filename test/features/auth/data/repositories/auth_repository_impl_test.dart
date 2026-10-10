@@ -196,7 +196,7 @@ void main() {
       expect(result, isA<Failure<UserEntity, AppFailure>>());
       final failure = (result as Failure).failure;
       expect(failure, isA<NetworkFailure>());
-      expect(failure.message, 'No connection');
+      expect(failure.message, 'Network error. Please check your connection.');
     });
 
     test('maps ServerException to ServerFailure with safe message', () async {
@@ -330,7 +330,9 @@ void main() {
       );
 
       expect(result, isA<Failure<UserEntity, AppFailure>>());
-      expect((result as Failure).failure, isA<NetworkFailure>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<NetworkFailure>());
+      expect(failure.message, 'Network error. Please check your connection.');
     });
   });
 
@@ -365,7 +367,9 @@ void main() {
       final result = await repository.signOut();
 
       expect(result, isA<Failure<void, AppFailure>>());
-      expect((result as Failure).failure, isA<NetworkFailure>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<NetworkFailure>());
+      expect(failure.message, 'Network error. Please check your connection.');
     });
 
     test('maps ServerException to ServerFailure with safe message', () async {
