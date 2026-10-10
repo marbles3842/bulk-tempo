@@ -73,7 +73,10 @@ void main() {
       expect(result, isA<Failure<UserEntity, AppFailure>>());
       final failure = (result as Failure<UserEntity, AppFailure>).failure;
       expect(failure, isA<AuthFailure>());
-      expect(failure.message, 'An account with this email already exists');
+      expect(
+        failure.message,
+        'Registration failed. Please check your details or try signing in',
+      );
     });
 
     test(

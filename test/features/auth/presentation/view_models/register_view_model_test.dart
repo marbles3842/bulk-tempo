@@ -134,7 +134,9 @@ void main() {
     expect(state.status, equals(FormStatus.failure));
     expect(
       state.errorMessage,
-      equals('An account with this email already exists'),
+      equals(
+        'Registration failed. Please check your details or try signing in',
+      ),
     );
   });
 
@@ -151,5 +153,19 @@ void main() {
     final state = container.read(registerViewModelProvider);
     expect(state.status, equals(FormStatus.failure));
     expect(state.errorMessage, equals('Network connection failed'));
+  });
+
+  test('ignores submit when status is submitting', () async {
+    final notifier = container.read(registerViewModelProvider.notifier);
+    notifier.updateEmail('fresh@example.com');
+    notifier.updatePassword('securePass123');
+
+    final future1 = notifier.submit();
+    final future2 = notifier.submit();
+
+    await Future.wait([future1, future2]);
+
+    final state = container.read(registerViewModelProvider);
+    expect(state.status, equals(FormStatus.success));
   });
 }

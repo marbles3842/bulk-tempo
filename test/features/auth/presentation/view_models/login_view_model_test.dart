@@ -145,4 +145,18 @@ void main() {
     expect(state.status, equals(FormStatus.failure));
     expect(state.errorMessage, equals('Network connection failed'));
   });
+
+  test('ignores submit when status is submitting', () async {
+    final notifier = container.read(loginViewModelProvider.notifier);
+    notifier.updateEmail('test@example.com');
+    notifier.updatePassword('password123');
+
+    final future1 = notifier.submit();
+    final future2 = notifier.submit();
+
+    await Future.wait([future1, future2]);
+
+    final state = container.read(loginViewModelProvider);
+    expect(state.status, equals(FormStatus.success));
+  });
 }

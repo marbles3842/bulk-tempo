@@ -32,6 +32,8 @@ class RegisterViewModel extends AutoDisposeNotifier<RegisterFormState> {
   }
 
   Future<void> submit() async {
+    if (state.status == FormStatus.submitting) return;
+
     final trimmedEmail = state.email.trim();
     String? emailError;
     if (trimmedEmail.isEmpty) {

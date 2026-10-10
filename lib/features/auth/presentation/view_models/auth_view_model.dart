@@ -17,13 +17,23 @@ class AuthViewModel extends Notifier<AuthState> {
     final repository = ref.watch(authRepositoryProvider);
 
     _subscription?.cancel();
-    _subscription = repository.authStateChanges().listen((user) {
-      state = state.copyWith(
-        user: user,
-        isInitializing: false,
-        errorMessage: null,
-      );
-    });
+    _subscription = repository.authStateChanges().listen(
+      (user) {
+        state = state.copyWith(
+          user: user,
+          isInitializing: false,
+          errorMessage: null,
+        );
+      },
+      onError: (Object error) {
+        state = state.copyWith(
+          user: null,
+          isInitializing: false,
+          errorMessage:
+              'Failed to verify authentication status. Please try again.',
+        );
+      },
+    );
 
     ref.onDispose(() {
       _subscription?.cancel();

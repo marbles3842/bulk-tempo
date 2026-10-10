@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
@@ -114,5 +115,24 @@ void main() {
 
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+  });
+
+  testWidgets('displays error SnackBar when logout fails', (tester) async {
+    fakeRepository.signOutFailure = const ServerFailure('Sign out failed');
+
+    await tester.pumpApp(
+      const HomeShellScreen(),
+      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('home_logout_button')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('confirm_logout_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.text('Sign out failed'), findsOneWidget);
   });
 }
