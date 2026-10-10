@@ -180,24 +180,27 @@ void main() {
       expect(failure.message, 'Authentication failed. Please try again.');
     });
 
-    test('maps NetworkException to NetworkFailure with user-friendly message', () async {
-      when(
-        () => mockDataSource.signInWithEmailAndPassword(
+    test(
+      'maps NetworkException to NetworkFailure with user-friendly message',
+      () async {
+        when(
+          () => mockDataSource.signInWithEmailAndPassword(
+            email: 'user@test.com',
+            password: 'password',
+          ),
+        ).thenThrow(const NetworkException('No connection'));
+
+        final result = await repository.signInWithEmailAndPassword(
           email: 'user@test.com',
           password: 'password',
-        ),
-      ).thenThrow(const NetworkException('No connection'));
+        );
 
-      final result = await repository.signInWithEmailAndPassword(
-        email: 'user@test.com',
-        password: 'password',
-      );
-
-      expect(result, isA<Failure<UserEntity, AppFailure>>());
-      final failure = (result as Failure).failure;
-      expect(failure, isA<NetworkFailure>());
-      expect(failure.message, 'Network error. Please check your connection.');
-    });
+        expect(result, isA<Failure<UserEntity, AppFailure>>());
+        final failure = (result as Failure).failure;
+        expect(failure, isA<NetworkFailure>());
+        expect(failure.message, 'Network error. Please check your connection.');
+      },
+    );
 
     test('maps ServerException to ServerFailure with safe message', () async {
       when(
@@ -316,24 +319,27 @@ void main() {
       expect(failure.message, 'Too many attempts. Please try again later');
     });
 
-    test('maps NetworkException on signup to NetworkFailure with user-friendly message', () async {
-      when(
-        () => mockDataSource.signUpWithEmailAndPassword(
+    test(
+      'maps NetworkException on signup to NetworkFailure with user-friendly message',
+      () async {
+        when(
+          () => mockDataSource.signUpWithEmailAndPassword(
+            email: 'user@test.com',
+            password: 'password',
+          ),
+        ).thenThrow(const NetworkException('Network unavailable'));
+
+        final result = await repository.signUpWithEmailAndPassword(
           email: 'user@test.com',
           password: 'password',
-        ),
-      ).thenThrow(const NetworkException('Network unavailable'));
+        );
 
-      final result = await repository.signUpWithEmailAndPassword(
-        email: 'user@test.com',
-        password: 'password',
-      );
-
-      expect(result, isA<Failure<UserEntity, AppFailure>>());
-      final failure = (result as Failure).failure;
-      expect(failure, isA<NetworkFailure>());
-      expect(failure.message, 'Network error. Please check your connection.');
-    });
+        expect(result, isA<Failure<UserEntity, AppFailure>>());
+        final failure = (result as Failure).failure;
+        expect(failure, isA<NetworkFailure>());
+        expect(failure.message, 'Network error. Please check your connection.');
+      },
+    );
   });
 
   group('signOut', () {
@@ -360,21 +366,26 @@ void main() {
       expect(failure.message, 'Authentication failed. Please try again.');
     });
 
-    test('maps NetworkException to NetworkFailure with user-friendly message', () async {
-      when(() => mockDataSource.signOut())
-          .thenThrow(const NetworkException('Network lost'));
+    test(
+      'maps NetworkException to NetworkFailure with user-friendly message',
+      () async {
+        when(
+          () => mockDataSource.signOut(),
+        ).thenThrow(const NetworkException('Network lost'));
 
-      final result = await repository.signOut();
+        final result = await repository.signOut();
 
-      expect(result, isA<Failure<void, AppFailure>>());
-      final failure = (result as Failure).failure;
-      expect(failure, isA<NetworkFailure>());
-      expect(failure.message, 'Network error. Please check your connection.');
-    });
+        expect(result, isA<Failure<void, AppFailure>>());
+        final failure = (result as Failure).failure;
+        expect(failure, isA<NetworkFailure>());
+        expect(failure.message, 'Network error. Please check your connection.');
+      },
+    );
 
     test('maps ServerException to ServerFailure with safe message', () async {
-      when(() => mockDataSource.signOut())
-          .thenThrow(const ServerException(message: 'Sign out server error'));
+      when(
+        () => mockDataSource.signOut(),
+      ).thenThrow(const ServerException(message: 'Sign out server error'));
 
       final result = await repository.signOut();
 
@@ -421,8 +432,9 @@ void main() {
 
   group('authStateChanges', () {
     test('maps UserDto stream to UserEntity stream', () async {
-      when(() => mockDataSource.authStateChanges())
-          .thenAnswer((_) => Stream.fromIterable([null, testDto, null]));
+      when(
+        () => mockDataSource.authStateChanges(),
+      ).thenAnswer((_) => Stream.fromIterable([null, testDto, null]));
 
       final stream = repository.authStateChanges();
 

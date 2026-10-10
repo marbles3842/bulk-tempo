@@ -73,8 +73,9 @@ class HomeShellScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 Text(
                   'Welcome to Bulk Tempo',
-                  style: Theme.of(context).textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
