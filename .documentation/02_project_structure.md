@@ -77,7 +77,7 @@ When creating a new feature (e.g. `auth`), follow this sequence to maintain prop
    - [ ] Implement the `Notifier` or `AsyncNotifier` in `lib/features/<feature>/presentation/view_models/<feature>_view_model.dart`.
    - [ ] Build the screen widget in `lib/features/<feature>/presentation/views/<feature>_screen.dart`.
 4. **Routing**:
-   - [ ] Register the route path and screen in `lib/core/router/app_router.dart`.
+   - [ ] Register the route path and screen in `lib/app/router/app_router.dart`.
 5. **Testing**:
    - [ ] Add repository unit test in `test/features/<feature>/data/repositories/<feature>_repository_impl_test.dart`.
    - [ ] Add ViewModel unit test in `test/features/<feature>/presentation/view_models/<feature>_view_model_test.dart`.
