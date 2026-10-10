@@ -180,7 +180,7 @@ void main() {
       expect(failure.message, 'Authentication failed. Please try again.');
     });
 
-    test('maps NetworkException to NetworkFailure', () async {
+    test('maps NetworkException to NetworkFailure with user-friendly message', () async {
       when(
         () => mockDataSource.signInWithEmailAndPassword(
           email: 'user@test.com',
@@ -196,7 +196,7 @@ void main() {
       expect(result, isA<Failure<UserEntity, AppFailure>>());
       final failure = (result as Failure).failure;
       expect(failure, isA<NetworkFailure>());
-      expect(failure.message, 'No connection');
+      expect(failure.message, 'Network error. Please check your connection.');
     });
 
     test('maps ServerException to ServerFailure with safe message', () async {
@@ -316,7 +316,7 @@ void main() {
       expect(failure.message, 'Too many attempts. Please try again later');
     });
 
-    test('maps NetworkException on signup to NetworkFailure', () async {
+    test('maps NetworkException on signup to NetworkFailure with user-friendly message', () async {
       when(
         () => mockDataSource.signUpWithEmailAndPassword(
           email: 'user@test.com',
@@ -330,7 +330,9 @@ void main() {
       );
 
       expect(result, isA<Failure<UserEntity, AppFailure>>());
-      expect((result as Failure).failure, isA<NetworkFailure>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<NetworkFailure>());
+      expect(failure.message, 'Network error. Please check your connection.');
     });
   });
 
@@ -358,14 +360,16 @@ void main() {
       expect(failure.message, 'Authentication failed. Please try again.');
     });
 
-    test('maps NetworkException to NetworkFailure', () async {
+    test('maps NetworkException to NetworkFailure with user-friendly message', () async {
       when(() => mockDataSource.signOut())
           .thenThrow(const NetworkException('Network lost'));
 
       final result = await repository.signOut();
 
       expect(result, isA<Failure<void, AppFailure>>());
-      expect((result as Failure).failure, isA<NetworkFailure>());
+      final failure = (result as Failure).failure;
+      expect(failure, isA<NetworkFailure>());
+      expect(failure.message, 'Network error. Please check your connection.');
     });
 
     test('maps ServerException to ServerFailure with safe message', () async {

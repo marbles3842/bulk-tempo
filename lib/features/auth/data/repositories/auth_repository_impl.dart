@@ -6,7 +6,7 @@ import 'package:bulk_tempo/features/auth/data/datasources/auth_remote_data_sourc
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/domain/repositories/auth_repository.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
+final authRepositoryImplProvider = Provider<AuthRepository>((ref) {
   final remoteDataSource = ref.watch(authRemoteDataSourceProvider);
   return AuthRepositoryImpl(remoteDataSource);
 });
@@ -39,13 +39,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Result.success(userDto.toEntity());
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException catch (_) {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(
@@ -74,13 +70,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Result.success(userDto.toEntity());
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException catch (_) {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(
@@ -103,13 +95,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Result.success(null);
     } on AuthException catch (e) {
       return Result.failure(_mapAuthException(e));
-    } on NetworkException catch (e) {
-      return Result.failure(
-        NetworkFailure(
-          e.message.isNotEmpty
-              ? e.message
-              : 'Network error. Please check your connection.',
-        ),
+    } on NetworkException catch (_) {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
       );
     } on ServerException catch (e) {
       return Result.failure(

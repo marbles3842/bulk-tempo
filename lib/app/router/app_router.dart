@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/app/router/router_refresh_notifier.dart';
 import 'package:bulk_tempo/core/router/route_names.dart';
 import 'package:bulk_tempo/core/router/route_paths.dart';
-import 'package:bulk_tempo/core/router/router_refresh_notifier.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/login_screen.dart';

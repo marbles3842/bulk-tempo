@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/core/router/route_paths.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_form_state.dart';
@@ -45,9 +46,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       widget.onNavigateToRegister!();
       return;
     }
-    try {
-      context.push('/register');
-    } catch (_) {}
+    context.push(RoutePaths.register);
   }
 
   @override

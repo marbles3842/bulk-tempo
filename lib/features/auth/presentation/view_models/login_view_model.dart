@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_form_state.dart';
 
