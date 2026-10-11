@@ -4,6 +4,9 @@ import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dar
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
+import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_view_model.dart';
+import 'package:bulk_tempo/features/workout/presentation/views/workout_progress_view.dart';
+import 'package:bulk_tempo/features/workout/presentation/widgets/hevy_key_bottom_sheet.dart';
 
 class HomeShellScreen extends ConsumerStatefulWidget {
   const HomeShellScreen({super.key});
@@ -71,6 +74,13 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                 onPressed: () => setState(() => _selectedIndex = 1),
               ),
               const SizedBox(height: 16),
+              FilledButton.tonalIcon(
+                key: const Key('home_go_to_workouts_button'),
+                icon: const Icon(Icons.fitness_center),
+                label: const Text('Go to Workouts'),
+                onPressed: () => setState(() => _selectedIndex = 2),
+              ),
+              const SizedBox(height: 16),
               OutlinedButton.icon(
                 key: const Key('home_logout_button'),
                 icon: const Icon(Icons.logout),
@@ -85,6 +95,9 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
   }
 
   Widget _buildProfileTab(BuildContext context, String? email) {
+    final workoutState = ref.watch(workoutProgressViewModelProvider);
+    final maskedApiKey = workoutState.maskedApiKey;
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -107,6 +120,98 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             ),
             const SizedBox(height: 24),
             const GainTargetView(),
+            const SizedBox(height: 24),
+            Card(
+              key: const Key('profile_hevy_card'),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.fitness_center,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Hevy Integration',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Connection status:',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (maskedApiKey != null)
+                      Text(
+                        maskedApiKey,
+                        key: const Key('profile_hevy_masked_key'),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    else
+                      Text(
+                        'Not connected',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton.tonal(
+                            key: const Key(
+                              'profile_connect_or_update_hevy_key_button',
+                            ),
+                            onPressed: () => HevyKeyBottomSheet.show(context),
+                            child: Text(
+                              maskedApiKey != null
+                                  ? 'Update Key'
+                                  : 'Connect Hevy Key',
+                            ),
+                          ),
+                        ),
+                        if (maskedApiKey != null) ...[
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            key: const Key(
+                              'profile_disconnect_hevy_key_button',
+                            ),
+                            onPressed: () {
+                              ref
+                                  .read(
+                                    workoutProgressViewModelProvider.notifier,
+                                  )
+                                  .disconnectApiKey();
+                            },
+                            child: const Text('Disconnect'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 32),
             OutlinedButton.icon(
               key: const Key('profile_logout_button'),
@@ -145,6 +250,8 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
       case 1:
         body = const WeightHistoryView();
       case 2:
+        body = const WorkoutProgressView();
+      case 3:
         body = _buildProfileTab(context, user?.email);
       default:
         body = _buildHomeTab(context, user?.email);
@@ -169,6 +276,11 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
           setState(() {
             _selectedIndex = index;
           });
+          if (index == 3) {
+            ref
+                .read(workoutProgressViewModelProvider.notifier)
+                .ensureInitialized();
+          }
         },
         destinations: const [
           NavigationDestination(
@@ -182,6 +294,12 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             icon: Icon(Icons.monitor_weight_outlined),
             selectedIcon: Icon(Icons.monitor_weight),
             label: 'Weights',
+          ),
+          NavigationDestination(
+            key: Key('nav_workouts_tab'),
+            icon: Icon(Icons.fitness_center_outlined),
+            selectedIcon: Icon(Icons.fitness_center),
+            label: 'Workouts',
           ),
           NavigationDestination(
             key: Key('nav_profile_tab'),
