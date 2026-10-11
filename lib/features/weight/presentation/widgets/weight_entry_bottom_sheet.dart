@@ -53,6 +53,7 @@ class _WeightEntryBottomSheetState
 
     final picked = await showDatePicker(
       context: context,
+      locale: const Locale('en', 'GB'),
       initialDate: currentDate.isAfter(now)
           ? now
           : (currentDate.isBefore(firstAllowedDate)

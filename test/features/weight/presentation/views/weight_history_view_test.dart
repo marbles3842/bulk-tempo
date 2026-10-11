@@ -240,6 +240,31 @@ void main() {
       expect(find.text('Please enter a weight'), findsOneWidget);
     });
 
+    testWidgets(
+      'tapping date picker button displays calendar with Monday as first day of week',
+      (tester) async {
+        await tester.pumpApp(
+          const WeightEntryBottomSheet(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('weight_date_picker_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(DatePickerDialog), findsOneWidget);
+
+        final BuildContext dialogContext = tester.element(
+          find.byType(DatePickerDialog),
+        );
+        final localizations = MaterialLocalizations.of(dialogContext);
+        expect(localizations.firstDayOfWeekIndex, equals(1)); // 1 == Monday
+      },
+    );
+
     testWidgets('shows error banner when repository fails during save', (
       tester,
     ) async {
