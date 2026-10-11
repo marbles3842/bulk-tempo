@@ -4,7 +4,6 @@ import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dar
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
-import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_state.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_view_model.dart';
 import 'package:bulk_tempo/features/workout/presentation/views/workout_progress_view.dart';
 import 'package:bulk_tempo/features/workout/presentation/widgets/hevy_key_bottom_sheet.dart';
@@ -97,13 +96,6 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
 
   Widget _buildProfileTab(BuildContext context, String? email) {
     final workoutState = ref.watch(workoutProgressViewModelProvider);
-    if (workoutState is WorkoutProgressInitial) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        ref.read(workoutProgressViewModelProvider.notifier).ensureInitialized();
-      });
-    }
-
     final maskedApiKey = workoutState.maskedApiKey;
 
     return SafeArea(
@@ -284,6 +276,11 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
           setState(() {
             _selectedIndex = index;
           });
+          if (index == 3) {
+            ref
+                .read(workoutProgressViewModelProvider.notifier)
+                .ensureInitialized();
+          }
         },
         destinations: const [
           NavigationDestination(

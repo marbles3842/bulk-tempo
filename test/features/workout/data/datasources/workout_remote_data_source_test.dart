@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -91,6 +92,24 @@ void main() {
       expect(
         () => dataSource.fetchWorkoutCount(apiKey: validKey),
         throwsA(isA<NetworkException>()),
+      );
+    });
+
+    test('throws NetworkException on timeout', () async {
+      when(() => mockHttpClient.get(any(), headers: any(named: 'headers')))
+          .thenAnswer(
+            (_) => Future<http.Response>.error(TimeoutException('timeout')),
+          );
+
+      expect(
+        () => dataSource.fetchWorkoutCount(apiKey: validKey),
+        throwsA(
+          isA<NetworkException>().having(
+            (e) => e.message,
+            'message',
+            contains('timed out'),
+          ),
+        ),
       );
     });
   });

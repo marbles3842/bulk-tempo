@@ -95,14 +95,14 @@ void main() {
   });
 
   group('HevyKeyValidators.maskApiKey', () {
-    test('masks valid UUID preserving trailing 12 characters', () {
+    test('masks valid UUID preserving trailing 4 characters', () {
       expect(
         HevyKeyValidators.maskApiKey(validLowerUuid),
-        equals('••••••••-••••-••••-••••-0e1f2a3b4c5d'),
+        equals('••••••••-••••-••••-••••-••••••••4c5d'),
       );
       expect(
         HevyKeyValidators.maskApiKey('  $validUpperUuid  '),
-        equals('••••••••-••••-••••-••••-0E1F2A3B4C5D'),
+        equals('••••••••-••••-••••-••••-••••••••4C5D'),
       );
     });
 

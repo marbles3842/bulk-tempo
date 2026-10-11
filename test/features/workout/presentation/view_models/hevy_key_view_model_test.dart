@@ -124,7 +124,7 @@ void main() {
       expect(loaded.workouts, hasLength(1));
       expect(
         loaded.maskedApiKey,
-        equals('••••••••-••••-••••-••••-ef1234567890'),
+        equals('••••••••-••••-••••-••••-••••••••7890'),
       );
     });
 

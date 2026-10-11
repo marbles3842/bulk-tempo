@@ -127,5 +127,18 @@ void main() {
         throwsFormatException,
       );
     });
+
+    test('normalizes set type string casing and trimming', () {
+      final setDto = WorkoutSetDto.fromJson(<String, dynamic>{
+        'index': 0,
+        'type': '  Warmup  ',
+        'weight_kg': 50.0,
+        'reps': 10,
+      });
+
+      expect(setDto.type, 'warmup');
+      final entity = setDto.toEntity();
+      expect(entity.isWorkingSet, isFalse);
+    });
   });
 }

@@ -31,12 +31,12 @@ abstract final class HevyKeyValidators {
   }
 
   /// Masks [apiKey] for safe display in the UI, preserving only the trailing
-  /// 12 characters of a valid 36-character UUID.
+  /// 4 characters of a valid 36-character UUID.
   static String maskApiKey(String apiKey) {
     final trimmed = normalizeKey(apiKey);
     if (!isValidUuid(trimmed)) {
       return '••••••••';
     }
-    return '••••••••-••••-••••-••••-${trimmed.substring(trimmed.length - 12)}';
+    return '••••••••-••••-••••-••••-••••••••${trimmed.substring(trimmed.length - 4)}';
   }
 }

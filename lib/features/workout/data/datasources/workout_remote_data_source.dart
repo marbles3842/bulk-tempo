@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,13 +41,17 @@ class WorkoutRemoteDataSourceImpl implements WorkoutRemoteDataSource {
     };
   }
 
+  static const Duration requestTimeout = Duration(seconds: 15);
+
   @override
   Future<int> fetchWorkoutCount({required String apiKey}) async {
     final uri = Uri.parse(
       '${HevyApiConstants.baseUrl}${HevyApiConstants.workoutsCountPath}',
     );
     try {
-      final response = await _client.get(uri, headers: _buildHeaders(apiKey));
+      final response = await _client
+          .get(uri, headers: _buildHeaders(apiKey))
+          .timeout(requestTimeout);
       if (response.statusCode == 401 || response.statusCode == 403) {
         throw const AuthException(
           'invalid-api-key',
@@ -76,6 +81,10 @@ class WorkoutRemoteDataSourceImpl implements WorkoutRemoteDataSource {
       return rawCount.toInt();
     } on AppException {
       rethrow;
+    } on TimeoutException {
+      throw const NetworkException(
+        'Request timed out. Please check your connection.',
+      );
     } on FormatException catch (e) {
       throw ServerException(message: 'Invalid JSON response: ${e.message}');
     } on http.ClientException catch (e) {
@@ -98,7 +107,9 @@ class WorkoutRemoteDataSourceImpl implements WorkoutRemoteDataSource {
       '${HevyApiConstants.baseUrl}${HevyApiConstants.workoutsPath}?page=$page&pageSize=$pageSize',
     );
     try {
-      final response = await _client.get(uri, headers: _buildHeaders(apiKey));
+      final response = await _client
+          .get(uri, headers: _buildHeaders(apiKey))
+          .timeout(requestTimeout);
       if (response.statusCode == 401 || response.statusCode == 403) {
         throw const AuthException(
           'invalid-api-key',
@@ -122,6 +133,10 @@ class WorkoutRemoteDataSourceImpl implements WorkoutRemoteDataSource {
       return PaginatedWorkoutsResponseDto.fromJson(decoded);
     } on AppException {
       rethrow;
+    } on TimeoutException {
+      throw const NetworkException(
+        'Request timed out. Please check your connection.',
+      );
     } on FormatException catch (e) {
       throw ServerException(message: 'Invalid JSON response: ${e.message}');
     } on http.ClientException catch (e) {

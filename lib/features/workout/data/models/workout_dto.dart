@@ -27,7 +27,9 @@ class WorkoutSetDto {
     final rawIndex = json['index'];
     final index = rawIndex is num ? rawIndex.toInt() : 0;
     final rawType = json['type'] ?? json['set_type'];
-    final type = rawType is String && rawType.isNotEmpty ? rawType : 'normal';
+    final type = rawType is String && rawType.trim().isNotEmpty
+        ? rawType.toLowerCase().trim()
+        : 'normal';
 
     return WorkoutSetDto(
       index: index,
