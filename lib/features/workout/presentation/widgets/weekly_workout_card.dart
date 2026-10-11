@@ -6,7 +6,7 @@ import 'package:bulk_tempo/features/workout/presentation/widgets/workout_detail_
 
 /// Expandable card displaying an ISO Monday–Sunday weekly workout summary and
 /// its individual logged workouts.
-class WeeklyWorkoutCard extends StatelessWidget {
+class WeeklyWorkoutCard extends StatefulWidget {
   final WeeklyWorkoutSummaryEntity summary;
   final bool initiallyExpanded;
   final ValueChanged<WorkoutEntity>? onWorkoutTap;
@@ -19,10 +19,31 @@ class WeeklyWorkoutCard extends StatelessWidget {
   });
 
   @override
+  State<WeeklyWorkoutCard> createState() => _WeeklyWorkoutCardState();
+}
+
+class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initiallyExpanded;
+  }
+
+  @override
+  void didUpdateWidget(WeeklyWorkoutCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
+      _isExpanded = widget.initiallyExpanded;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final countLabel =
-        '${summary.workoutCount} ${summary.workoutCount == 1 ? "workout" : "workouts"}';
+        '${widget.summary.workoutCount} ${widget.summary.workoutCount == 1 ? "workout" : "workouts"}';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -30,49 +51,77 @@ class WeeklyWorkoutCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
-        key: Key('workout_week_card_${summary.weekStartIso}'),
-        initiallyExpanded: initiallyExpanded,
+        key: Key('workout_week_card_${widget.summary.weekStartIso}'),
+        initiallyExpanded: widget.initiallyExpanded,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _isExpanded = expanded;
+          });
+        },
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Row(
           children: [
             Expanded(
               child: Text(
                 WeekDateUtils.formatWeekRange(
-                  summary.weekStartMonday,
-                  summary.weekEndSunday,
+                  widget.summary.weekStartMonday,
+                  widget.summary.weekEndSunday,
                 ),
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                countLabel,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSecondaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    ),
+                    child: child,
+                  ),
+                );
+              },
+              child: _isExpanded
+                  ? const SizedBox.shrink(key: ValueKey('workout_count_empty'))
+                  : Container(
+                      key: Key(
+                        'workout_count_chip_${widget.summary.weekStartIso}',
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        countLabel,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text(
-            '${summary.totalWorkingSets} working sets • ${summary.totalVolumeKg.toStringAsFixed(2)} kg volume',
+            '${widget.summary.totalWorkingSets} working sets • ${widget.summary.totalVolumeKg.toStringAsFixed(2)} kg volume',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        children: summary.workouts.map((workout) {
+        children: widget.summary.workouts.map((workout) {
           final exerciseCount = workout.exercises.length;
           final exerciseLabel =
               '$exerciseCount ${exerciseCount == 1 ? "exercise" : "exercises"}';
@@ -83,8 +132,8 @@ class WeeklyWorkoutCard extends StatelessWidget {
           return ListTile(
             key: Key('workout_item_${workout.id}'),
             onTap: () {
-              if (onWorkoutTap != null) {
-                onWorkoutTap!(workout);
+              if (widget.onWorkoutTap != null) {
+                widget.onWorkoutTap!(workout);
               } else {
                 WorkoutDetailBottomSheet.show(context, workout);
               }

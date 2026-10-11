@@ -41,7 +41,7 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
     return '—';
   }
 
-  static String formatSetTypeLabel(WorkoutSetEntity set) {
+  static String? formatSetTypeLabel(WorkoutSetEntity set) {
     switch (set.type) {
       case 'warmup':
         return 'Warmup';
@@ -51,7 +51,7 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
         return 'Dropset';
       case 'normal':
       default:
-        return 'Working';
+        return null;
     }
   }
 
@@ -162,6 +162,7 @@ class _ExerciseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final bestSet = exercise.bestWorkingSet;
 
     return Card(
@@ -189,20 +190,43 @@ class _ExerciseCard extends StatelessWidget {
                 if (bestSet != null) ...[
                   const SizedBox(width: 8),
                   Container(
+                    key: Key('workout_best_set_${exercise.index}'),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isDark
+                          ? const Color(0xFF78350F).withValues(alpha: 0.4)
+                          : const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Best: ${WorkoutDetailBottomSheet.formatSetPerformance(bestSet)}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.w600,
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFFD97706).withValues(alpha: 0.5)
+                            : const Color(0xFFFDE68A),
+                        width: 1,
                       ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _CrownIcon(
+                          size: 13,
+                          color: isDark
+                              ? const Color(0xFFFCD34D)
+                              : const Color(0xFF92400E),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Best: ${WorkoutDetailBottomSheet.formatSetPerformance(bestSet)}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: isDark
+                                ? const Color(0xFFFCD34D)
+                                : const Color(0xFF92400E),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -222,6 +246,9 @@ class _ExerciseCard extends StatelessWidget {
             const SizedBox(height: 10),
             ...exercise.sets.map((set) {
               final isWarmup = !set.isWorkingSet;
+              final typeLabel = WorkoutDetailBottomSheet.formatSetTypeLabel(
+                set,
+              );
               final badgeColor = isWarmup
                   ? theme.colorScheme.surfaceContainerHighest
                   : theme.colorScheme.secondaryContainer;
@@ -244,23 +271,24 @@ class _ExerciseCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: badgeColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        WorkoutDetailBottomSheet.formatSetTypeLabel(set),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: badgeTextColor,
-                          fontWeight: FontWeight.w600,
+                    if (typeLabel != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: badgeColor,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          typeLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: badgeTextColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
                     const Spacer(),
                     Text(
                       WorkoutDetailBottomSheet.formatSetPerformance(set),
@@ -280,6 +308,80 @@ class _ExerciseCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CrownPainter extends CustomPainter {
+  final Color color;
+
+  const _CrownPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    // Base band
+    final baseRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.05,
+        size.height * 0.82,
+        size.width * 0.9,
+        size.height * 0.18,
+      ),
+      const Radius.circular(1),
+    );
+    canvas.drawRRect(baseRect, paint);
+
+    // Crown peaks
+    final path = Path()
+      ..moveTo(size.width * 0.08, size.height * 0.80)
+      ..lineTo(size.width * 0.04, size.height * 0.28)
+      ..lineTo(size.width * 0.32, size.height * 0.55)
+      ..lineTo(size.width * 0.50, size.height * 0.10)
+      ..lineTo(size.width * 0.68, size.height * 0.55)
+      ..lineTo(size.width * 0.96, size.height * 0.28)
+      ..lineTo(size.width * 0.92, size.height * 0.80)
+      ..close();
+    canvas.drawPath(path, paint);
+
+    // Peak dots
+    final dotRadius = size.width * 0.08;
+    canvas.drawCircle(
+      Offset(size.width * 0.04, size.height * 0.22),
+      dotRadius,
+      paint,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.50, size.height * 0.08),
+      dotRadius * 1.1,
+      paint,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.96, size.height * 0.22),
+      dotRadius,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CrownPainter oldDelegate) =>
+      color != oldDelegate.color;
+}
+
+class _CrownIcon extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _CrownIcon({this.size = 13, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size * 0.8),
+      painter: _CrownPainter(color: color),
     );
   }
 }

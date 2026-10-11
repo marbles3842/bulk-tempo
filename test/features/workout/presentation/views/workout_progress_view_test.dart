@@ -316,6 +316,18 @@ void main() {
           findsNWidgets(2),
         );
 
+        // First week card is initially expanded so workout count chip is hidden
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsNothing,
+        );
+        // Second week card is collapsed so workout count chip is visible
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-09-28')),
+          findsOneWidget,
+        );
+        expect(find.text('1 workout'), findsOneWidget);
+
         // First week card is initially expanded so workout_item_w1 is visible
         expect(find.byKey(const Key('workout_item_w1')), findsOneWidget);
 
@@ -328,6 +340,7 @@ void main() {
         expect(find.byKey(const Key('workout_exercise_1')), findsOneWidget);
         expect(find.text('Barbell Bench Press'), findsOneWidget);
         expect(find.text('Best: 100.00 kg × 8'), findsOneWidget);
+        expect(find.byKey(const Key('workout_best_set_0')), findsOneWidget);
 
         // Check sets and badges
         expect(find.byKey(const Key('workout_set_0_0')), findsOneWidget);
@@ -335,6 +348,7 @@ void main() {
         expect(find.byKey(const Key('workout_set_0_2')), findsOneWidget);
         expect(find.text('Warmup'), findsOneWidget);
         expect(find.text('Failure'), findsOneWidget);
+        expect(find.text('Working'), findsNothing);
         expect(find.text('60.00 kg × 10'), findsOneWidget);
         expect(find.text('95.00 kg × 8'), findsOneWidget);
         expect(find.text('100.00 kg × 8'), findsOneWidget);
