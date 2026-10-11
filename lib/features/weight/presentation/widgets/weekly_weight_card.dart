@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
+import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
 
 /// Card widget displaying an ISO week summary row with its average weight,
@@ -7,11 +8,13 @@ import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_e
 class WeeklyWeightCard extends StatelessWidget {
   final WeeklyWeightSummaryEntity summary;
   final bool initiallyExpanded;
+  final ValueChanged<WeightEntryEntity>? onEntryTap;
 
   const WeeklyWeightCard({
     super.key,
     required this.summary,
     required this.initiallyExpanded,
+    this.onEntryTap,
   });
 
   @override
@@ -70,6 +73,7 @@ class WeeklyWeightCard extends StatelessWidget {
           return ListTile(
             key: Key('daily_entry_${entry.dateIso}'),
             dense: true,
+            onTap: onEntryTap != null ? () => onEntryTap!(entry) : null,
             leading: Icon(
               Icons.calendar_today,
               size: 18,
@@ -79,11 +83,25 @@ class WeeklyWeightCard extends StatelessWidget {
               WeekDateUtils.formatDayWithWeekday(entry.date),
               style: theme.textTheme.bodyMedium,
             ),
-            trailing: Text(
-              '${entry.weightKg.toStringAsFixed(2)} kg',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${entry.weightKg.toStringAsFixed(2)} kg',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  key: Key('edit_entry_${entry.dateIso}'),
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  tooltip: 'Edit weight entry',
+                  onPressed: onEntryTap != null
+                      ? () => onEntryTap!(entry)
+                      : null,
+                ),
+              ],
             ),
           );
         }).toList(),

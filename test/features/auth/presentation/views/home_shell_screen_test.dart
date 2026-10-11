@@ -362,5 +362,97 @@ void main() {
         expect(fakeRepository.currentUser, isNull);
       },
     );
+
+    testWidgets(
+      'Weights tab allows opening daily entry, editing weight, and saving update',
+      (tester) async {
+        fakeWeightRepository.seedEntries(testUser.id, [
+          createEntry('2026-10-06', 78.5),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Weights tab
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+
+        // Scroll up so daily entry is clear of the bottom navigation bar
+        await tester.drag(find.byType(ListView), const Offset(0, -200));
+        await tester.pumpAndSettle();
+
+        // Tap daily row to open edit sheet
+        await tester.tap(find.byKey(const Key('daily_entry_2026-10-06')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeightEntryBottomSheet), findsOneWidget);
+        expect(find.text('Edit Weight Entry'), findsOneWidget);
+
+        // Change weight and save
+        await tester.enterText(
+          find.byKey(const Key('weight_input_field')),
+          '80.00',
+        );
+        await tester.tap(find.byKey(const Key('save_weight_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeightEntryBottomSheet), findsNothing);
+
+        final entries = fakeWeightRepository.getEntriesForUser(testUser.id);
+        expect(entries.first.weightKg, equals(80.00));
+        expect(find.text('80.00 kg avg'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'logging out while dirty edit sheet is open dismisses sheet immediately without discard prompt',
+      (tester) async {
+        fakeWeightRepository.seedEntries(testUser.id, [
+          createEntry('2026-10-06', 78.5),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Weights tab
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+
+        // Scroll up so daily entry is clear of the bottom navigation bar
+        await tester.drag(find.byType(ListView), const Offset(0, -200));
+        await tester.pumpAndSettle();
+
+        // Open edit sheet
+        await tester.tap(find.byKey(const Key('daily_entry_2026-10-06')));
+        await tester.pumpAndSettle();
+
+        // Make sheet dirty
+        await tester.enterText(
+          find.byKey(const Key('weight_input_field')),
+          '85.00',
+        );
+
+        // Sign out user asynchronously via repository
+        await fakeRepository.signOut();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        // Sheet is dismissed without showing discard dialog
+        expect(find.byType(WeightEntryBottomSheet), findsNothing);
+        expect(find.byKey(const Key('discard_changes_dialog')), findsNothing);
+      },
+    );
   });
 }

@@ -89,4 +89,39 @@ class WeightRepositoryImpl implements WeightRepository {
       );
     }
   }
+
+  @override
+  Future<Result<void, AppFailure>> deleteWeightEntry({
+    required String userId,
+    required String dateIso,
+  }) async {
+    if (userId.trim().isEmpty) {
+      return const Result.failure(ValidationFailure('User ID cannot be empty'));
+    }
+
+    if (dateIso != dateIso.trim() ||
+        WeekDateUtils.tryParseIsoDate(dateIso) == null) {
+      return const Result.failure(ValidationFailure('Invalid date format'));
+    }
+
+    try {
+      await _remoteDataSource.deleteWeightEntry(
+        userId: userId,
+        dateIso: dateIso,
+      );
+      return const Result.success(null);
+    } on AuthException catch (e) {
+      return Result.failure(AuthFailure(e.message));
+    } on NetworkException {
+      return const Result.failure(
+        NetworkFailure('Network error. Please check your connection.'),
+      );
+    } on ServerException catch (e) {
+      return Result.failure(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (_) {
+      return const Result.failure(
+        UnknownFailure('An unexpected error occurred. Please try again.'),
+      );
+    }
+  }
 }

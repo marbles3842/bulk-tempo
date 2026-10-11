@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -225,5 +227,104 @@ void main() {
         throwsA(isA<ServerException>()),
       );
     });
+  });
+
+  group('WeightRemoteDataSource.deleteWeightEntry', () {
+    test(
+      'removes only the requested date and awaits acknowledgement',
+      () async {
+        final completion = Completer<void>();
+        when(() => mockRef.remove()).thenAnswer((_) => completion.future);
+        var completed = false;
+        final deletion = dataSource
+            .deleteWeightEntry(userId: 'user_123', dateIso: '2000-02-29')
+            .then((_) => completed = true);
+
+        await Future<void>.delayed(Duration.zero);
+        expect(completed, isFalse);
+        verify(
+          () => mockDatabase.ref('users/user_123/weight_entries/2000-02-29'),
+        ).called(1);
+        verify(() => mockRef.remove()).called(1);
+        verifyNoMoreInteractions(mockDatabase);
+        verifyNoMoreInteractions(mockRef);
+        completion.complete();
+        await deletion;
+        expect(completed, isTrue);
+      },
+    );
+
+    test('removes without a preflight read even when already absent', () async {
+      when(() => mockRef.remove()).thenAnswer((_) async {});
+      for (var attempt = 0; attempt < 2; attempt++) {
+        await dataSource.deleteWeightEntry(
+          userId: 'user_123',
+          dateIso: '2026-10-10',
+        );
+      }
+      verify(() => mockDatabase.ref('users/user_123/weight_entries/2026-10-10'))
+          .called(2);
+      verify(() => mockRef.remove()).called(2);
+      verifyNoMoreInteractions(mockRef);
+      verifyNoMoreInteractions(mockDatabase);
+    });
+
+    final firebaseFailures = <String, Matcher>{
+      'permission-denied': isA<AuthException>(),
+      'network-error': isA<NetworkException>(),
+      'network-request-failed': isA<NetworkException>(),
+      'unavailable': isA<NetworkException>(),
+      'disconnected': isA<NetworkException>(),
+      'unknown': isA<ServerException>(),
+    };
+    for (final entry in firebaseFailures.entries) {
+      test('maps Firebase ${entry.key} after failed removal', () async {
+        when(() => mockRef.remove()).thenAnswer(
+          (_) async => throw FirebaseException(
+            plugin: 'database',
+            code: entry.key,
+            message: 'Removal failed',
+          ),
+        );
+        await expectLater(
+          dataSource.deleteWeightEntry(
+            userId: 'user_123',
+            dateIso: '2026-10-10',
+          ),
+          throwsA(entry.value),
+        );
+      });
+    }
+
+    test('preserves an existing application exception', () async {
+      const error = ServerException(message: 'Unavailable', statusCode: 503);
+      when(() => mockRef.remove()).thenThrow(error);
+      await expectLater(
+        dataSource.deleteWeightEntry(userId: 'user_123', dateIso: '2026-10-10'),
+        throwsA(same(error)),
+      );
+    });
+
+    for (final networkError in [false, true]) {
+      test(
+        'maps ${networkError ? "socket" : "unexpected"} errors like save',
+        () async {
+          when(() => mockRef.remove()).thenThrow(
+            Exception(
+              networkError ? 'SocketException: disconnected' : 'Unexpected',
+            ),
+          );
+          await expectLater(
+            dataSource.deleteWeightEntry(
+              userId: 'user_123',
+              dateIso: '2026-10-10',
+            ),
+            throwsA(
+              networkError ? isA<NetworkException>() : isA<ServerException>(),
+            ),
+          );
+        },
+      );
+    }
   });
 }

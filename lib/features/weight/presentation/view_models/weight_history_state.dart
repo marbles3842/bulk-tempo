@@ -43,6 +43,9 @@ final class WeightHistoryLoaded extends WeightHistoryState {
     return entries.any((entry) => entry.dateIso == dateIso);
   }
 
+  /// Whether the loaded entry list is empty.
+  bool get isEmpty => entries.isEmpty;
+
   WeightHistoryLoaded copyWith({
     List<WeightEntryEntity>? entries,
     List<WeeklyWeightSummaryEntity>? weeklySummaries,

@@ -209,5 +209,39 @@ void main() {
         expect(find.byType(LoginScreen), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'signing out while on protected route pops back to /login cleanly',
+      (tester) async {
+        const user = UserEntity(id: 'u1', email: 'test@example.com');
+        final authenticatedRepo = FakeAuthRepository(initialUser: user);
+        late GoRouter router;
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              authRepositoryProvider.overrideWithValue(authenticatedRepo),
+            ],
+            child: Consumer(
+              builder: (context, ref, _) {
+                router = ref.watch(appRouterProvider);
+                return MaterialApp.router(routerConfig: router);
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(router.state.matchedLocation, equals(RoutePaths.home));
+
+        await authenticatedRepo.signOut();
+        await tester.pumpAndSettle();
+
+        expect(router.state.matchedLocation, equals(RoutePaths.login));
+        expect(find.byType(LoginScreen), findsOneWidget);
+
+        authenticatedRepo.dispose();
+      },
+    );
   });
 }

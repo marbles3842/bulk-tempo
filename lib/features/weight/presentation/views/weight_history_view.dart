@@ -38,11 +38,23 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
             ? previous.refreshErrorMessage
             : null;
         if (next.refreshErrorMessage != prevError) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.hideCurrentSnackBar();
+          messenger.showSnackBar(
             SnackBar(
               key: const Key('weight_history_refresh_error_snackbar'),
               content: Text(next.refreshErrorMessage!),
               backgroundColor: Theme.of(context).colorScheme.error,
+              action: SnackBarAction(
+                key: const Key('weight_history_refresh_retry_action'),
+                label: 'Retry',
+                textColor: Colors.white,
+                onPressed: () {
+                  ref
+                      .read(weightHistoryViewModelProvider.notifier)
+                      .loadEntries(showLoading: false);
+                },
+              ),
             ),
           );
           ref.read(weightHistoryViewModelProvider.notifier).clearRefreshError();
@@ -165,8 +177,14 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                 final summaryIndex = index - 1;
                 final summary = weeklySummaries[summaryIndex];
                 return WeeklyWeightCard(
+                  key: PageStorageKey<String>(
+                    'week_card_outer_${summary.weekStartIso}',
+                  ),
                   summary: summary,
                   initiallyExpanded: summaryIndex == 0,
+                  onEntryTap: (entry) {
+                    WeightEntryBottomSheet.show(context, existingEntry: entry);
+                  },
                 );
               },
             ),

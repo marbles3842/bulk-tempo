@@ -45,7 +45,7 @@ Osoba budująca beztłuszczową masę dziś przenosi pomiary do arkusza i osobno
 | F-02 | workout-source-proof | (foundation) potwierdzono dostęp do przykładowych danych treningowych | — | FR-006 | blocked |
 | S-01 | private-account-access | użytkownik może założyć konto, zalogować się i wylogować | — | FR-001 | done |
 | S-02 | dated-weight-history | użytkownik może dodać dzisiejszy lub historyczny pomiar i odczytać go na innym urządzeniu | F-01, S-01 | FR-002, FR-005, FR-012 | done |
-| S-03 | correct-weight-entry | użytkownik może poprawić lub usunąć własny błędny pomiar | S-02 | FR-003, FR-004 | in-progress |
+| S-03 | correct-weight-entry | użytkownik może poprawić lub usunąć własny błędny pomiar | S-02 | FR-003, FR-004 | done |
 | S-04 | set-gain-target | użytkownik może ustawić i odczytać własny docelowy zakres przyrostu | F-01, S-01 | FR-007, FR-012 | planning |
 | S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | proposed |
 | S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | proposed |
@@ -129,7 +129,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zmiana historycznego wpisu musi odświeżyć późniejsze podsumowania, inaczej poprawka nie naprawi decyzji użytkownika.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-04: Własny zakres docelowy
 
@@ -220,3 +220,4 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 
 - **S-01: Dostęp do prywatnego konta** (`private-account-access`) — Obsługa rejestracji, logowania i wylogowania użytkownika.
 - **S-02: Historia pomiarów dostępna na koncie** (`dated-weight-history`) — Zapisywanie i odczytywanie pomiarów z datą, walidacja i integracja z Firebase RTDB (PR #20).
+- **S-03: Użytkownik może edytować lub usunąć błędny pomiar i zobaczyć poprawioną historię.** — Archived 2026-10-11 → `context/archive/2026-10-11-correct-weight-entry/`. Lesson: —.

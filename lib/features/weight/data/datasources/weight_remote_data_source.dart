@@ -14,6 +14,10 @@ final weightRemoteDataSourceProvider = Provider<WeightRemoteDataSource>((ref) {
 });
 
 abstract class WeightRemoteDataSource {
+  Future<void> deleteWeightEntry({
+    required String userId,
+    required String dateIso,
+  });
   Future<List<WeightEntryDto>> getWeightEntries({required String userId});
   Future<WeightEntryDto> saveWeightEntry({
     required String userId,
@@ -107,6 +111,36 @@ class WeightRemoteDataSourceImpl implements WeightRemoteDataSource {
           .ref('users/$userId/weight_entries/${dto.date}')
           .set(dto.toJson());
       return dto;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw AuthException(e.code, e.message ?? 'Permission denied');
+      }
+      if (e.code == 'network-error' ||
+          e.code == 'network-request-failed' ||
+          e.code == 'unavailable' ||
+          e.code == 'disconnected') {
+        throw NetworkException(e.message ?? 'Network error occurred');
+      }
+      throw ServerException(message: e.message ?? 'Database error occurred');
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      if (e.runtimeType.toString() == 'SocketException' ||
+          e.toString().toLowerCase().contains('socketexception') ||
+          e.toString().toLowerCase().contains('network')) {
+        throw NetworkException(e.toString());
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteWeightEntry({
+    required String userId,
+    required String dateIso,
+  }) async {
+    try {
+      await _database.ref('users/$userId/weight_entries/$dateIso').remove();
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
         throw AuthException(e.code, e.message ?? 'Permission denied');

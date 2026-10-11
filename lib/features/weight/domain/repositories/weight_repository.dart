@@ -14,4 +14,11 @@ abstract class WeightRepository {
     required String userId,
     required WeightEntryEntity entry,
   });
+
+  /// Deletes one daily entry for [userId], succeeding if it is already absent.
+  /// [dateIso] must be a valid canonical `YYYY-MM-DD` date, of any age.
+  Future<Result<void, AppFailure>> deleteWeightEntry({
+    required String userId,
+    required String dateIso,
+  });
 }
