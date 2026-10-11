@@ -387,9 +387,6 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -437,9 +434,6 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
           ],
         );
         await tester.pumpAndSettle();

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement roadmap slice S-04 (`set-gain-target`, FR-007 and FR-012). An authenticated user can set, replace, and read one private weekly gain range in the Profile tab, including after signing in on another device. The user approved ten planning decisions and the three phases below on 2026-10-11; implementation has not started.
+Implement roadmap slice S-04 (`set-gain-target`, FR-007 and FR-012). An authenticated user can set, replace, and read one private weekly gain range in the Profile tab, including after signing in on another device. The user approved ten planning decisions and the three phases below on 2026-10-11; all three phases are implemented and automated verification is complete, awaiting manual device verification.
 
 ## Current State Analysis
 
@@ -280,6 +280,6 @@ This is an additive RTDB node. Existing accounts begin unset; there is no backfi
 
 #### Manual
 
-- [x] 3.5 On Android, optional first setup and replacement work in Profile with comma/dot input, validation feedback, readable kg/week summary, usable keyboard layout, and unchanged navigation/logout.
-- [x] 3.6 On two devices using one test account, Profile open/refresh reads the confirmed replacement; a different account sees only its own target and weights remain intact.
-- [x] 3.7 Disconnect, submit, leave and reopen Profile, then reconnect: the save stays pending until acknowledgement and completes once; leaving unsubmitted edits instead restores the saved target on re-entry.
+- [ ] 3.5 On Android, optional first setup and replacement work in Profile with comma/dot input, validation feedback, readable kg/week summary, usable keyboard layout, and unchanged navigation/logout.
+- [ ] 3.6 On two devices using one test account, Profile open/refresh reads the confirmed replacement; a different account sees only its own target and weights remain intact.
+- [ ] 3.7 Disconnect, submit, leave and reopen Profile, then reconnect: the save stays pending until acknowledgement and completes once; leaving unsubmitted edits instead restores the saved target on re-entry.

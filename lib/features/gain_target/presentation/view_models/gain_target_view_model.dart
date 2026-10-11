@@ -6,22 +6,40 @@ import 'package:bulk_tempo/features/gain_target/domain/validation/gain_target_va
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_state.dart';
 
 final gainTargetViewModelProvider =
-    StateNotifierProvider<GainTargetViewModel, GainTargetState>((ref) {
-      final repository = ref.watch(gainTargetRepositoryProvider);
-      final userId = ref.watch(authViewModelProvider.select((s) => s.user?.id));
-      return GainTargetViewModel(repository: repository, userId: userId);
-    });
+    NotifierProvider<GainTargetViewModel, GainTargetState>(
+      GainTargetViewModel.new,
+    );
 
 /// Pure-Dart ViewModel coordinating weekly gain target reads, edits, validation,
 /// server saves, and account isolation without UI dependencies.
-class GainTargetViewModel extends StateNotifier<GainTargetState> {
-  final GainTargetRepository repository;
+class GainTargetViewModel extends Notifier<GainTargetState> {
+  late GainTargetRepository _repository;
   String? _userId;
   int _generation = 0;
+  bool _disposed = false;
 
-  GainTargetViewModel({required this.repository, String? userId})
-    : _userId = userId,
-      super(GainTargetState(userId: userId));
+  GainTargetRepository get repository => _repository;
+  bool get mounted => !_disposed;
+
+  @override
+  GainTargetState build() {
+    _disposed = false;
+    ref.onDispose(() {
+      _disposed = true;
+    });
+
+    _repository = ref.watch(gainTargetRepositoryProvider);
+    final newUserId = ref.watch(
+      authViewModelProvider.select((s) => s.user?.id),
+    );
+
+    if (_userId != newUserId) {
+      _userId = newUserId;
+      _generation++;
+    }
+
+    return GainTargetState(userId: _userId);
+  }
 
   /// Loads the weekly gain target for the current authenticated user.
   ///
@@ -193,6 +211,8 @@ class GainTargetViewModel extends StateNotifier<GainTargetState> {
 
     state = state.copyWith(
       isSubmitting: true,
+      isRefreshing: false,
+      isLoading: false,
       pendingTarget: validTarget,
       clearSaveErrorMessage: true,
       clearSuccessMessage: true,

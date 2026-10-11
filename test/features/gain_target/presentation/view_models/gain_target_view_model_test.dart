@@ -1,12 +1,18 @@
 import 'dart:async';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/core/result/result.dart';
+import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
+import 'package:bulk_tempo/features/gain_target/data/repositories/gain_target_repository_impl.dart';
 import 'package:bulk_tempo/features/gain_target/domain/models/gain_target_entity.dart';
+import 'package:bulk_tempo/features/gain_target/domain/repositories/gain_target_repository.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
 
+import '../../../../test_helpers/fakes/fake_auth_repository.dart';
 import '../../../../test_helpers/fakes/fake_gain_target_repository.dart';
 import '../../../../test_helpers/mocks.dart';
 
@@ -26,14 +32,34 @@ void main() {
     mockRepository = MockGainTargetRepository();
   });
 
+  ProviderContainer createContainer({
+    GainTargetRepository? repository,
+    String? userId = testUserId,
+  }) {
+    final fakeAuthRepo = FakeAuthRepository(
+      initialUser: userId != null
+          ? UserEntity(id: userId, email: '$userId@example.com')
+          : null,
+    );
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeAuthRepo),
+        gainTargetRepositoryProvider.overrideWithValue(
+          repository ?? fakeRepository,
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    addTearDown(fakeAuthRepo.dispose);
+    return container;
+  }
+
   group('GainTargetViewModel initial load', () {
     test(
       'initial load success with null (No target set, blank fields)',
       () async {
-        final viewModel = GainTargetViewModel(
-          repository: fakeRepository,
-          userId: testUserId,
-        );
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
         expect(viewModel.state.isLoading, isFalse);
         expect(viewModel.state.savedTarget, isNull);
@@ -60,10 +86,8 @@ void main() {
         );
         fakeRepository.seedTarget(testUserId, existing);
 
-        final viewModel = GainTargetViewModel(
-          repository: fakeRepository,
-          userId: testUserId,
-        );
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
         await viewModel.loadTarget();
 
@@ -80,10 +104,8 @@ void main() {
     test('initial load failure sets errorMessage and allows retry', () async {
       fakeRepository.getFailure = const NetworkFailure('Connection timed out');
 
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
       await viewModel.loadTarget();
 
@@ -117,10 +139,8 @@ void main() {
       );
       fakeRepository.seedTarget(testUserId, initial);
 
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
       await viewModel.loadTarget();
 
       // User starts editing
@@ -154,10 +174,8 @@ void main() {
         );
         fakeRepository.seedTarget(testUserId, initial);
 
-        final viewModel = GainTargetViewModel(
-          repository: fakeRepository,
-          userId: testUserId,
-        );
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
         await viewModel.loadTarget();
 
         viewModel.updateMinInput('0.22');
@@ -179,10 +197,8 @@ void main() {
 
   group('GainTargetViewModel input updates and validation', () {
     test('updateMinInput and updateMaxInput flag dirty and compute errors', () {
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
       viewModel.updateMinInput('0.30');
       expect(viewModel.state.minInput, equals('0.30'));
@@ -209,10 +225,8 @@ void main() {
     });
 
     test('saveTarget rejects invalid inputs and sets field errors', () async {
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
       // Empty inputs
       await viewModel.saveTarget();
@@ -241,10 +255,8 @@ void main() {
     test(
       'save success updates savedTarget, clears dirty, shows successMessage',
       () async {
-        final viewModel = GainTargetViewModel(
-          repository: fakeRepository,
-          userId: testUserId,
-        );
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
         viewModel.updateMinInput('0.15');
         viewModel.updateMaxInput('0.25');
@@ -274,10 +286,8 @@ void main() {
           'Database write rejected',
         );
 
-        final viewModel = GainTargetViewModel(
-          repository: fakeRepository,
-          userId: testUserId,
-        );
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
         viewModel.updateMinInput('0.20');
         viewModel.updateMaxInput('0.30');
@@ -305,10 +315,8 @@ void main() {
         ),
       ).thenAnswer((_) => completer.future);
 
-      final viewModel = GainTargetViewModel(
-        repository: mockRepository,
-        userId: testUserId,
-      );
+      final container = createContainer(repository: mockRepository);
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
       viewModel.updateMinInput('0.15');
       viewModel.updateMaxInput('0.25');
@@ -341,6 +349,55 @@ void main() {
       expect(viewModel.state.isSubmitting, isFalse);
     });
 
+    test(
+      'saveTarget resets isRefreshing and isLoading to false while in flight',
+      () async {
+        final refreshCompleter =
+            Completer<Result<GainTargetEntity?, AppFailure>>();
+        final saveCompleter = Completer<Result<GainTargetEntity, AppFailure>>();
+
+        when(() => mockRepository.getGainTarget(userId: any(named: 'userId')))
+            .thenAnswer((_) => refreshCompleter.future);
+        when(
+          () => mockRepository.saveGainTarget(
+            userId: any(named: 'userId'),
+            target: any(named: 'target'),
+          ),
+        ).thenAnswer((_) => saveCompleter.future);
+
+        final container = createContainer(repository: mockRepository);
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
+
+        // Start in-flight refresh
+        final refreshFuture = viewModel.loadTarget(isRefresh: true);
+        expect(viewModel.state.isRefreshing, isTrue);
+
+        viewModel.updateMinInput('0.15');
+        viewModel.updateMaxInput('0.25');
+
+        // Start save while refresh is in flight
+        final saveFuture = viewModel.saveTarget();
+        expect(viewModel.state.isSubmitting, isTrue);
+        expect(viewModel.state.isRefreshing, isFalse);
+        expect(viewModel.state.isLoading, isFalse);
+
+        // Complete refresh (should be discarded due to generation/isSubmitting)
+        refreshCompleter.complete(const Result.success(null));
+        await refreshFuture;
+        expect(viewModel.state.isRefreshing, isFalse);
+
+        // Complete save
+        saveCompleter.complete(
+          const Result.success(
+            GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+          ),
+        );
+        await saveFuture;
+        expect(viewModel.state.isSubmitting, isFalse);
+        expect(viewModel.state.isRefreshing, isFalse);
+      },
+    );
+
     test('controlled Completer verifies pending write lifecycle and read suppression', () async {
       final saveCompleter = Completer<Result<GainTargetEntity, AppFailure>>();
       when(
@@ -350,10 +407,8 @@ void main() {
         ),
       ).thenAnswer((_) => saveCompleter.future);
 
-      final viewModel = GainTargetViewModel(
-        repository: mockRepository,
-        userId: testUserId,
-      );
+      final container = createContainer(repository: mockRepository);
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
       viewModel.updateMinInput('0.15');
       viewModel.updateMaxInput('0.25');
@@ -390,10 +445,8 @@ void main() {
       );
       fakeRepository.seedTarget('user-1', user1Target);
 
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: 'user-1',
-      );
+      final container = createContainer(userId: 'user-1');
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
       await viewModel.loadTarget();
       expect(viewModel.state.savedTarget, equals(user1Target));
 
@@ -417,10 +470,11 @@ void main() {
           ),
         ).thenAnswer((_) => saveCompleter.future);
 
-        final viewModel = GainTargetViewModel(
+        final container = createContainer(
           repository: mockRepository,
           userId: 'user-1',
         );
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
         viewModel.updateMinInput('0.15');
         viewModel.updateMaxInput('0.25');
 
@@ -453,10 +507,8 @@ void main() {
       );
       fakeRepository.seedTarget(testUserId, saved);
 
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
       await viewModel.loadTarget();
 
       viewModel.updateMinInput('0.99');
@@ -478,10 +530,8 @@ void main() {
         ),
       ).thenAnswer((_) => completer.future);
 
-      final viewModel = GainTargetViewModel(
-        repository: mockRepository,
-        userId: testUserId,
-      );
+      final container = createContainer(repository: mockRepository);
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
       viewModel.updateMinInput('0.15');
       viewModel.updateMaxInput('0.25');
 
@@ -502,10 +552,8 @@ void main() {
     });
 
     test('clearMessages clears all transient feedback', () {
-      final viewModel = GainTargetViewModel(
-        repository: fakeRepository,
-        userId: testUserId,
-      );
+      final container = createContainer();
+      final viewModel = container.read(gainTargetViewModelProvider.notifier);
       viewModel.state = viewModel.state.copyWith(
         successMessage: 'Saved',
         saveErrorMessage: 'Error',
