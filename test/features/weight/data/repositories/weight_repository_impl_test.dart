@@ -202,4 +202,97 @@ void main() {
       expect(result.failureOrNull, isA<NetworkFailure>());
     });
   });
+
+  group('WeightRepositoryImpl.deleteWeightEntry', () {
+    for (final userId in ['', '   ']) {
+      test('rejects empty user "$userId" before data access', () async {
+        final result = await repository.deleteWeightEntry(
+          userId: userId,
+          dateIso: '2026-10-10',
+        );
+        expect(result.failureOrNull, isA<ValidationFailure>());
+        verifyZeroInteractions(mockRemoteDataSource);
+      });
+    }
+
+    for (final dateIso in [
+      '',
+      '2026-02-30',
+      '2025-02-29',
+      '2026-13-01',
+      '2026-01-00',
+      '2026-1-01',
+      '2026-10-10T00:00:00Z',
+      ' 2026-10-10',
+      '2026-10-10 ',
+      '2026-10-10/other',
+    ]) {
+      test(
+        'rejects invalid or noncanonical date "$dateIso" before access',
+        () async {
+          final result = await repository.deleteWeightEntry(
+            userId: 'user_1',
+            dateIso: dateIso,
+          );
+          expect(result.failureOrNull, isA<ValidationFailure>());
+          verifyZeroInteractions(mockRemoteDataSource);
+        },
+      );
+    }
+
+    test('forwards an older date and succeeds on repeated deletion', () async {
+      when(
+        () => mockRemoteDataSource.deleteWeightEntry(
+          userId: 'user_1',
+          dateIso: '2000-02-29',
+        ),
+      ).thenAnswer((_) async {});
+
+      for (var attempt = 0; attempt < 2; attempt++) {
+        final result = await repository.deleteWeightEntry(
+          userId: 'user_1',
+          dateIso: '2000-02-29',
+        );
+        expect(result.isSuccess, isTrue);
+      }
+      verify(
+        () => mockRemoteDataSource.deleteWeightEntry(
+          userId: 'user_1',
+          dateIso: '2000-02-29',
+        ),
+      ).called(2);
+      verifyNoMoreInteractions(mockRemoteDataSource);
+    });
+
+    final failures = <Exception, AppFailure>{
+      const AuthException('permission-denied', 'No permission'):
+          const AuthFailure('No permission'),
+      const NetworkException('Offline'): const NetworkFailure(
+        'Network error. Please check your connection.',
+      ),
+      const ServerException(message: 'DB failure', statusCode: 500):
+          const ServerFailure('DB failure', statusCode: 500),
+      Exception('Unexpected'): const UnknownFailure(
+        'An unexpected error occurred. Please try again.',
+      ),
+    };
+    for (final entry in failures.entries) {
+      test(
+        'maps ${entry.key.runtimeType} to ${entry.value.runtimeType}',
+        () async {
+          when(
+            () => mockRemoteDataSource.deleteWeightEntry(
+              userId: 'user_1',
+              dateIso: '2026-10-10',
+            ),
+          ).thenAnswer((_) async => throw entry.key);
+          final result = await repository.deleteWeightEntry(
+            userId: 'user_1',
+            dateIso: '2026-10-10',
+          );
+          expect(result.failureOrNull, entry.value);
+        },
+      );
+    }
+  });
 }

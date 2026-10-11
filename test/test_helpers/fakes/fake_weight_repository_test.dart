@@ -146,4 +146,149 @@ void main() {
       expect(result.dataOrNull, isEmpty);
     });
   });
+
+  group('FakeWeightRepository.deleteWeightEntry', () {
+    final oldEntry = WeightEntryEntity(
+      dateIso: '2000-02-29',
+      date: DateTime.utc(2000, 2, 29),
+      weightKg: 80,
+      updatedAt: DateTime.utc(2000, 2, 29),
+    );
+    final recentEntry = WeightEntryEntity(
+      dateIso: '2026-10-10',
+      date: DateTime.utc(2026, 10, 10),
+      weightKg: 82,
+      updatedAt: DateTime.utc(2026, 10, 10),
+    );
+
+    setUp(() {
+      repository.seedEntries('user_1', [oldEntry, recentEntry]);
+      repository.seedEntries('user_2', [oldEntry]);
+    });
+
+    test(
+      'deletes an old entry while preserving other dates and accounts',
+      () async {
+        final result = await repository.deleteWeightEntry(
+          userId: 'user_1',
+          dateIso: oldEntry.dateIso,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(repository.getEntriesForUser('user_1'), [recentEntry]);
+        expect(repository.getEntriesForUser('user_2'), [oldEntry]);
+      },
+    );
+
+    test(
+      'succeeds for absent dates and accounts and repeated deletion',
+      () async {
+        for (final userId in ['user_1', 'user_1', 'unknown']) {
+          final result = await repository.deleteWeightEntry(
+            userId: userId,
+            dateIso: oldEntry.dateIso,
+          );
+          expect(result.isSuccess, isTrue);
+        }
+        expect(repository.getEntriesForUser('user_1'), [recentEntry]);
+        expect(repository.getEntriesForUser('user_2'), [oldEntry]);
+        expect(repository.getEntriesForUser('unknown'), isEmpty);
+      },
+    );
+
+    test(
+      'rejects invalid input without changing entries or consuming failures',
+      () async {
+        repository.nextFailure = const NetworkFailure('Offline');
+        for (final input in [
+          ('', oldEntry.dateIso),
+          ('   ', oldEntry.dateIso),
+          ('user_1', ''),
+          ('user_1', '2026-02-30'),
+          ('user_1', ' 2000-02-29'),
+          ('user_1', '2000-02-29 '),
+          ('user_1', '2000-2-29'),
+          ('user_1', '2000-02-29/other'),
+        ]) {
+          final result = await repository.deleteWeightEntry(
+            userId: input.$1,
+            dateIso: input.$2,
+          );
+          expect(result.failureOrNull, isA<ValidationFailure>());
+        }
+        expect(repository.nextFailure, const NetworkFailure('Offline'));
+        expect(repository.getEntriesForUser('user_1'), [recentEntry, oldEntry]);
+        expect(repository.getEntriesForUser('user_2'), [oldEntry]);
+      },
+    );
+
+    test(
+      'delete failure persists, preserves entries and permits retry',
+      () async {
+        repository.deleteFailure = const ServerFailure('Delete failed');
+        for (var attempt = 0; attempt < 2; attempt++) {
+          final result = await repository.deleteWeightEntry(
+            userId: 'user_1',
+            dateIso: oldEntry.dateIso,
+          );
+          expect(result.failureOrNull, const ServerFailure('Delete failed'));
+          expect(repository.getEntriesForUser('user_1'), [
+            recentEntry,
+            oldEntry,
+          ]);
+        }
+        expect(
+          (await repository.getWeightEntries(userId: 'user_1')).isSuccess,
+          isTrue,
+        );
+        repository.deleteFailure = null;
+        expect(
+          (await repository.deleteWeightEntry(
+            userId: 'user_1',
+            dateIso: oldEntry.dateIso,
+          )).isSuccess,
+          isTrue,
+        );
+        expect(repository.getEntriesForUser('user_1'), [recentEntry]);
+        expect(repository.getEntriesForUser('user_2'), [oldEntry]);
+      },
+    );
+
+    test('nextFailure takes precedence and is consumed once', () async {
+      repository.nextFailure = const NetworkFailure('Offline');
+      repository.deleteFailure = const ServerFailure('Delete failed');
+      final first = await repository.deleteWeightEntry(
+        userId: 'user_1',
+        dateIso: oldEntry.dateIso,
+      );
+      expect(first.failureOrNull, const NetworkFailure('Offline'));
+      expect(repository.nextFailure, isNull);
+      final second = await repository.deleteWeightEntry(
+        userId: 'user_1',
+        dateIso: oldEntry.dateIso,
+      );
+      expect(second.failureOrNull, const ServerFailure('Delete failed'));
+      expect(repository.getEntriesForUser('user_1'), [recentEntry, oldEntry]);
+    });
+
+    test('reset clears every failure and all account entries', () async {
+      repository.nextFailure = const NetworkFailure('Offline');
+      repository.getFailure = const ServerFailure('Read failed');
+      repository.saveFailure = const ServerFailure('Save failed');
+      repository.deleteFailure = const ServerFailure('Delete failed');
+      repository.reset();
+      expect(repository.nextFailure, isNull);
+      expect(repository.getFailure, isNull);
+      expect(repository.saveFailure, isNull);
+      expect(repository.deleteFailure, isNull);
+      expect(repository.getEntriesForUser('user_1'), isEmpty);
+      expect(repository.getEntriesForUser('user_2'), isEmpty);
+      expect(
+        (await repository.deleteWeightEntry(
+          userId: 'user_1',
+          dateIso: oldEntry.dateIso,
+        )).isSuccess,
+        isTrue,
+      );
+    });
+  });
 }

@@ -1,5 +1,6 @@
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/core/result/result.dart';
+import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 import 'package:bulk_tempo/features/weight/domain/repositories/weight_repository.dart';
 
@@ -11,6 +12,7 @@ class FakeWeightRepository implements WeightRepository {
   AppFailure? nextFailure;
   AppFailure? getFailure;
   AppFailure? saveFailure;
+  AppFailure? deleteFailure;
 
   @override
   Future<Result<List<WeightEntryEntity>, AppFailure>> getWeightEntries({
@@ -51,6 +53,29 @@ class FakeWeightRepository implements WeightRepository {
     return Result.success(entry);
   }
 
+  @override
+  Future<Result<void, AppFailure>> deleteWeightEntry({
+    required String userId,
+    required String dateIso,
+  }) async {
+    if (userId.trim().isEmpty) {
+      return const Result.failure(ValidationFailure('User ID cannot be empty'));
+    }
+    if (dateIso != dateIso.trim() ||
+        WeekDateUtils.tryParseIsoDate(dateIso) == null) {
+      return const Result.failure(ValidationFailure('Invalid date format'));
+    }
+
+    final failure = nextFailure ?? deleteFailure;
+    if (failure != null) {
+      nextFailure = null;
+      return Result.failure(failure);
+    }
+
+    _userEntries[userId]?.remove(dateIso);
+    return const Result.success(null);
+  }
+
   /// Seeds initial [entries] for a specific [userId].
   void seedEntries(String userId, List<WeightEntryEntity> entries) {
     final map = _userEntries.putIfAbsent(
@@ -76,5 +101,6 @@ class FakeWeightRepository implements WeightRepository {
     nextFailure = null;
     getFailure = null;
     saveFailure = null;
+    deleteFailure = null;
   }
 }
