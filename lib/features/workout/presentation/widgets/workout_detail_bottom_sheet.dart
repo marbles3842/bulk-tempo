@@ -180,6 +180,7 @@ class _ExerciseCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
+                  flex: 3,
                   child: Text(
                     exercise.title,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -189,44 +190,50 @@ class _ExerciseCard extends StatelessWidget {
                 ),
                 if (bestSet != null) ...[
                   const SizedBox(width: 8),
-                  Container(
-                    key: Key('workout_best_set_${exercise.index}'),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF78350F).withValues(alpha: 0.4)
-                          : const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isDark
-                            ? const Color(0xFFD97706).withValues(alpha: 0.5)
-                            : const Color(0xFFFDE68A),
-                        width: 1,
+                  Flexible(
+                    flex: 2,
+                    child: Container(
+                      key: Key('workout_best_set_${exercise.index}'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _CrownIcon(
-                          size: 13,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF78350F).withValues(alpha: 0.4)
+                            : const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
                           color: isDark
-                              ? const Color(0xFFFCD34D)
-                              : const Color(0xFF92400E),
+                              ? const Color(0xFFD97706).withValues(alpha: 0.5)
+                              : const Color(0xFFFDE68A),
+                          width: 1,
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Best: ${WorkoutDetailBottomSheet.formatSetPerformance(bestSet)}',
-                          style: theme.textTheme.labelSmall?.copyWith(
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _CrownIcon(
+                            size: 13,
                             color: isDark
                                 ? const Color(0xFFFCD34D)
                                 : const Color(0xFF92400E),
-                            fontWeight: FontWeight.w600,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'Best: ${WorkoutDetailBottomSheet.formatSetPerformance(bestSet)}',
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: isDark
+                                    ? const Color(0xFFFCD34D)
+                                    : const Color(0xFF92400E),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -81,5 +81,66 @@ void main() {
         expect(find.text('Working'), findsNothing);
       },
     );
+
+    testWidgets(
+      'renders without layout overflow on a narrow screen with long exercise title and best set',
+      (tester) async {
+        tester.view.physicalSize = const Size(300, 600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final workout = WorkoutEntity(
+          id: 'w_narrow',
+          title: 'Upper Body Workout',
+          startTime: DateTime.utc(2026, 10, 6, 10),
+          endTime: DateTime.utc(2026, 10, 6, 11),
+          localDate: DateTime.parse('2026-10-06T00:00:00.000Z'),
+          localDateIso: '2026-10-06',
+          exercises: const [
+            WorkoutExerciseEntity(
+              index: 0,
+              title: 'Incline Dumbbell Bench Press with Pause',
+              exerciseTemplateId: 'ex_incline',
+              sets: [
+                WorkoutSetEntity(
+                  index: 0,
+                  type: 'normal',
+                  weightKg: 120.5,
+                  reps: 12,
+                ),
+              ],
+            ),
+          ],
+        );
+
+        await tester.pumpApp(
+          Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () =>
+                      WorkoutDetailBottomSheet.show(context, workout),
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('workout_best_set_0')), findsOneWidget);
+        expect(
+          find.text('Incline Dumbbell Bench Press with Pause'),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

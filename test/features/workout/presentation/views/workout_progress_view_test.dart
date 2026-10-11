@@ -8,6 +8,8 @@ import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_exercise_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_set_entity.dart';
 import 'package:bulk_tempo/features/workout/presentation/views/workout_progress_view.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/features/workout/presentation/view_models/hevy_key_view_model.dart';
 import 'package:bulk_tempo/features/workout/presentation/widgets/hevy_key_bottom_sheet.dart';
 import 'package:bulk_tempo/features/workout/presentation/widgets/workout_detail_bottom_sheet.dart';
 
@@ -157,6 +159,40 @@ void main() {
           findsOneWidget,
         );
         expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'synchronizes inline text field when HevyKeyFormState rawKey changes externally',
+      (tester) async {
+        await tester.pumpApp(
+          const WorkoutProgressView(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // User enters a key inline
+        await tester.enterText(
+          find.byKey(const Key('hevy_key_inline_input_field')),
+          'some-partial-key',
+        );
+        await tester.pumpAndSettle();
+
+        final element = tester.element(find.byType(WorkoutProgressView));
+        final container = ProviderScope.containerOf(element);
+
+        // Reset the form provider externally (as happens when opening the bottom sheet)
+        container.read(hevyKeyViewModelProvider.notifier).reset();
+        await tester.pumpAndSettle();
+
+        // The text controller should now reflect the empty rawKey
+        final textField = tester.widget<TextField>(
+          find.byKey(const Key('hevy_key_inline_input_field')),
+        );
+        expect(textField.controller?.text, '');
       },
     );
   });

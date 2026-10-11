@@ -24,11 +24,13 @@ class WeeklyWorkoutCard extends StatefulWidget {
 
 class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   late bool _isExpanded;
+  late final ExpansibleController _controller;
 
   @override
   void initState() {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
+    _controller = ExpansibleController();
   }
 
   @override
@@ -36,6 +38,15 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
       _isExpanded = widget.initiallyExpanded;
+      if (widget.initiallyExpanded) {
+        if (!_controller.isExpanded) {
+          _controller.expand();
+        }
+      } else {
+        if (_controller.isExpanded) {
+          _controller.collapse();
+        }
+      }
     }
   }
 
@@ -52,6 +63,7 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         key: Key('workout_week_card_${widget.summary.weekStartIso}'),
+        controller: _controller,
         initiallyExpanded: widget.initiallyExpanded,
         onExpansionChanged: (expanded) {
           setState(() {

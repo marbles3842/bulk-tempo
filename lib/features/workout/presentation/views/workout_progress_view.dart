@@ -303,6 +303,12 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<HevyKeyFormState>(hevyKeyViewModelProvider, (previous, next) {
+      if (next.rawKey != _inlineKeyController.text) {
+        _inlineKeyController.text = next.rawKey;
+      }
+    });
+
     ref.listen<WorkoutProgressState>(workoutProgressViewModelProvider, (
       previous,
       next,

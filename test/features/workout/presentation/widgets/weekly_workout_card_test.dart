@@ -107,5 +107,52 @@ void main() {
         expect(find.text('Workout 0'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'updates expansion state and count chip when initiallyExpanded changes',
+      (tester) async {
+        final summary = createSummary(workoutCount: 2);
+
+        // Start collapsed
+        await tester.pumpApp(
+          Scaffold(
+            body: WeeklyWorkoutCard(summary: summary, initiallyExpanded: false),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsOneWidget,
+        );
+
+        // Update widget with initiallyExpanded: true
+        await tester.pumpApp(
+          Scaffold(
+            body: WeeklyWorkoutCard(summary: summary, initiallyExpanded: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsNothing,
+        );
+        expect(find.text('Workout 0'), findsOneWidget);
+
+        // Update widget back to initiallyExpanded: false
+        await tester.pumpApp(
+          Scaffold(
+            body: WeeklyWorkoutCard(summary: summary, initiallyExpanded: false),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }
