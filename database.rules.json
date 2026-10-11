@@ -10,6 +10,12 @@
           "$date": {
             ".validate": "newData.hasChildren(['date', 'weightKg', 'updatedAt']) && newData.child('date').isString() && newData.child('date').val() == $date && newData.child('date').val().matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.child('weightKg').isNumber() && newData.child('weightKg').val() >= 20.0 && newData.child('weightKg').val() <= 300.0 && newData.child('updatedAt').isString()"
           }
+        },
+        "gain_target": {
+          ".validate": "newData.hasChildren(['minWeeklyGainKg', 'maxWeeklyGainKg']) && newData.child('minWeeklyGainKg').isNumber() && newData.child('maxWeeklyGainKg').isNumber() && newData.child('minWeeklyGainKg').val() > 0 && newData.child('maxWeeklyGainKg').val() > newData.child('minWeeklyGainKg').val()",
+          "$other": {
+            ".validate": false
+          }
         }
       }
     }

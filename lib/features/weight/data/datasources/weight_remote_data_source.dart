@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/core/errors/exceptions.dart';
 import 'package:bulk_tempo/features/weight/data/models/weight_entry_dto.dart';
 
-final firebaseDatabaseProvider = Provider<FirebaseDatabase>((ref) {
-  return FirebaseDatabase.instance;
-});
+import 'package:bulk_tempo/core/providers/firebase_database_provider.dart';
+
+export 'package:bulk_tempo/core/providers/firebase_database_provider.dart'
+    show firebaseDatabaseProvider;
 
 final weightRemoteDataSourceProvider = Provider<WeightRemoteDataSource>((ref) {
   final database = ref.watch(firebaseDatabaseProvider);

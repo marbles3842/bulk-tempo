@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
 
 class HomeShellScreen extends ConsumerStatefulWidget {
@@ -85,36 +86,35 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
 
   Widget _buildProfileTab(BuildContext context, String? email) {
     return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.person_outline, size: 72),
-              const SizedBox(height: 16),
-              Text(
-                'Profile',
-                key: const Key('profile_heading'),
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            const Icon(Icons.person_outline, size: 72),
+            const SizedBox(height: 16),
+            Text(
+              'Profile',
+              key: const Key('profile_heading'),
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              email ?? 'No email',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(height: 8),
-              Text(
-                email ?? 'No email',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 32),
-              OutlinedButton.icon(
-                key: const Key('profile_logout_button'),
-                icon: const Icon(Icons.logout),
-                label: const Text('Log Out'),
-                onPressed: () => _showLogoutDialog(context),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+            const GainTargetView(),
+            const SizedBox(height: 32),
+            OutlinedButton.icon(
+              key: const Key('profile_logout_button'),
+              icon: const Icon(Icons.logout),
+              label: const Text('Log Out'),
+              onPressed: () => _showLogoutDialog(context),
+            ),
+          ],
         ),
       ),
     );
