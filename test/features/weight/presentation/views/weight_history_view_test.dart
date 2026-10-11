@@ -913,6 +913,56 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(WeightEntryBottomSheet), findsOneWidget);
     });
+
+    testWidgets(
+      'multi-step swipe on dirty edit opens exactly one discard dialog',
+      (tester) async {
+        fakeWeightRepository.seedEntries(testUser.id, [
+          createEntry('2026-10-06', 78.5),
+        ]);
+
+        await tester.pumpApp(
+          const WeightHistoryView(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('daily_entry_2026-10-06')));
+        await tester.pumpAndSettle();
+
+        // Modify weight
+        await tester.enterText(
+          find.byKey(const Key('weight_input_field')),
+          '83.00',
+        );
+
+        // Perform multi-step downward drag
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byType(WeightEntryBottomSheet)),
+        );
+        await gesture.moveBy(const Offset(0, 30));
+        await tester.pump();
+        await gesture.moveBy(const Offset(0, 30));
+        await tester.pump();
+        await gesture.moveBy(const Offset(0, 50));
+        await tester.pump();
+        await gesture.up();
+        await tester.pumpAndSettle();
+
+        // Exactly one discard dialog is opened
+        expect(find.byKey(const Key('discard_changes_dialog')), findsOneWidget);
+
+        // Discarding pops the dialog and sheet cleanly
+        await tester.tap(find.byKey(const Key('discard_changes_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('discard_changes_dialog')), findsNothing);
+        expect(find.byType(WeightEntryBottomSheet), findsNothing);
+      },
+    );
   });
 
   group('Mutation Failure, Retry & Refresh Warning', () {

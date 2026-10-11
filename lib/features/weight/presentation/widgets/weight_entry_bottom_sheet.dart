@@ -49,6 +49,7 @@ class _WeightEntryBottomSheetState
   late final TextEditingController _weightController;
   double _dragDistance = 0.0;
   bool _forceDismiss = false;
+  bool _dismissPromptOpen = false;
 
   @override
   void initState() {
@@ -218,7 +219,7 @@ class _WeightEntryBottomSheetState
   }
 
   Future<void> _handleDismissRequest() async {
-    if (_forceDismiss) return;
+    if (_forceDismiss || _dismissPromptOpen) return;
     final formState = ref.read(weightEntryViewModelProvider);
     if (formState.status == FormStatus.submitting) {
       // While submitting, disable inputs, Save, Delete, close, Back, outside-tap and swipe dismissal
@@ -226,7 +227,13 @@ class _WeightEntryBottomSheetState
     }
 
     if (formState.isEdit && formState.isDirty) {
-      final shouldDiscard = await _showDiscardDialog(context);
+      _dismissPromptOpen = true;
+      final bool? shouldDiscard;
+      try {
+        shouldDiscard = await _showDiscardDialog(context);
+      } finally {
+        _dismissPromptOpen = false;
+      }
       if (shouldDiscard == true && mounted) {
         setState(() {
           _forceDismiss = true;
