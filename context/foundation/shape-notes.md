@@ -89,7 +89,7 @@ Acknowledged on 2026-09-27: 4–5-week MVP requires sustained dedication; user a
   > Socrates: Counter-argument considered: sama liczba treningów nie wystarczy do oceny postępu siłowego. Resolution: wymaganie rozszerzono o pobieranie ciężarów i liczby powtórzeń.
 - FR-007: Użytkownik może ustawić docelowy zakres tygodniowego przyrostu masy, np. 0,15–0,25 kg. Priority: must-have
   > Socrates: No counter-argument; it stands as written.
-- FR-008: Użytkownik może zobaczyć na dashboardzie bieżące tempo, liczbę treningów w tygodniu, ostatnią średnią masy oraz łączny przyrost od początku okresu masowego. Priority: must-have
+- FR-008: Użytkownik może zobaczyć na dashboardzie bieżące tempo, liczbę treningów w tygodniu oraz porównanie wyników treningowych (ciężary i liczba powtórzeń) z bieżącego i co najmniej dwóch wcześniejszych tygodni, ostatnią średnią masy oraz łączny przyrost od początku okresu masowego. Priority: must-have
   > Socrates: No counter-argument; it stands as written.
 - FR-009: Użytkownik może zobaczyć, czy przyrost w danym tygodniu mieści się w ustawionym zakresie względem średnich masy z co najmniej dwóch wcześniejszych tygodni. Priority: must-have
   > Socrates: Counter-argument considered: do oceny mogą być potrzebne co najmniej dwa wcześniejsze tygodnie. Resolution: wymaganie rozszerzono o porównanie z co najmniej dwoma wcześniejszymi tygodniami.
@@ -106,7 +106,7 @@ Acknowledged on 2026-09-27: 4–5-week MVP requires sustained dedication; user a
 
 - **Given** użytkownik ma konto z zapisanymi pomiarami masy oraz danymi treningowymi dla bieżącego i co najmniej dwóch wcześniejszych tygodni
 - **When** loguje się i przechodzi do dashboardu
-- **Then** widzi bieżące tempo zmiany masy, porównanie z ustawionym zakresem docelowym, liczbę treningów w bieżącym tygodniu, ostatnią średnią masy oraz łączny przyrost od początku okresu masowego
+- **Then** widzi bieżące tempo zmiany masy, porównanie z ustawionym zakresem docelowym, liczbę treningów w bieżącym tygodniu wraz z porównaniem wyników treningowych (ciężary i powtórzenia) z bieżącego i co najmniej dwóch wcześniejszych tygodni, ostatnią średnią masy oraz łączny przyrost od początku okresu masowego
 
 #### Acceptance Criteria
 

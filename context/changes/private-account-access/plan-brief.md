@@ -25,7 +25,7 @@ Users can launch the app, see an initial splash check, register a new account or
 | Session restoration | Splash screen holding route (`/`) | Prevents visual flickering or premature login screen flashes during cold launches. | Plan |
 | Password validation | Standard min 6 characters | Matches Firebase Auth default requirements with instant client-side feedback. | Plan |
 | Error presentation | Mapped banners / SnackBars | Balances security best practices (no user enumeration) with clear feedback. | Plan |
-| Test strategy | Mocktail for Repos + Fake for UI | Fast, headless, deterministic tests fully matching `.documentation/06_testing_strategy.md`. | Plan |
+| Test strategy | Mocktail for Repos + Fake for UI | Fast, headless, deterministic tests fully matching `context/documentation/06_testing_strategy.md`. | Plan |
 | Logout UX | Confirmation dialog before sign-out | Prevents accidental sign-outs on mobile touch screens. | Plan |
 | Android permission | Add release `INTERNET` permission | Fixes verified configuration gap so release APKs can reach Firebase Auth. | Plan |
 

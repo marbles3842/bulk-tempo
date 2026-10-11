@@ -8,7 +8,7 @@ Implement **S-01: Private Account Access (`private-account-access`)** for Bulk T
 
 - **Firebase SDKs**: `firebase_core` (3.12.1) and `firebase_auth` (5.5.1) are installed in `pubspec.yaml`, initialized in `lib/main.dart`, and configured for Android, iOS, and Web via `lib/firebase_options.dart`.
 - **UI & Navigation**: The application currently renders a single placeholder `MainApp` with "Hello World!" in `lib/main.dart:15`. There are no feature screens or routes.
-- **Architectural Foundations**: The project specifications in `.documentation/` prescribe Feature-First MVVM with functional `Result<T, AppFailure>`, `GoRouter` redirect guards with `RouterRefreshNotifier`, and headless Riverpod ViewModel tests. None of these core utilities exist yet in `lib/core/` or `test/test_helpers/`.
+- **Architectural Foundations**: The project specifications in `context/documentation/` prescribe Feature-First MVVM with functional `Result<T, AppFailure>`, `GoRouter` redirect guards with `RouterRefreshNotifier`, and headless Riverpod ViewModel tests. None of these core utilities exist yet in `lib/core/` or `test/test_helpers/`.
 - **Package Gaps**: `go_router` and `mocktail` are missing from `pubspec.yaml`.
 - **Platform Gaps**: `android/app/src/main/AndroidManifest.xml` lacks `android.permission.INTERNET` for release builds.
 
@@ -26,10 +26,10 @@ After this plan is complete:
 ### Key Discoveries:
 
 - `bulk_tempo/lib/main.dart:10` already runs `await Firebase.initializeApp(...)` before `runApp`.
-- `bulk_tempo/.documentation/05_navigation.md:121-195` specifies the exact `RouterRefreshNotifier` pattern connecting Riverpod auth state to GoRouter's `refreshListenable` and `redirect`.
-- `bulk_tempo/.documentation/03_state_management_mvvm.md:40-82` provides the composite form state pattern using `copyWith` and `_sentinel`.
-- `bulk_tempo/.documentation/04_data_and_domain.md:7-71` provides the functional `Result<S, F>` and `AppFailure` definitions.
-- `bulk_tempo/.documentation/06_testing_strategy.md:76-155` provides the headless `ProviderContainer` testing pattern for ViewModels.
+- `context/documentation/05_navigation.md:121-195` specifies the exact `RouterRefreshNotifier` pattern connecting Riverpod auth state to GoRouter's `refreshListenable` and `redirect`.
+- `context/documentation/03_state_management_mvvm.md:40-82` provides the composite form state pattern using `copyWith` and `_sentinel`.
+- `context/documentation/04_data_and_domain.md:7-71` provides the functional `Result<S, F>` and `AppFailure` definitions.
+- `context/documentation/06_testing_strategy.md:76-155` provides the headless `ProviderContainer` testing pattern for ViewModels.
 
 ## What We're NOT Doing
 
@@ -76,7 +76,7 @@ Add missing project dependencies, configure Android release internet permissions
 
 #### 3. Core Functional Result Pattern
 **File**: `bulk_tempo/lib/core/result/result.dart`
-**Intent**: Pure Dart functional Result type eliminating unhandled exceptions in accordance with `.documentation/04_data_and_domain.md`.
+**Intent**: Pure Dart functional Result type eliminating unhandled exceptions in accordance with `context/documentation/04_data_and_domain.md`.
 **Contract**: Sealed class `Result<S, F>` with `Success<S, F>`, `Failure<S, F>`, and `when<R>({required R Function(S) success, required R Function(F) failure})`.
 
 #### 4. Core Failures Hierarchy
@@ -303,7 +303,7 @@ Integrate `GoRouter` with `RouterRefreshNotifier` and authentication redirect gu
 
 #### 2. Router Refresh Notifier Bridge
 **File**: `bulk_tempo/lib/core/router/router_refresh_notifier.dart`
-**Intent**: Bridge Riverpod auth state changes to GoRouter's `refreshListenable` in accordance with `.documentation/05_navigation.md`.
+**Intent**: Bridge Riverpod auth state changes to GoRouter's `refreshListenable` in accordance with `context/documentation/05_navigation.md`.
 **Contract**:
 ```dart
 class RouterRefreshNotifier extends ChangeNotifier {
@@ -397,11 +397,11 @@ class RouterRefreshNotifier extends ChangeNotifier {
 - Upstream roadmap: `context/foundation/roadmap.md` (Slice S-01: `private-account-access`)
 - Product requirements: `context/foundation/prd.md` (FR-001, Access Control)
 - Tech stack specification: `context/foundation/tech-stack.md` (Flutter, Firebase Auth)
-- Architecture overview: `bulk_tempo/.documentation/01_architecture_overview.md`
-- State management & MVVM: `bulk_tempo/.documentation/03_state_management_mvvm.md`
-- Data & Domain layers: `bulk_tempo/.documentation/04_data_and_domain.md`
-- Navigation & Router: `bulk_tempo/.documentation/05_navigation.md`
-- Testing strategy: `bulk_tempo/.documentation/06_testing_strategy.md`
+- Architecture overview: `context/documentation/01_architecture_overview.md`
+- State management & MVVM: `context/documentation/03_state_management_mvvm.md`
+- Data & Domain layers: `context/documentation/04_data_and_domain.md`
+- Navigation & Router: `context/documentation/05_navigation.md`
+- Testing strategy: `context/documentation/06_testing_strategy.md`
 
 ## Progress
 

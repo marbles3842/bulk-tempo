@@ -27,7 +27,7 @@ Authenticated users can navigate to the `Weights` tab in `/home`, log today's or
 | App shell placement | 3-tab bottom `NavigationBar` (`Home`, `Weights`, `Profile`) | Hosts `Home`, `Weights` (with `add_weight_fab`), and `Profile` while preserving all existing `S-01` logout keys and widget tests. |
 | Empty & error states | Actionable empty view, full/transient errors & inline banner | Guides first-time users, provides retry on initial load failure, keeps loaded data visible on refresh failure, and preserves form input on save error. |
 | Validation & precision | `20.0–300.0 kg`, 2 decimals, `365d` lookback | Prevents chart-distorting typos and preserves 2-decimal precision needed for `0.15–0.25 kg` weekly gain targets (`FR-007`). |
-| Sync model | Fetch on load + refresh on save & pull-to-refresh | Follows `.documentation/03` and `04` (`Future<Result<T, AppFailure>>`) for deterministic states and unit/widget testing. |
+| Sync model | Fetch on load + refresh on save & pull-to-refresh | Follows `context/documentation/03_state_management_mvvm.md` and `04_data_and_domain.md` (`Future<Result<T, AppFailure>>`) for deterministic states and unit/widget testing. |
 
 ## Scope
 

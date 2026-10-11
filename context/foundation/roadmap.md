@@ -150,7 +150,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **PRD refs:** FR-006, FR-012
 - **Prerequisites:** F-01, F-02, S-01
 - **Parallel with:** S-02, S-03, S-04
-- **Blockers:** —
+- **Blockers:** F-02 (dostęp do reprezentatywnego konta i uprawnień)
 - **Unknowns:**
   - Które dane i jaka miara najlepiej pokazują postęp treningowy w ocenie tygodnia? — Owner: użytkownik. Block: no.
 - **Risk:** Zakres pobieranych treningów trzeba potwierdzić na rzeczywistych danych, zanim S-06 oprze na nich liczbę sesji.
@@ -192,7 +192,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 | S-02 | dated-weight-history | Zapisywać i odczytywać pomiary z datą | no | Zaimplementowane (done). Zmergowane w PR #20. |
 | S-03 | correct-weight-entry | Poprawiać błędne pomiary | yes | Gotowe do planowania (/10x-plan; S-02 gotowe). |
 | S-04 | set-gain-target | Ustawiać docelowy przyrost masy | yes | Gotowe do planowania (/10x-plan; F-01 i S-01 gotowe). |
-| S-05 | import-workout-progress | Importować postęp treningowy | no | Czeka na F-01, F-02 i S-01. |
+| S-05 | import-workout-progress | Importować postęp treningowy | no | Czeka na F-02; F-01 i S-01 są ukończone. |
 | S-06 | weekly-progress-overview | Pokazać tygodniowy obraz postępów | no | Czeka na pomiary i treningi. |
 | S-07 | contextual-pace-assessment | Ocenić tempo masy w kontekście treningu | no | Wymaga reguł oceny i brakujących danych. |
 

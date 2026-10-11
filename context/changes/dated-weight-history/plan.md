@@ -21,7 +21,7 @@ An authenticated user can switch to the `Weights` tab in `HomeShellScreen` (`/ho
 ### Key Discoveries:
 
 - `bulk_tempo/pubspec.yaml:14` and `bulk_tempo/lib/firebase_options.dart:55-77` already configure Firebase Realtime Database (`europe-west1`), resolving `roadmap.md:60,205` (`F-01`) in favor of Realtime Database over Firestore.
-- `bulk_tempo/.documentation/01_architecture_overview.md:49-57` and `03_state_management_mvvm.md:85-92` enforce strict layer boundaries: `Domain` imports only pure Dart + `core/{result,errors}`, and `ViewModel` classes never import `package:flutter/material.dart` or accept a `BuildContext`.
+- `context/documentation/01_architecture_overview.md:49-57` and `03_state_management_mvvm.md:85-92` enforce strict layer boundaries: `Domain` imports only pure Dart + `core/{result,errors}`, and `ViewModel` classes never import `package:flutter/material.dart` or accept a `BuildContext`.
 - `bulk_tempo/test/features/auth/presentation/views/home_shell_screen_test.dart:33-175` asserts `Welcome to Bulk Tempo`, `user.email`, `Key('home_logout_button')`, `Key('home_app_bar_logout_button')`, and `Key('confirm_logout_button')` on the initial `/home` view, so keeping tab index 0 as the `Home` overview preserves 100% of `S-01` tests.
 
 ## What We're NOT Doing
@@ -35,7 +35,7 @@ An authenticated user can switch to the `Weights` tab in `HomeShellScreen` (`/ho
 
 ## Implementation Approach
 
-We follow the repository's Feature-First Clean Architecture + MVVM pattern (`bulk_tempo/.documentation/02_project_structure.md`):
+We follow the repository's Feature-First Clean Architecture + MVVM pattern (`context/documentation/02_project_structure.md`):
 1. **Core utilities & security rules**: Add `fl_chart` to `pubspec.yaml`, define `bulk_tempo/database.rules.json` for `users/$uid/weight_entries/$date`, and create pure-Dart validators (`WeightValidators`) and ISO Monday–Sunday week/date helpers (`WeekDateUtils`) in `lib/core/utils/`.
 2. **Domain & Data layers (`lib/features/weight/{domain,data}/`)**: Model daily entries (`WeightEntryEntity`) and ISO weekly aggregates (`WeeklyWeightSummaryEntity` with static grouping/averaging over `List<WeightEntryEntity>`), implement `WeightEntryDto`, `WeightRemoteDataSource` (wrapping `FirebaseDatabase`), `WeightRepositoryImpl` (mapping exceptions to `Result<T, AppFailure>`), and `FakeWeightRepository`.
 3. **Presentation layer (`lib/features/weight/presentation/`)**: Implement pure-Dart `WeightHistoryViewModel` (loads entries, derives descending `List<WeeklyWeightSummaryEntity>` for the list and chronological last-12-weeks slice for the chart, and handles both initial load errors and non-destructive refresh errors) and `WeightEntryViewModel` (validates inputs, checks same-day conflicts, requires explicit overwrite confirmation, and surfaces save errors), plus `WeeklyWeightChart` (`fl_chart`), `WeeklyWeightCard`, `WeightHistoryView`, and `WeightEntryBottomSheet`.
@@ -474,7 +474,7 @@ Integrate `WeightHistoryView` and `WeightEntryBottomSheet` into `HomeShellScreen
 - PRD: `context/foundation/prd.md` (`FR-002`, `FR-005`, `FR-012`)
 - Roadmap: `context/foundation/roadmap.md` (`F-01`, `S-02`)
 - Prior slice plan: `context/changes/private-account-access/plan.md`
-- Architecture standards: `bulk_tempo/.documentation/01_architecture_overview.md`, `02_project_structure.md`, `03_state_management_mvvm.md`, `04_data_and_domain.md`, `06_testing_strategy.md`
+- Architecture standards: `context/documentation/01_architecture_overview.md`, `02_project_structure.md`, `03_state_management_mvvm.md`, `04_data_and_domain.md`, `06_testing_strategy.md`
 
 ## Progress
 
