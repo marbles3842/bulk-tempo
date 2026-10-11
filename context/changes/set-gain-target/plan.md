@@ -273,10 +273,10 @@ This is an additive RTDB node. Existing accounts begin unset; there is no backfi
 
 #### Automated
 
-- [x] 3.1 Target ViewModel and widget tests pass, including controlled pending-write and account-switch cases: `cd bulk_tempo && flutter test test/features/gain_target/presentation/`.
-- [x] 3.2 Profile shell and existing router tests pass: `cd bulk_tempo && flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`.
-- [x] 3.3 Full regression suite passes: `cd bulk_tempo && flutter test`.
-- [x] 3.4 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
+- [x] 3.1 Target ViewModel and widget tests pass, including controlled pending-write and account-switch cases: `cd bulk_tempo && flutter test test/features/gain_target/presentation/`. — 1895174
+- [x] 3.2 Profile shell and existing router tests pass: `cd bulk_tempo && flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`. — 1895174
+- [x] 3.3 Full regression suite passes: `cd bulk_tempo && flutter test`. — 1895174
+- [x] 3.4 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`. — 1895174
 
 #### Manual
 
