@@ -1,10 +1,10 @@
 ---
 change_id: correct-weight-entry
 title: Correct weight entry
-status: impl_reviewed
+status: archived
 created: 2026-10-11
 updated: 2026-10-11
-archived_at: null
+archived_at: 2026-10-11T14:09:35Z
 ---
 
 ## Notes
