@@ -83,6 +83,7 @@ class _HevyKeyBottomSheetState extends ConsumerState<HevyKeyBottomSheet> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
+                  tooltip: 'Close',
                   onPressed: isSubmitting
                       ? null
                       : () => Navigator.of(context).pop(false),
