@@ -516,27 +516,27 @@ Integrate `WorkoutProgressView` as the 3rd tab (`index 2`, `Workouts`) in `HomeS
 
 #### Automated
 
-- [x] 2.1 Workout domain entity and weekly grouping unit tests pass: `flutter test test/features/workout/domain/`
-- [x] 2.2 Workout DTO, data sources, repository, and FakeWorkoutRepository unit tests pass: `flutter test test/features/workout/data/ test/test_helpers/fakes/fake_workout_repository_test.dart`
-- [x] 2.3 Static analysis passes with zero warnings: `flutter analyze`
-- [x] 2.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 2.1 Workout domain entity and weekly grouping unit tests pass: `flutter test test/features/workout/domain/` — 784e0f1
+- [x] 2.2 Workout DTO, data sources, repository, and FakeWorkoutRepository unit tests pass: `flutter test test/features/workout/data/ test/test_helpers/fakes/fake_workout_repository_test.dart` — 784e0f1
+- [x] 2.3 Static analysis passes with zero warnings: `flutter analyze` — 784e0f1
+- [x] 2.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test` — 784e0f1
 
 #### Manual
 
-- [x] 2.5 Verify `lib/features/workout/domain/` has zero imports from `package:flutter/`, `data/`, `presentation/`, `http`, or `flutter_secure_storage`.
+- [x] 2.5 Verify `lib/features/workout/domain/` has zero imports from `package:flutter/`, `data/`, `presentation/`, `http`, or `flutter_secure_storage`. — 784e0f1
 
 ### Phase 3: Workout Presentation Layer (ViewModels, Key Setup & Weekly UI)
 
 #### Automated
 
-- [ ] 3.1 WorkoutProgressViewModel and HevyKeyViewModel unit tests pass: `flutter test test/features/workout/presentation/view_models/`
-- [ ] 3.2 WorkoutProgressView, WeeklyWorkoutCard, and bottom sheet widget tests pass: `flutter test test/features/workout/presentation/views/`
-- [ ] 3.3 Static analysis passes with zero warnings: `flutter analyze`
-- [ ] 3.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 WorkoutProgressViewModel and HevyKeyViewModel unit tests pass: `flutter test test/features/workout/presentation/view_models/`
+- [x] 3.2 WorkoutProgressView, WeeklyWorkoutCard, and bottom sheet widget tests pass: `flutter test test/features/workout/presentation/views/`
+- [x] 3.3 Static analysis passes with zero warnings: `flutter analyze`
+- [x] 3.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 3.5 Verify `WorkoutProgressViewModel` and `HevyKeyViewModel` contain zero `package:flutter/material.dart` imports or `BuildContext` references.
+- [x] 3.5 Verify `WorkoutProgressViewModel` and `HevyKeyViewModel` contain zero `package:flutter/material.dart` imports or `BuildContext` references.
 
 ### Phase 4: HomeShellScreen 4-Tab Integration & Profile Key Management
 
