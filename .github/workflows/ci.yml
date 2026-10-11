@@ -32,11 +32,11 @@ jobs:
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
 
-      - name: Verify code formatting
-        run: dart format --output=none --set-exit-if-changed lib test
-
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Verify code formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Configure environment and Firebase
         env:
