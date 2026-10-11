@@ -502,15 +502,15 @@ Integrate `WorkoutProgressView` as the 3rd tab (`index 2`, `Workouts`) in `HomeS
 
 #### Automated
 
-- [ ] 1.1 Legacy `HeavyEnv` file is removed: `test ! -f lib/core/constants/heavy_env.dart`
-- [ ] 1.2 Dependencies resolve cleanly: `flutter pub get`
-- [ ] 1.3 Hevy key validator unit tests pass: `flutter test test/core/utils/hevy_key_validators_test.dart`
-- [ ] 1.4 Static analysis passes with zero warnings: `flutter analyze`
-- [ ] 1.5 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 1.1 Legacy `HeavyEnv` file is removed: `test ! -f lib/core/constants/heavy_env.dart`
+- [x] 1.2 Dependencies resolve cleanly: `flutter pub get`
+- [x] 1.3 Hevy key validator unit tests pass: `flutter test test/core/utils/hevy_key_validators_test.dart`
+- [x] 1.4 Static analysis passes with zero warnings: `flutter analyze`
+- [x] 1.5 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 1.6 Inspect `README.md` and `pubspec.yaml` to confirm no personal API key or `HEAVY_API_KEY` `--dart-define` instructions remain.
+- [x] 1.6 Inspect `README.md` and `pubspec.yaml` to confirm no personal API key or `HEAVY_API_KEY` `--dart-define` instructions remain.
 
 ### Phase 2: Workout Domain & Data Layer (Hevy REST API & Local Key Storage)
 

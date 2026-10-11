@@ -47,7 +47,7 @@ Osoba budująca beztłuszczową masę dziś przenosi pomiary do arkusza i osobno
 | S-02 | dated-weight-history | użytkownik może dodać dzisiejszy lub historyczny pomiar i odczytać go na innym urządzeniu | F-01, S-01 | FR-002, FR-005, FR-012 | done |
 | S-03 | correct-weight-entry | użytkownik może poprawić lub usunąć własny błędny pomiar | S-02 | FR-003, FR-004 | done |
 | S-04 | set-gain-target | użytkownik może ustawić i odczytać własny docelowy zakres przyrostu | F-01, S-01 | FR-007, FR-012 | in-progress |
-| S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | planning |
+| S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | in-progress |
 | S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | proposed |
 | S-07 | contextual-pace-assessment | użytkownik może zobaczyć ocenę tempa względem celu, wcześniejszych tygodni i treningów | S-04, S-06 | FR-008, FR-009, US-01, §Business Logic, §Non-Functional Requirements | blocked |
 
@@ -154,7 +154,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **Unknowns:**
   - Które dane i jaka miara najlepiej pokazują postęp treningowy w ocenie tygodnia? — Owner: użytkownik. Block: no.
 - **Risk:** Zakres pobieranych treningów trzeba potwierdzić na rzeczywistych danych, zanim S-06 oprze na nich liczbę sesji.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-06: Tygodniowy obraz postępów
 

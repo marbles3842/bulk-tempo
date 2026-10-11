@@ -4,39 +4,22 @@ A Flutter application targeting Android, iOS, and Web.
 
 ---
 
-## Environment Configuration (`env.json`)
+## Hevy API Integration
 
-To securely handle API credentials and external service configuration without leaking secrets to version control, this project uses compile-time environment variables loaded via `--dart-define-from-file`.
-
-### 1. Create `env.json`
-
-Create an `env.json` file in the project root directory (this file is ignored by git):
-
-```json
-{
-  "HEAVY_BASE_URL": "https://api.example.com",
-  "HEAVY_API_KEY": "your_heavy_api_key_here"
-}
-```
-
-These values are mapped at compile time to [`HeavyEnv`](lib/core/constants/heavy_env.dart):
-* `HEAVY_BASE_URL` -> `HeavyEnv.baseUrl`
-* `HEAVY_API_KEY` -> `HeavyEnv.apiKey`
+Each user configures their personal Hevy Pro API key (`https://hevy.com/settings?developer`) directly inside the app via the **Workouts** or **Profile** tab. The API key is validated and stored locally in encrypted device storage (`flutter_secure_storage`) scoped to the signed-in account, and is never compiled into application binaries or shared across users.
 
 ---
 
 ## Running and Building
 
-When launching or building the app, pass `--dart-define-from-file=env.json`:
-
 ### Command Line
 
 ```bash
 # Run the application
-flutter run --dart-define-from-file=env.json
+flutter run
 
 # Build APK
-flutter build apk --dart-define-from-file=env.json
+flutter build apk
 ```
 
 ---
