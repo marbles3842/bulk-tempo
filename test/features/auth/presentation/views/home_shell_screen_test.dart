@@ -6,6 +6,8 @@ import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
+import 'package:bulk_tempo/features/gain_target/data/repositories/gain_target_repository_impl.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/data/repositories/weight_repository_impl.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
@@ -14,6 +16,7 @@ import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_ch
 import 'package:bulk_tempo/features/weight/presentation/widgets/weight_entry_bottom_sheet.dart';
 
 import '../../../../test_helpers/fakes/fake_auth_repository.dart';
+import '../../../../test_helpers/fakes/fake_gain_target_repository.dart';
 import '../../../../test_helpers/fakes/fake_weight_repository.dart';
 import '../../../../test_helpers/pump_app.dart';
 
@@ -28,16 +31,19 @@ class FakeAuthViewModel extends AuthViewModel {
 void main() {
   late FakeAuthRepository fakeRepository;
   late FakeWeightRepository fakeWeightRepository;
+  late FakeGainTargetRepository fakeGainTargetRepository;
   const testUser = UserEntity(id: 'u1', email: 'athlete@example.com');
 
   setUp(() {
     fakeRepository = FakeAuthRepository(initialUser: testUser);
     fakeWeightRepository = FakeWeightRepository();
+    fakeGainTargetRepository = FakeGainTargetRepository();
   });
 
   tearDown(() {
     fakeRepository.dispose();
     fakeWeightRepository.reset();
+    fakeGainTargetRepository.reset();
   });
 
   WeightEntryEntity createEntry(String dateIso, double weightKg) {
@@ -335,6 +341,9 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -348,6 +357,9 @@ void main() {
         expect(find.byKey(const Key('profile_logout_button')), findsOneWidget);
 
         // Tap logout
+        await tester.ensureVisible(
+          find.byKey(const Key('profile_logout_button')),
+        );
         await tester.tap(find.byKey(const Key('profile_logout_button')));
         await tester.pumpAndSettle();
 
@@ -375,6 +387,9 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -422,6 +437,9 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -452,6 +470,33 @@ void main() {
         // Sheet is dismissed without showing discard dialog
         expect(find.byType(WeightEntryBottomSheet), findsNothing);
         expect(find.byKey(const Key('discard_changes_dialog')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Profile tab renders GainTargetView and weekly gain target section alongside profile details',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('profile_heading')), findsOneWidget);
+        expect(find.text('athlete@example.com'), findsOneWidget);
+        expect(find.byType(GainTargetView), findsOneWidget);
+        expect(find.text('Weekly Gain Target'), findsOneWidget);
+        expect(find.byKey(const Key('gain_target_summary')), findsOneWidget);
       },
     );
   });

@@ -263,20 +263,20 @@ This is an additive RTDB node. Existing accounts begin unset; there is no backfi
 
 #### Automated
 
-- [x] 2.1 Target data and fake-repository tests pass: `cd bulk_tempo && flutter test test/features/gain_target/data/ test/test_helpers/fakes/fake_gain_target_repository_test.dart`.
-- [x] 2.2 Emulator harness dependencies install reproducibly: `cd bulk_tempo/database-rules-tests && npm ci`.
-- [x] 2.3 Emulator tests prove owner access, foreign/unauthenticated denial, complete valid replacements, invalid/partial payload rejection, and unchanged weight access: `cd bulk_tempo/database-rules-tests && npm run test:emulator`.
-- [x] 2.4 Existing weight data tests pass after the provider move: `cd bulk_tempo && flutter test test/features/weight/data/`.
-- [x] 2.5 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
+- [x] 2.1 Target data and fake-repository tests pass: `cd bulk_tempo && flutter test test/features/gain_target/data/ test/test_helpers/fakes/fake_gain_target_repository_test.dart`. — 47ab9c9
+- [x] 2.2 Emulator harness dependencies install reproducibly: `cd bulk_tempo/database-rules-tests && npm ci`. — 47ab9c9
+- [x] 2.3 Emulator tests prove owner access, foreign/unauthenticated denial, complete valid replacements, invalid/partial payload rejection, and unchanged weight access: `cd bulk_tempo/database-rules-tests && npm run test:emulator`. — 47ab9c9
+- [x] 2.4 Existing weight data tests pass after the provider move: `cd bulk_tempo && flutter test test/features/weight/data/`. — 47ab9c9
+- [x] 2.5 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`. — 47ab9c9
 
 ### Phase 3: Profile Integration
 
 #### Automated
 
-- [ ] 3.1 Target ViewModel and widget tests pass, including controlled pending-write and account-switch cases: `cd bulk_tempo && flutter test test/features/gain_target/presentation/`.
-- [ ] 3.2 Profile shell and existing router tests pass: `cd bulk_tempo && flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`.
-- [ ] 3.3 Full regression suite passes: `cd bulk_tempo && flutter test`.
-- [ ] 3.4 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
+- [x] 3.1 Target ViewModel and widget tests pass, including controlled pending-write and account-switch cases: `cd bulk_tempo && flutter test test/features/gain_target/presentation/`.
+- [x] 3.2 Profile shell and existing router tests pass: `cd bulk_tempo && flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`.
+- [x] 3.3 Full regression suite passes: `cd bulk_tempo && flutter test`.
+- [x] 3.4 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
 
 #### Manual
 
