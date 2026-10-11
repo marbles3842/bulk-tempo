@@ -14,10 +14,18 @@ import 'package:bulk_tempo/features/weight/presentation/views/weight_history_vie
 import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_card.dart';
 import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_chart.dart';
 import 'package:bulk_tempo/features/weight/presentation/widgets/weight_entry_bottom_sheet.dart';
+import 'package:bulk_tempo/features/workout/data/repositories/workout_repository_impl.dart';
+import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
+import 'package:bulk_tempo/features/workout/domain/models/workout_exercise_entity.dart';
+import 'package:bulk_tempo/features/workout/domain/models/workout_set_entity.dart';
+import 'package:bulk_tempo/features/workout/presentation/views/workout_progress_view.dart';
+import 'package:bulk_tempo/features/workout/presentation/widgets/hevy_key_bottom_sheet.dart';
+import 'package:bulk_tempo/features/workout/presentation/widgets/weekly_workout_card.dart';
 
 import '../../../../test_helpers/fakes/fake_auth_repository.dart';
 import '../../../../test_helpers/fakes/fake_gain_target_repository.dart';
 import '../../../../test_helpers/fakes/fake_weight_repository.dart';
+import '../../../../test_helpers/fakes/fake_workout_repository.dart';
 import '../../../../test_helpers/pump_app.dart';
 
 class FakeAuthViewModel extends AuthViewModel {
@@ -32,18 +40,23 @@ void main() {
   late FakeAuthRepository fakeRepository;
   late FakeWeightRepository fakeWeightRepository;
   late FakeGainTargetRepository fakeGainTargetRepository;
+  late FakeWorkoutRepository fakeWorkoutRepository;
   const testUser = UserEntity(id: 'u1', email: 'athlete@example.com');
+  const validApiKey = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 
   setUp(() {
     fakeRepository = FakeAuthRepository(initialUser: testUser);
     fakeWeightRepository = FakeWeightRepository();
     fakeGainTargetRepository = FakeGainTargetRepository();
+    fakeWorkoutRepository = FakeWorkoutRepository()
+      ..defaultNow = DateTime.utc(2026, 10, 11, 12);
   });
 
   tearDown(() {
     fakeRepository.dispose();
     fakeWeightRepository.reset();
     fakeGainTargetRepository.reset();
+    fakeWorkoutRepository.reset();
   });
 
   WeightEntryEntity createEntry(String dateIso, double weightKg) {
@@ -53,6 +66,46 @@ void main() {
       date: parsed,
       weightKg: weightKg,
       updatedAt: parsed,
+    );
+  }
+
+  WorkoutEntity createSampleWorkout({
+    String id = 'w1',
+    String title = 'Upper Body Hypertrophy',
+    String localDateIso = '2026-10-06',
+    DateTime? startTime,
+  }) {
+    final start = startTime ?? DateTime.utc(2026, 10, 6, 17, 0);
+    return WorkoutEntity(
+      id: id,
+      title: title,
+      startTime: start,
+      endTime: start.add(const Duration(minutes: 55)),
+      localDate: DateTime.parse('${localDateIso}T00:00:00.000Z'),
+      localDateIso: localDateIso,
+      exercises: const [
+        WorkoutExerciseEntity(
+          index: 0,
+          title: 'Barbell Bench Press',
+          exerciseTemplateId: 'ex_bench',
+          notes: 'Paused reps on chest',
+          sets: [
+            WorkoutSetEntity(
+              index: 0,
+              type: 'warmup',
+              weightKg: 60.0,
+              reps: 10,
+            ),
+            WorkoutSetEntity(index: 1, type: 'normal', weightKg: 95.0, reps: 8),
+            WorkoutSetEntity(
+              index: 2,
+              type: 'failure',
+              weightKg: 100.0,
+              reps: 8,
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -341,6 +394,7 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
             gainTargetRepositoryProvider.overrideWithValue(
               fakeGainTargetRepository,
             ),
@@ -475,6 +529,7 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(fakeRepository),
             weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
             gainTargetRepositoryProvider.overrideWithValue(
               fakeGainTargetRepository,
             ),
@@ -491,6 +546,300 @@ void main() {
         expect(find.byType(GainTargetView), findsOneWidget);
         expect(find.text('Weekly Gain Target'), findsOneWidget);
         expect(find.byKey(const Key('gain_target_summary')), findsOneWidget);
+      },
+    );
+  });
+
+  group('4-Tab Navigation, Workouts & Profile Hevy Key Integration', () {
+    testWidgets(
+      'renders 4 navigation destinations and quick-action button on Home tab',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('nav_home_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_weights_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_workouts_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_profile_tab')), findsOneWidget);
+        expect(
+          find.byKey(const Key('home_go_to_workouts_button')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'tapping quick-action button on Home tab switches to Workouts tab',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WorkoutProgressView), findsNothing);
+
+        await tester.tap(find.byKey(const Key('home_go_to_workouts_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WorkoutProgressView), findsOneWidget);
+        expect(
+          find.byKey(const Key('workout_unconfigured_state')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'navigating to Workouts tab via bottom NavigationBar renders unconfigured state when no key',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('nav_workouts_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WorkoutProgressView), findsOneWidget);
+        expect(
+          find.byKey(const Key('workout_unconfigured_state')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('hevy_key_inline_input_field')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'entering Hevy key inline connects and displays weekly workout cards in Workouts tab',
+      (tester) async {
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          createSampleWorkout(),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Workouts tab
+        await tester.tap(find.byKey(const Key('nav_workouts_tab')));
+        await tester.pumpAndSettle();
+
+        // Enter valid key and connect
+        await tester.enterText(
+          find.byKey(const Key('hevy_key_inline_input_field')),
+          validApiKey,
+        );
+        await tester.tap(
+          find.byKey(const Key('hevy_key_inline_connect_button')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeeklyWorkoutCard), findsOneWidget);
+        expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Profile tab renders Hevy Integration card showing Not connected and opens bottom sheet',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(find.byKey(const Key('profile_hevy_card')));
+        expect(find.byKey(const Key('profile_hevy_card')), findsOneWidget);
+        expect(find.text('Not connected'), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('profile_connect_or_update_hevy_key_button')),
+          findsOneWidget,
+        );
+        expect(find.text('Connect Hevy Key'), findsOneWidget);
+
+        // Tap connect button opens HevyKeyBottomSheet
+        await tester.tap(
+          find.byKey(const Key('profile_connect_or_update_hevy_key_button')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(HevyKeyBottomSheet), findsOneWidget);
+        expect(
+          find.byKey(const Key('hevy_key_sheet_input_field')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'Profile tab displays masked key, allows updating via bottom sheet, and disconnects',
+      (tester) async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          createSampleWorkout(),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(find.byKey(const Key('profile_hevy_card')));
+        expect(find.byKey(const Key('profile_hevy_card')), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_hevy_masked_key')),
+          findsOneWidget,
+        );
+        expect(find.text('Update Key'), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+          findsOneWidget,
+        );
+
+        // Tap Update Key opens bottom sheet
+        await tester.tap(
+          find.byKey(const Key('profile_connect_or_update_hevy_key_button')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(HevyKeyBottomSheet), findsOneWidget);
+
+        // Close bottom sheet
+        await tester.tap(find.byIcon(Icons.close));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(HevyKeyBottomSheet), findsNothing);
+
+        // Tap Disconnect
+        await tester.ensureVisible(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+        );
+        await tester.tap(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Not connected'), findsOneWidget);
+        expect(find.byKey(const Key('profile_hevy_masked_key')), findsNothing);
+        expect(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+          findsNothing,
+        );
+        expect(find.text('Connect Hevy Key'), findsOneWidget);
+        expect(fakeWorkoutRepository.getApiKeyForUser(testUser.id), isNull);
+      },
+    );
+
+    testWidgets(
+      'switching between Workouts and Profile tabs preserves session-cached data',
+      (tester) async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          createSampleWorkout(),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Workouts tab
+        await tester.tap(find.byKey(const Key('nav_workouts_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeeklyWorkoutCard), findsOneWidget);
+        expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(find.byKey(const Key('profile_hevy_card')));
+        expect(find.byKey(const Key('profile_hevy_card')), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_hevy_masked_key')),
+          findsOneWidget,
+        );
+
+        // Switch back to Workouts tab
+        await tester.tap(find.byKey(const Key('nav_workouts_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeeklyWorkoutCard), findsOneWidget);
+        expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
       },
     );
   });

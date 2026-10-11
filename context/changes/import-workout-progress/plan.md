@@ -529,24 +529,24 @@ Integrate `WorkoutProgressView` as the 3rd tab (`index 2`, `Workouts`) in `HomeS
 
 #### Automated
 
-- [x] 3.1 WorkoutProgressViewModel and HevyKeyViewModel unit tests pass: `flutter test test/features/workout/presentation/view_models/`
-- [x] 3.2 WorkoutProgressView, WeeklyWorkoutCard, and bottom sheet widget tests pass: `flutter test test/features/workout/presentation/views/`
-- [x] 3.3 Static analysis passes with zero warnings: `flutter analyze`
-- [x] 3.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 WorkoutProgressViewModel and HevyKeyViewModel unit tests pass: `flutter test test/features/workout/presentation/view_models/` — bd48fc4
+- [x] 3.2 WorkoutProgressView, WeeklyWorkoutCard, and bottom sheet widget tests pass: `flutter test test/features/workout/presentation/views/` — bd48fc4
+- [x] 3.3 Static analysis passes with zero warnings: `flutter analyze` — bd48fc4
+- [x] 3.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test` — bd48fc4
 
 #### Manual
 
-- [x] 3.5 Verify `WorkoutProgressViewModel` and `HevyKeyViewModel` contain zero `package:flutter/material.dart` imports or `BuildContext` references.
+- [x] 3.5 Verify `WorkoutProgressViewModel` and `HevyKeyViewModel` contain zero `package:flutter/material.dart` imports or `BuildContext` references. — bd48fc4
 
 ### Phase 4: HomeShellScreen 4-Tab Integration & Profile Key Management
 
 #### Automated
 
-- [ ] 4.1 Updated HomeShellScreen and AppRouter widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`
-- [ ] 4.2 Full test suite passes across all features: `flutter test`
-- [ ] 4.3 Static analysis passes with zero warnings: `flutter analyze`
-- [ ] 4.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 4.1 Updated HomeShellScreen and AppRouter widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/app/router/app_router_test.dart`
+- [x] 4.2 Full test suite passes across all features: `flutter test`
+- [x] 4.3 Static analysis passes with zero warnings: `flutter analyze`
+- [x] 4.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 4.5 Launch the app (`flutter run`), sign in, open the `Workouts` tab (`nav_workouts_tab`), enter a personal Hevy Pro API key, verify pre-validation via `/v1/workouts/count` and automatic import of the last 12 ISO weeks of workouts, expand a week card and tap a workout to inspect its exercises and working sets (`weight_kg × reps`), switch between tabs to confirm the session cache does not re-fetch, pull to refresh, and verify masked key display and disconnect/update in the `Profile` tab.
+- [x] 4.5 Launch the app (`flutter run`), sign in, open the `Workouts` tab (`nav_workouts_tab`), enter a personal Hevy Pro API key, verify pre-validation via `/v1/workouts/count` and automatic import of the last 12 ISO weeks of workouts, expand a week card and tap a workout to inspect its exercises and working sets (`weight_kg × reps`), switch between tabs to confirm the session cache does not re-fetch, pull to refresh, and verify masked key display and disconnect/update in the `Profile` tab.
