@@ -45,8 +45,10 @@ class _WeightEntryBottomSheetState
 
   Future<void> _pickDate(DateTime currentDate) async {
     final now = DateTime.now();
-    final firstAllowedDate = now.subtract(
-      const Duration(days: WeightValidators.maxLookbackDays),
+    final firstAllowedDate = DateTime(
+      now.year,
+      now.month,
+      now.day - WeightValidators.maxLookbackDays,
     );
 
     final picked = await showDatePicker(

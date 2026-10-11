@@ -46,20 +46,28 @@ class WeightRemoteDataSourceImpl implements WeightRemoteDataSource {
           final keyDate = entry.key?.toString();
           final val = entry.value;
           if (val is Map) {
-            entries.add(
-              WeightEntryDto.fromJson(
-                Map<Object?, Object?>.from(val),
-                keyDate: keyDate,
-              ),
-            );
+            try {
+              entries.add(
+                WeightEntryDto.fromJson(
+                  Map<Object?, Object?>.from(val),
+                  keyDate: keyDate,
+                ),
+              );
+            } on FormatException {
+              // Ignore malformed records before they reach history grouping.
+            }
           }
         }
       } else if (rawValue is List) {
         for (final item in rawValue) {
           if (item is Map) {
-            entries.add(
-              WeightEntryDto.fromJson(Map<Object?, Object?>.from(item)),
-            );
+            try {
+              entries.add(
+                WeightEntryDto.fromJson(Map<Object?, Object?>.from(item)),
+              );
+            } on FormatException {
+              // Ignore malformed records before they reach history grouping.
+            }
           }
         }
       }

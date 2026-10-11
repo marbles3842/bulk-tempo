@@ -5,6 +5,9 @@ import 'package:bulk_tempo/core/errors/exceptions.dart';
 import 'package:bulk_tempo/features/weight/data/datasources/weight_remote_data_source.dart';
 import 'package:bulk_tempo/features/weight/data/models/weight_entry_dto.dart';
 
+import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
+import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_state.dart';
+
 import '../../../../test_helpers/mocks.dart';
 
 void main() {
@@ -61,6 +64,57 @@ void main() {
       expect(result[0].weightKg, 81.0);
       expect(result[1].date, '2026-10-01');
       expect(result[1].weightKg, 80.0);
+    });
+
+    for (final useList in [false, true]) {
+      test(
+        'skips malformed records in ${useList ? 'list' : 'map'} snapshots',
+        () async {
+          final records = <String, Object?>{
+            '2026-10-05': {'date': '2026-10-05', 'weightKg': 80},
+            '2026-10-06': {'date': '2026-10-06', 'weightKg': 82},
+            '2026-10-07': {'date': '2026-10-07', 'weightKg': 'bad'},
+            '2026-10-08': {'date': '', 'weightKg': 90},
+            '2026-10-09': {'date': 'invalid', 'weightKg': 90},
+            '2026-10-10': {'date': '2026-10-10', 'weightKg': double.nan},
+            'bad-key': {'weightKg': 90},
+            '2026-10-11': {'date': 123, 'weightKg': 90},
+            'other': null,
+          };
+          when(() => mockRef.get()).thenAnswer((_) async => mockSnapshot);
+          when(() => mockSnapshot.exists).thenReturn(true);
+          when(() => mockSnapshot.value)
+              .thenReturn(useList ? records.values.toList() : records);
+
+          final dtos = await dataSource.getWeightEntries(userId: 'user_123');
+          expect(dtos.map((dto) => dto.date), ['2026-10-06', '2026-10-05']);
+          final entries = dtos.map((dto) => dto.toEntity()).toList();
+          final summaries = WeeklyWeightSummaryEntity.groupEntriesByIsoWeek(
+            entries,
+          );
+          expect(summaries.single.averageWeightKg, 81);
+          expect(summaries.single.entries.length, 2);
+          final history = WeightHistoryLoaded(
+            entries: entries,
+            weeklySummaries: summaries,
+            chartSummaries: summaries,
+          );
+          expect(history.hasEntryForDate('2026-10-07'), isFalse);
+          expect(history.hasEntryForDate('2026-10-08'), isFalse);
+          expect(history.hasEntryForDate('2026-10-06'), isTrue);
+        },
+      );
+    }
+
+    test('uses a valid map key when a record has no date', () async {
+      when(() => mockRef.get()).thenAnswer((_) async => mockSnapshot);
+      when(() => mockSnapshot.exists).thenReturn(true);
+      when(() => mockSnapshot.value).thenReturn({
+        '2026-10-10': {'weightKg': '80.5'},
+      });
+      final entries = await dataSource.getWeightEntries(userId: 'user_123');
+      expect(entries.single.date, '2026-10-10');
+      expect(entries.single.weightKg, 80.5);
     });
 
     test('throws AuthException when permission-denied occurs', () async {

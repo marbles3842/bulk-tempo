@@ -48,6 +48,77 @@ void main() {
       expect(result.weightKg, 80.0);
     });
 
+    test('fromJson accepts numeric strings and boundary weights', () {
+      for (final weight in ['82.50', 20, 300.0]) {
+        final result = WeightEntryDto.fromJson({
+          'date': '2026-10-10',
+          'weightKg': weight,
+        });
+        expect(result.weightKg, double.parse(weight.toString()));
+      }
+    });
+
+    test('fromJson rejects invalid effective dates even with a valid key', () {
+      for (final date in ['', ' ', 'invalid', '2026-02-30', 123]) {
+        expect(
+          () => WeightEntryDto.fromJson({
+            'date': date,
+            'weightKg': 80,
+          }, keyDate: '2026-10-10'),
+          throwsFormatException,
+        );
+      }
+      for (final key in [null, '', 'invalid', '2026-02-30']) {
+        expect(
+          () => WeightEntryDto.fromJson({'weightKg': 80}, keyDate: key),
+          throwsFormatException,
+        );
+      }
+    });
+
+    test(
+      'fromJson rejects missing, malformed, nonfinite or out of range weights',
+      () {
+        for (final weight in [
+          null,
+          '',
+          'invalid',
+          true,
+          0,
+          -1,
+          19.99,
+          300.01,
+          double.nan,
+          double.infinity,
+          double.negativeInfinity,
+          'NaN',
+          'Infinity',
+        ]) {
+          expect(
+            () => WeightEntryDto.fromJson({
+              'date': '2026-10-10',
+              'weightKg': weight,
+            }),
+            throwsFormatException,
+          );
+        }
+      },
+    );
+
+    test('fromJson normalizes date whitespace for conflict detection', () {
+      final result = WeightEntryDto.fromJson({
+        'date': ' 2026-10-10 ',
+        'weightKg': 80,
+      });
+      expect(result.date, '2026-10-10');
+      expect(result.toEntity().dateIso, '2026-10-10');
+    });
+
+    test('toEntity rejects invalid dates instead of using today', () {
+      const invalid = WeightEntryDto(date: '', weightKg: 80, updatedAt: '');
+      expect(invalid.toEntity, throwsFormatException);
+    });
+
     test('toJson serializes correctly', () {
       final json = dto.toJson();
 

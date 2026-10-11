@@ -248,12 +248,15 @@ void main() {
       );
 
       await tester.pumpApp(
-        const WeightEntryBottomSheet(),
+        const WeightHistoryView(),
         overrides: [
           authRepositoryProvider.overrideWithValue(fakeAuthRepository),
           weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
         ],
       );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('empty_state_add_weight_button')));
       await tester.pumpAndSettle();
 
       await tester.enterText(

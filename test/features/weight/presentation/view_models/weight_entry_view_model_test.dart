@@ -207,7 +207,77 @@ void main() {
     },
   );
 
+  for (final historyStatus in ['initial', 'loading', 'error']) {
+    for (final confirmOverwrite in [false, true]) {
+      test(
+        'blocks save with $historyStatus history and confirm=$confirmOverwrite',
+        () async {
+          final today = WeekDateUtils.normalizeDateUtc(DateTime.now());
+          final existing = WeightEntryEntity(
+            dateIso: WeekDateUtils.toIsoDateString(today),
+            date: today,
+            weightKg: 78,
+            updatedAt: today,
+          );
+          fakeWeightRepository.seedEntries(testUser.id, [existing]);
+          final history = container.read(
+            weightHistoryViewModelProvider.notifier,
+          );
+          Future<void>? loading;
+          if (historyStatus == 'error') {
+            fakeWeightRepository.getFailure = const NetworkFailure('Offline');
+            await history.loadEntries();
+            expect(
+              container.read(weightHistoryViewModelProvider),
+              isA<WeightHistoryError>(),
+            );
+          } else if (historyStatus == 'loading') {
+            loading = history.loadEntries();
+            expect(
+              container.read(weightHistoryViewModelProvider),
+              isA<WeightHistoryLoading>(),
+            );
+          } else {
+            expect(
+              container.read(weightHistoryViewModelProvider),
+              isA<WeightHistoryInitial>(),
+            );
+          }
+
+          final notifier = container.read(
+            weightEntryViewModelProvider.notifier,
+          );
+          notifier.onWeightChanged('80');
+          expect(
+            await notifier.submit(confirmOverwrite: confirmOverwrite),
+            isFalse,
+          );
+          expect(fakeWeightRepository.getEntriesForUser(testUser.id), [
+            existing,
+          ]);
+          expect(
+            container.read(weightEntryViewModelProvider).errorMessage,
+            'Load weight history before saving. Please try again.',
+          );
+          if (loading != null) await loading;
+
+          // Once history is available, the existing confirmation flow resumes.
+          fakeWeightRepository.getFailure = null;
+          await history.loadEntries();
+          expect(await notifier.submit(), isFalse);
+          expect(
+            container
+                .read(weightEntryViewModelProvider)
+                .requiresOverwriteConfirmation,
+            isTrue,
+          );
+        },
+      );
+    }
+  }
+
   test('submit successfully saves new entry without conflict', () async {
+    await container.read(weightHistoryViewModelProvider.notifier).loadEntries();
     final entryDate = DateTime.now().subtract(const Duration(days: 3));
     final notifier = container.read(weightEntryViewModelProvider.notifier);
     notifier.onDateChanged(entryDate);
@@ -226,6 +296,7 @@ void main() {
   });
 
   test('submit transitions to failure on repository error', () async {
+    await container.read(weightHistoryViewModelProvider.notifier).loadEntries();
     fakeWeightRepository.saveFailure = const ServerFailure(
       'Database save failed',
     );

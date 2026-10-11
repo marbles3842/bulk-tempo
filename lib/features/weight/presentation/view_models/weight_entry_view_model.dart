@@ -72,8 +72,17 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     final dateIso = WeekDateUtils.toIsoDateString(state.selectedDate);
     final historyState = ref.read(weightHistoryViewModelProvider);
 
-    if (historyState is WeightHistoryLoaded &&
-        historyState.hasEntryForDate(dateIso)) {
+    if (historyState is! WeightHistoryLoaded) {
+      state = state.copyWith(
+        status: FormStatus.failure,
+        errorMessage: 'Load weight history before saving. Please try again.',
+        requiresOverwriteConfirmation: false,
+        clearExistingEntry: true,
+      );
+      return false;
+    }
+
+    if (historyState.hasEntryForDate(dateIso)) {
       if (!confirmOverwrite) {
         final existing = historyState.entries.firstWhere(
           (e) => e.dateIso == dateIso,
