@@ -6,8 +6,15 @@ import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
+import 'package:bulk_tempo/features/weight/data/repositories/weight_repository_impl.dart';
+import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
+import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
+import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_card.dart';
+import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_chart.dart';
+import 'package:bulk_tempo/features/weight/presentation/widgets/weight_entry_bottom_sheet.dart';
 
 import '../../../../test_helpers/fakes/fake_auth_repository.dart';
+import '../../../../test_helpers/fakes/fake_weight_repository.dart';
 import '../../../../test_helpers/pump_app.dart';
 
 class FakeAuthViewModel extends AuthViewModel {
@@ -20,15 +27,28 @@ class FakeAuthViewModel extends AuthViewModel {
 
 void main() {
   late FakeAuthRepository fakeRepository;
+  late FakeWeightRepository fakeWeightRepository;
   const testUser = UserEntity(id: 'u1', email: 'athlete@example.com');
 
   setUp(() {
     fakeRepository = FakeAuthRepository(initialUser: testUser);
+    fakeWeightRepository = FakeWeightRepository();
   });
 
   tearDown(() {
     fakeRepository.dispose();
+    fakeWeightRepository.reset();
   });
+
+  WeightEntryEntity createEntry(String dateIso, double weightKg) {
+    final parsed = DateTime.parse('${dateIso}T00:00:00.000Z');
+    return WeightEntryEntity(
+      dateIso: dateIso,
+      date: parsed,
+      weightKg: weightKg,
+      updatedAt: parsed,
+    );
+  }
 
   testWidgets('renders welcome message and authenticated user email', (
     tester,
@@ -172,4 +192,175 @@ void main() {
       expect(find.text('Sign out failed'), findsOneWidget);
     },
   );
+
+  group('3-Tab Navigation & Weights Integration', () {
+    testWidgets(
+      'tapping quick-action button on Home tab switches to Weights tab',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('home_go_to_weights_button')),
+          findsOneWidget,
+        );
+        expect(find.byType(WeightHistoryView), findsNothing);
+
+        await tester.tap(find.byKey(const Key('home_go_to_weights_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeightHistoryView), findsOneWidget);
+        expect(
+          find.byKey(const Key('weight_history_empty_state')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'navigating to Weights tab via bottom NavigationBar renders empty state when no weights',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeightHistoryView), findsOneWidget);
+        expect(
+          find.byKey(const Key('weight_history_empty_state')),
+          findsOneWidget,
+        );
+        expect(find.text('No weight entries yet'), findsOneWidget);
+        expect(find.byKey(const Key('add_weight_fab')), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Weights tab renders WeeklyWeightChart and WeeklyWeightCard with seeded entries',
+      (tester) async {
+        fakeWeightRepository.seedEntries(testUser.id, [
+          createEntry('2026-10-06', 78.5),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(WeightHistoryView), findsOneWidget);
+        expect(find.byType(WeeklyWeightChart), findsOneWidget);
+        expect(
+          find.byKey(const Key('weekly_weight_chart_card')),
+          findsOneWidget,
+        );
+        expect(find.byType(WeeklyWeightCard), findsOneWidget);
+        expect(find.byKey(const Key('week_card_2026-10-05')), findsOneWidget);
+        expect(find.byKey(const Key('daily_entry_2026-10-06')), findsOneWidget);
+        expect(find.text('78.50 kg avg'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'tapping add_weight_fab on Weights tab opens bottom sheet and saves new weight entry',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Weights tab
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+
+        // Tap Add Weight FAB
+        await tester.tap(find.byKey(const Key('add_weight_fab')));
+        await tester.pumpAndSettle();
+
+        // Bottom sheet open
+        expect(find.byType(WeightEntryBottomSheet), findsOneWidget);
+        expect(find.byKey(const Key('weight_input_field')), findsOneWidget);
+
+        // Enter weight and save
+        await tester.enterText(
+          find.byKey(const Key('weight_input_field')),
+          '82.50',
+        );
+        await tester.tap(find.byKey(const Key('save_weight_button')));
+        await tester.pumpAndSettle();
+
+        // Modal dismissed
+        expect(find.byType(WeightEntryBottomSheet), findsNothing);
+
+        // Entry persisted in repository
+        final userEntries = fakeWeightRepository.getEntriesForUser(testUser.id);
+        expect(userEntries, hasLength(1));
+        expect(userEntries.first.weightKg, equals(82.50));
+
+        // UI updated to show chart and card
+        expect(find.byType(WeeklyWeightChart), findsOneWidget);
+        expect(find.byType(WeeklyWeightCard), findsOneWidget);
+        expect(find.text('82.50 kg avg'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'switching to Profile tab displays email and allows logging out',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('profile_heading')), findsOneWidget);
+        expect(find.text('athlete@example.com'), findsOneWidget);
+        expect(find.byKey(const Key('profile_logout_button')), findsOneWidget);
+
+        // Tap logout
+        await tester.tap(find.byKey(const Key('profile_logout_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+
+        // Confirm logout
+        await tester.tap(find.byKey(const Key('confirm_logout_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(fakeRepository.currentUser, isNull);
+      },
+    );
+  });
 }
