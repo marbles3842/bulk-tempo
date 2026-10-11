@@ -8,7 +8,8 @@ This document specifies the folder layout, file organization, and naming standar
 
 ```text
 bulk_tempo/
-├── .documentation/                      # Architectural specifications & guidelines
+├── context/
+│   └── documentation/               # Architectural specifications & guidelines
 ├── lib/
 │   ├── app/                             # Application root setup
 │   │   ├── app.dart                     # MaterialApp.router configuration

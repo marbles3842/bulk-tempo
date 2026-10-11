@@ -98,3 +98,7 @@ firebase.json
 *.key
 *.mobileprovision
 key.properties
+
+# AI Agents
+.agents/
+skills-lock.json
