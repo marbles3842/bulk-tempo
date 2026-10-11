@@ -502,28 +502,28 @@ Integrate `WorkoutProgressView` as the 3rd tab (`index 2`, `Workouts`) in `HomeS
 
 #### Automated
 
-- [x] 1.1 Legacy `HeavyEnv` file is removed: `test ! -f lib/core/constants/heavy_env.dart`
-- [x] 1.2 Dependencies resolve cleanly: `flutter pub get`
-- [x] 1.3 Hevy key validator unit tests pass: `flutter test test/core/utils/hevy_key_validators_test.dart`
-- [x] 1.4 Static analysis passes with zero warnings: `flutter analyze`
-- [x] 1.5 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 1.1 Legacy `HeavyEnv` file is removed: `test ! -f lib/core/constants/heavy_env.dart` — 47d11a9
+- [x] 1.2 Dependencies resolve cleanly: `flutter pub get` — 47d11a9
+- [x] 1.3 Hevy key validator unit tests pass: `flutter test test/core/utils/hevy_key_validators_test.dart` — 47d11a9
+- [x] 1.4 Static analysis passes with zero warnings: `flutter analyze` — 47d11a9
+- [x] 1.5 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test` — 47d11a9
 
 #### Manual
 
-- [x] 1.6 Inspect `README.md` and `pubspec.yaml` to confirm no personal API key or `HEAVY_API_KEY` `--dart-define` instructions remain.
+- [x] 1.6 Inspect `README.md` and `pubspec.yaml` to confirm no personal API key or `HEAVY_API_KEY` `--dart-define` instructions remain. — 47d11a9
 
 ### Phase 2: Workout Domain & Data Layer (Hevy REST API & Local Key Storage)
 
 #### Automated
 
-- [ ] 2.1 Workout domain entity and weekly grouping unit tests pass: `flutter test test/features/workout/domain/`
-- [ ] 2.2 Workout DTO, data sources, repository, and FakeWorkoutRepository unit tests pass: `flutter test test/features/workout/data/ test/test_helpers/fakes/fake_workout_repository_test.dart`
-- [ ] 2.3 Static analysis passes with zero warnings: `flutter analyze`
-- [ ] 2.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 2.1 Workout domain entity and weekly grouping unit tests pass: `flutter test test/features/workout/domain/`
+- [x] 2.2 Workout DTO, data sources, repository, and FakeWorkoutRepository unit tests pass: `flutter test test/features/workout/data/ test/test_helpers/fakes/fake_workout_repository_test.dart`
+- [x] 2.3 Static analysis passes with zero warnings: `flutter analyze`
+- [x] 2.4 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 2.5 Verify `lib/features/workout/domain/` has zero imports from `package:flutter/`, `data/`, `presentation/`, `http`, or `flutter_secure_storage`.
+- [x] 2.5 Verify `lib/features/workout/domain/` has zero imports from `package:flutter/`, `data/`, `presentation/`, `http`, or `flutter_secure_storage`.
 
 ### Phase 3: Workout Presentation Layer (ViewModels, Key Setup & Weekly UI)
 
