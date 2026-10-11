@@ -255,19 +255,19 @@ This is an additive RTDB node. Existing accounts begin unset; there is no backfi
 
 #### Automated
 
-- [x] 1.1 Domain and input boundary tests pass: `cd bulk_tempo && flutter test test/features/gain_target/domain/`.
-- [x] 1.2 Static analysis passes: `cd bulk_tempo && flutter analyze`.
-- [x] 1.3 Formatting passes: `cd bulk_tempo && dart format --output=none --set-exit-if-changed lib test`.
+- [x] 1.1 Domain and input boundary tests pass: `cd bulk_tempo && flutter test test/features/gain_target/domain/`. — 3b87a28
+- [x] 1.2 Static analysis passes: `cd bulk_tempo && flutter analyze`. — 3b87a28
+- [x] 1.3 Formatting passes: `cd bulk_tempo && dart format --output=none --set-exit-if-changed lib test`. — 3b87a28
 
 ### Phase 2: Persistence and Security
 
 #### Automated
 
-- [ ] 2.1 Target data and fake-repository tests pass: `cd bulk_tempo && flutter test test/features/gain_target/data/ test/test_helpers/fakes/fake_gain_target_repository_test.dart`.
-- [ ] 2.2 Emulator harness dependencies install reproducibly: `cd bulk_tempo/database-rules-tests && npm ci`.
-- [ ] 2.3 Emulator tests prove owner access, foreign/unauthenticated denial, complete valid replacements, invalid/partial payload rejection, and unchanged weight access: `cd bulk_tempo/database-rules-tests && npm run test:emulator`.
-- [ ] 2.4 Existing weight data tests pass after the provider move: `cd bulk_tempo && flutter test test/features/weight/data/`.
-- [ ] 2.5 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
+- [x] 2.1 Target data and fake-repository tests pass: `cd bulk_tempo && flutter test test/features/gain_target/data/ test/test_helpers/fakes/fake_gain_target_repository_test.dart`.
+- [x] 2.2 Emulator harness dependencies install reproducibly: `cd bulk_tempo/database-rules-tests && npm ci`.
+- [x] 2.3 Emulator tests prove owner access, foreign/unauthenticated denial, complete valid replacements, invalid/partial payload rejection, and unchanged weight access: `cd bulk_tempo/database-rules-tests && npm run test:emulator`.
+- [x] 2.4 Existing weight data tests pass after the provider move: `cd bulk_tempo && flutter test test/features/weight/data/`.
+- [x] 2.5 Static analysis and formatting pass: `cd bulk_tempo && flutter analyze && dart format --output=none --set-exit-if-changed lib test`.
 
 ### Phase 3: Profile Integration
 
