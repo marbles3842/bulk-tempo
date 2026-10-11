@@ -176,11 +176,12 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
 
     return Scaffold(
       body: SafeArea(child: content),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         key: const Key('add_weight_fab'),
         tooltip: 'Add Weight',
+        icon: const Icon(Icons.add),
+        label: const Text('Add Weight'),
         onPressed: () => WeightEntryBottomSheet.show(context),
-        child: const Icon(Icons.add),
       ),
     );
   }
