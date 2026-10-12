@@ -48,8 +48,9 @@ void main() {
         ),
       ];
 
-      when(() => mockRemoteDataSource.getWeightEntries(userId: 'user_1'))
-          .thenAnswer((_) async => dtos);
+      when(
+        () => mockRemoteDataSource.getWeightEntries(userId: 'user_1'),
+      ).thenAnswer((_) async => dtos);
 
       final result = await repository.getWeightEntries(userId: 'user_1');
 
@@ -61,8 +62,9 @@ void main() {
     });
 
     test('maps AuthException to AuthFailure', () async {
-      when(() => mockRemoteDataSource.getWeightEntries(userId: 'user_1'))
-          .thenThrow(const AuthException('permission-denied', 'No permission'));
+      when(
+        () => mockRemoteDataSource.getWeightEntries(userId: 'user_1'),
+      ).thenThrow(const AuthException('permission-denied', 'No permission'));
 
       final result = await repository.getWeightEntries(userId: 'user_1');
 
@@ -72,8 +74,9 @@ void main() {
     });
 
     test('maps NetworkException to NetworkFailure', () async {
-      when(() => mockRemoteDataSource.getWeightEntries(userId: 'user_1'))
-          .thenThrow(const NetworkException('No connection'));
+      when(
+        () => mockRemoteDataSource.getWeightEntries(userId: 'user_1'),
+      ).thenThrow(const NetworkException('No connection'));
 
       final result = await repository.getWeightEntries(userId: 'user_1');
 
@@ -82,10 +85,11 @@ void main() {
     });
 
     test('maps ServerException to ServerFailure', () async {
-      when(() => mockRemoteDataSource.getWeightEntries(userId: 'user_1'))
-          .thenThrow(
-            const ServerException(message: 'DB failure', statusCode: 500),
-          );
+      when(
+        () => mockRemoteDataSource.getWeightEntries(userId: 'user_1'),
+      ).thenThrow(
+        const ServerException(message: 'DB failure', statusCode: 500),
+      );
 
       final result = await repository.getWeightEntries(userId: 'user_1');
 
@@ -95,8 +99,9 @@ void main() {
     });
 
     test('maps unexpected exception to UnknownFailure', () async {
-      when(() => mockRemoteDataSource.getWeightEntries(userId: 'user_1'))
-          .thenThrow(Exception('Boom'));
+      when(
+        () => mockRemoteDataSource.getWeightEntries(userId: 'user_1'),
+      ).thenThrow(Exception('Boom'));
 
       final result = await repository.getWeightEntries(userId: 'user_1');
 

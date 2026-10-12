@@ -78,45 +78,48 @@ void main() {
   });
 
   group('WorkoutExerciseEntity', () {
-    test('computes workingSetsCount, totalVolumeKg, and bestWorkingSet with tie-breaking', () {
-      const warmupHeavy = WorkoutSetEntity(
-        index: 0,
-        type: 'warmup',
-        weightKg: 120.0,
-        reps: 5,
-      );
-      const set1 = WorkoutSetEntity(
-        index: 1,
-        type: 'normal',
-        weightKg: 100.0,
-        reps: 6,
-      );
-      const set2HigherReps = WorkoutSetEntity(
-        index: 2,
-        type: 'normal',
-        weightKg: 100.0,
-        reps: 8,
-      );
-      const set3Drop = WorkoutSetEntity(
-        index: 3,
-        type: 'dropset',
-        weightKg: 80.0,
-        reps: 12,
-      );
+    test(
+      'computes workingSetsCount, totalVolumeKg, and bestWorkingSet with tie-breaking',
+      () {
+        const warmupHeavy = WorkoutSetEntity(
+          index: 0,
+          type: 'warmup',
+          weightKg: 120.0,
+          reps: 5,
+        );
+        const set1 = WorkoutSetEntity(
+          index: 1,
+          type: 'normal',
+          weightKg: 100.0,
+          reps: 6,
+        );
+        const set2HigherReps = WorkoutSetEntity(
+          index: 2,
+          type: 'normal',
+          weightKg: 100.0,
+          reps: 8,
+        );
+        const set3Drop = WorkoutSetEntity(
+          index: 3,
+          type: 'dropset',
+          weightKg: 80.0,
+          reps: 12,
+        );
 
-      const exercise = WorkoutExerciseEntity(
-        index: 0,
-        title: 'Bench Press (Barbell)',
-        exerciseTemplateId: 'tpl_bench',
-        sets: [warmupHeavy, set1, set2HigherReps, set3Drop],
-      );
+        const exercise = WorkoutExerciseEntity(
+          index: 0,
+          title: 'Bench Press (Barbell)',
+          exerciseTemplateId: 'tpl_bench',
+          sets: [warmupHeavy, set1, set2HigherReps, set3Drop],
+        );
 
-      expect(exercise.workingSetsCount, 3);
-      // 100*6 (600) + 100*8 (800) + 80*12 (960) = 2360.0
-      expect(exercise.totalVolumeKg, 2360.0);
-      // Warmup is ignored even if heavier; 100x8 beats 100x6 on reps tie-break
-      expect(exercise.bestWorkingSet, equals(set2HigherReps));
-    });
+        expect(exercise.workingSetsCount, 3);
+        // 100*6 (600) + 100*8 (800) + 80*12 (960) = 2360.0
+        expect(exercise.totalVolumeKg, 2360.0);
+        // Warmup is ignored even if heavier; 100x8 beats 100x6 on reps tie-break
+        expect(exercise.bestWorkingSet, equals(set2HigherReps));
+      },
+    );
 
     test(
       'selects highest reps for bodyweight exercises (weightKg == null)',
@@ -179,75 +182,98 @@ void main() {
       expect(WeeklyWorkoutSummaryEntity.groupWorkoutsByIsoWeek([]), isEmpty);
     });
 
-    test('groups workouts by ISO Monday of localDate, sorts newest first, and sums metrics', () {
-      const ex1 = WorkoutExerciseEntity(
-        index: 0,
-        title: 'Squat',
-        exerciseTemplateId: 'sq',
-        sets: [
-          WorkoutSetEntity(index: 0, type: 'warmup', weightKg: 60.0, reps: 10),
-          WorkoutSetEntity(index: 1, type: 'normal', weightKg: 100.0, reps: 5),
-          WorkoutSetEntity(index: 2, type: 'normal', weightKg: 100.0, reps: 5),
-        ],
-      );
-      const ex2 = WorkoutExerciseEntity(
-        index: 0,
-        title: 'Deadlift',
-        exerciseTemplateId: 'dl',
-        sets: [
-          WorkoutSetEntity(index: 0, type: 'normal', weightKg: 140.0, reps: 5),
-        ],
-      );
+    test(
+      'groups workouts by ISO Monday of localDate, sorts newest first, and sums metrics',
+      () {
+        const ex1 = WorkoutExerciseEntity(
+          index: 0,
+          title: 'Squat',
+          exerciseTemplateId: 'sq',
+          sets: [
+            WorkoutSetEntity(
+              index: 0,
+              type: 'warmup',
+              weightKg: 60.0,
+              reps: 10,
+            ),
+            WorkoutSetEntity(
+              index: 1,
+              type: 'normal',
+              weightKg: 100.0,
+              reps: 5,
+            ),
+            WorkoutSetEntity(
+              index: 2,
+              type: 'normal',
+              weightKg: 100.0,
+              reps: 5,
+            ),
+          ],
+        );
+        const ex2 = WorkoutExerciseEntity(
+          index: 0,
+          title: 'Deadlift',
+          exerciseTemplateId: 'dl',
+          sets: [
+            WorkoutSetEntity(
+              index: 0,
+              type: 'normal',
+              weightKg: 140.0,
+              reps: 5,
+            ),
+          ],
+        );
 
-      // Week 1: Monday 2026-09-28 .. Sunday 2026-10-04
-      final sundayWeek1 = buildWorkout(
-        id: 'w_sun',
-        localDate: DateTime.utc(2026, 10, 4),
-        startTime: DateTime.utc(2026, 10, 4, 15),
-        exercises: const [ex1], // 2 working sets, 1000.0 kg
-      );
+        // Week 1: Monday 2026-09-28 .. Sunday 2026-10-04
+        final sundayWeek1 = buildWorkout(
+          id: 'w_sun',
+          localDate: DateTime.utc(2026, 10, 4),
+          startTime: DateTime.utc(2026, 10, 4, 15),
+          exercises: const [ex1], // 2 working sets, 1000.0 kg
+        );
 
-      // Week 2: Monday 2026-10-05 .. Sunday 2026-10-11
-      final mondayWeek2 = buildWorkout(
-        id: 'w_mon',
-        localDate: DateTime.utc(2026, 10, 5),
-        startTime: DateTime.utc(2026, 10, 5, 9),
-        exercises: const [ex1], // 2 working sets, 1000.0 kg
-      );
-      final thursdayWeek2 = buildWorkout(
-        id: 'w_thu',
-        localDate: DateTime.utc(2026, 10, 8),
-        startTime: DateTime.utc(2026, 10, 8, 18),
-        exercises: const [ex2], // 1 working set, 700.0 kg
-      );
+        // Week 2: Monday 2026-10-05 .. Sunday 2026-10-11
+        final mondayWeek2 = buildWorkout(
+          id: 'w_mon',
+          localDate: DateTime.utc(2026, 10, 5),
+          startTime: DateTime.utc(2026, 10, 5, 9),
+          exercises: const [ex1], // 2 working sets, 1000.0 kg
+        );
+        final thursdayWeek2 = buildWorkout(
+          id: 'w_thu',
+          localDate: DateTime.utc(2026, 10, 8),
+          startTime: DateTime.utc(2026, 10, 8, 18),
+          exercises: const [ex2], // 1 working set, 700.0 kg
+        );
 
-      final summaries = WeeklyWorkoutSummaryEntity.groupWorkoutsByIsoWeek([
-        sundayWeek1,
-        mondayWeek2,
-        thursdayWeek2,
-      ]);
+        final summaries = WeeklyWorkoutSummaryEntity.groupWorkoutsByIsoWeek([
+          sundayWeek1,
+          mondayWeek2,
+          thursdayWeek2,
+        ]);
 
-      expect(summaries.length, 2);
+        expect(summaries.length, 2);
 
-      // Newest week first (2026-10-05)
-      final latestWeek = summaries[0];
-      expect(latestWeek.weekStartIso, '2026-10-05');
-      expect(latestWeek.weekStartMonday, DateTime.utc(2026, 10, 5));
-      expect(latestWeek.weekEndSunday, DateTime.utc(2026, 10, 11));
-      expect(latestWeek.workoutCount, 2);
-      expect(latestWeek.totalWorkingSets, 3);
-      expect(latestWeek.totalVolumeKg, 1700.0);
-      // Workouts within week sorted descending by startTime
-      final latestIds = latestWeek.workouts.map((w) => w.id).toList();
-      expect(latestIds, ['w_thu', 'w_mon']);
+        // Newest week first (2026-10-05)
+        final latestWeek = summaries[0];
+        expect(latestWeek.weekStartIso, '2026-10-05');
+        expect(latestWeek.weekStartMonday, DateTime.utc(2026, 10, 5));
+        expect(latestWeek.weekEndSunday, DateTime.utc(2026, 10, 11));
+        expect(latestWeek.workoutCount, 2);
+        expect(latestWeek.totalWorkingSets, 3);
+        expect(latestWeek.totalVolumeKg, 1700.0);
+        // Workouts within week sorted descending by startTime
+        final latestIds = latestWeek.workouts.map((w) => w.id).toList();
+        expect(latestIds, ['w_thu', 'w_mon']);
 
-      // Older week second (2026-09-28)
-      final olderWeek = summaries[1];
-      expect(olderWeek.weekStartIso, '2026-09-28');
-      expect(olderWeek.workoutCount, 1);
-      expect(olderWeek.totalWorkingSets, 2);
-      expect(olderWeek.totalVolumeKg, 1000.0);
-    });
+        // Older week second (2026-09-28)
+        final olderWeek = summaries[1];
+        expect(olderWeek.weekStartIso, '2026-09-28');
+        expect(olderWeek.workoutCount, 1);
+        expect(olderWeek.totalWorkingSets, 2);
+        expect(olderWeek.totalVolumeKg, 1000.0);
+      },
+    );
 
     test('deduplicates workouts by id keeping latest startTime', () {
       const exOld = WorkoutExerciseEntity(

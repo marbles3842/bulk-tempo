@@ -42,8 +42,9 @@ void main() {
     );
 
     test('returns Success(null) when target does not exist', () async {
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenAnswer((_) async => null);
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -54,8 +55,9 @@ void main() {
     test('returns Success with GainTargetEntity mapped from DTO', () async {
       const dto = GainTargetDto(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25);
 
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenAnswer((_) async => dto);
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenAnswer((_) async => dto);
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -66,8 +68,9 @@ void main() {
     });
 
     test('maps AuthException to AuthFailure', () async {
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenThrow(const AuthException('permission-denied', 'No permission'));
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenThrow(const AuthException('permission-denied', 'No permission'));
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -77,8 +80,9 @@ void main() {
     });
 
     test('maps NetworkException to NetworkFailure', () async {
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenThrow(const NetworkException('Network error occurred'));
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenThrow(const NetworkException('Network error occurred'));
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -87,8 +91,9 @@ void main() {
     });
 
     test('maps ServerException to ServerFailure', () async {
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenThrow(const ServerException(message: 'Request timed out'));
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenThrow(const ServerException(message: 'Request timed out'));
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -98,8 +103,9 @@ void main() {
     });
 
     test('maps unexpected exception to UnknownFailure', () async {
-      when(() => mockRemoteDataSource.getGainTarget(userId: 'user_123'))
-          .thenThrow(Exception('Unexpected crash'));
+      when(
+        () => mockRemoteDataSource.getGainTarget(userId: 'user_123'),
+      ).thenThrow(Exception('Unexpected crash'));
 
       final result = await repository.getGainTarget(userId: 'user_123');
 
@@ -211,36 +217,39 @@ void main() {
       },
     );
 
-    test('saves DTO and returns Success with mapped entity on server acknowledgement', () async {
-      const savedDto = GainTargetDto(
-        minWeeklyGainKg: 0.15,
-        maxWeeklyGainKg: 0.25,
-      );
+    test(
+      'saves DTO and returns Success with mapped entity on server acknowledgement',
+      () async {
+        const savedDto = GainTargetDto(
+          minWeeklyGainKg: 0.15,
+          maxWeeklyGainKg: 0.25,
+        );
 
-      when(
-        () => mockRemoteDataSource.saveGainTarget(
-          userId: 'user_123',
-          dto: any(named: 'dto'),
-        ),
-      ).thenAnswer((_) async => savedDto);
-
-      final result = await repository.saveGainTarget(
-        userId: 'user_123',
-        target: validEntity,
-      );
-
-      expect(result.isSuccess, isTrue);
-      expect(result.dataOrNull, equals(validEntity));
-      verify(
-        () => mockRemoteDataSource.saveGainTarget(
-          userId: 'user_123',
-          dto: const GainTargetDto(
-            minWeeklyGainKg: 0.15,
-            maxWeeklyGainKg: 0.25,
+        when(
+          () => mockRemoteDataSource.saveGainTarget(
+            userId: 'user_123',
+            dto: any(named: 'dto'),
           ),
-        ),
-      ).called(1);
-    });
+        ).thenAnswer((_) async => savedDto);
+
+        final result = await repository.saveGainTarget(
+          userId: 'user_123',
+          target: validEntity,
+        );
+
+        expect(result.isSuccess, isTrue);
+        expect(result.dataOrNull, equals(validEntity));
+        verify(
+          () => mockRemoteDataSource.saveGainTarget(
+            userId: 'user_123',
+            dto: const GainTargetDto(
+              minWeeklyGainKg: 0.15,
+              maxWeeklyGainKg: 0.25,
+            ),
+          ),
+        ).called(1);
+      },
+    );
 
     test('maps remote AuthException to AuthFailure', () async {
       when(

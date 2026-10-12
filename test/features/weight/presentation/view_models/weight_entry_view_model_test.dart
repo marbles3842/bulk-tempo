@@ -155,33 +155,36 @@ void main() {
       },
     );
 
-    test('submit prompts for overwrite when entry already exists for selected date', () async {
-      final conflictDate = DateTime.now().subtract(const Duration(days: 1));
-      final dateIso = WeekDateUtils.toIsoDateString(conflictDate);
-      final existingEntry = createTestEntry(dateIso: dateIso, weightKg: 78.0);
-      fakeWeightRepository.seedEntries(testUser.id, [existingEntry]);
+    test(
+      'submit prompts for overwrite when entry already exists for selected date',
+      () async {
+        final conflictDate = DateTime.now().subtract(const Duration(days: 1));
+        final dateIso = WeekDateUtils.toIsoDateString(conflictDate);
+        final existingEntry = createTestEntry(dateIso: dateIso, weightKg: 78.0);
+        fakeWeightRepository.seedEntries(testUser.id, [existingEntry]);
 
-      await container
-          .read(weightHistoryViewModelProvider.notifier)
-          .loadEntries();
+        await container
+            .read(weightHistoryViewModelProvider.notifier)
+            .loadEntries();
 
-      final notifier = container.read(weightEntryViewModelProvider.notifier);
-      notifier.onDateChanged(conflictDate);
-      notifier.onWeightChanged('79.5');
+        final notifier = container.read(weightEntryViewModelProvider.notifier);
+        notifier.onDateChanged(conflictDate);
+        notifier.onWeightChanged('79.5');
 
-      final result = await notifier.submit(confirmOverwrite: false);
-      expect(result, isFalse);
+        final result = await notifier.submit(confirmOverwrite: false);
+        expect(result, isFalse);
 
-      final state = container.read(weightEntryViewModelProvider);
-      expect(state.requiresOverwriteConfirmation, isTrue);
-      expect(state.existingEntryForDate, equals(existingEntry));
+        final state = container.read(weightEntryViewModelProvider);
+        expect(state.requiresOverwriteConfirmation, isTrue);
+        expect(state.existingEntryForDate, equals(existingEntry));
 
-      // Canceling overwrite confirmation
-      notifier.cancelOverwriteConfirmation();
-      final afterCancel = container.read(weightEntryViewModelProvider);
-      expect(afterCancel.requiresOverwriteConfirmation, isFalse);
-      expect(afterCancel.existingEntryForDate, isNull);
-    });
+        // Canceling overwrite confirmation
+        notifier.cancelOverwriteConfirmation();
+        final afterCancel = container.read(weightEntryViewModelProvider);
+        expect(afterCancel.requiresOverwriteConfirmation, isFalse);
+        expect(afterCancel.existingEntryForDate, isNull);
+      },
+    );
 
     test(
       'submit overwrites existing entry when confirmOverwrite is true',
@@ -212,9 +215,9 @@ void main() {
         expect(updatedEntries.length, equals(1));
         expect(updatedEntries.first.weightKg, equals(79.5));
 
-        final historyState = container.read(
-          weightHistoryViewModelProvider,
-        ) as WeightHistoryLoaded;
+        final historyState =
+            container.read(weightHistoryViewModelProvider)
+                as WeightHistoryLoaded;
         expect(historyState.entries.first.weightKg, equals(79.5));
       },
     );
@@ -329,26 +332,29 @@ void main() {
   });
 
   group('Correction session initialization & reset', () {
-    test('initializeEdit prefills two-decimal weight, captures immutable original entry and date', () {
-      final existing = createTestEntry(dateIso: '2025-01-15', weightKg: 80.0);
-      final notifier = container.read(weightEntryViewModelProvider.notifier);
+    test(
+      'initializeEdit prefills two-decimal weight, captures immutable original entry and date',
+      () {
+        final existing = createTestEntry(dateIso: '2025-01-15', weightKg: 80.0);
+        final notifier = container.read(weightEntryViewModelProvider.notifier);
 
-      notifier.initializeEdit(existing, userId: testUser.id);
+        notifier.initializeEdit(existing, userId: testUser.id);
 
-      final state = container.read(weightEntryViewModelProvider);
-      expect(state.isEdit, isTrue);
-      expect(state.originalEntry, equals(existing));
-      expect(state.fixedDateIso, equals('2025-01-15'));
-      expect(state.fixedDate, equals(existing.date));
-      expect(state.weightInput, equals('80.00'));
-      expect(state.openingUserId, equals(testUser.id));
-      expect(state.status, equals(FormStatus.initial));
-      expect(state.weightError, isNull);
-      expect(state.dateError, isNull);
-      expect(state.errorMessage, isNull);
-      expect(state.requiresOverwriteConfirmation, isFalse);
-      expect(state.isDirty, isFalse);
-    });
+        final state = container.read(weightEntryViewModelProvider);
+        expect(state.isEdit, isTrue);
+        expect(state.originalEntry, equals(existing));
+        expect(state.fixedDateIso, equals('2025-01-15'));
+        expect(state.fixedDate, equals(existing.date));
+        expect(state.weightInput, equals('80.00'));
+        expect(state.openingUserId, equals(testUser.id));
+        expect(state.status, equals(FormStatus.initial));
+        expect(state.weightError, isNull);
+        expect(state.dateError, isNull);
+        expect(state.errorMessage, isNull);
+        expect(state.requiresOverwriteConfirmation, isFalse);
+        expect(state.isDirty, isFalse);
+      },
+    );
 
     test(
       'reopening for Add after Edit resets state and does not leak inputs',
@@ -373,16 +379,19 @@ void main() {
       },
     );
 
-    test('reset clears all errors, terminal status, and returns to initial Add state', () {
-      final notifier = container.read(weightEntryViewModelProvider.notifier);
-      notifier.onWeightChanged('invalid');
-      notifier.initializeAdd();
+    test(
+      'reset clears all errors, terminal status, and returns to initial Add state',
+      () {
+        final notifier = container.read(weightEntryViewModelProvider.notifier);
+        notifier.onWeightChanged('invalid');
+        notifier.initializeAdd();
 
-      final state = container.read(weightEntryViewModelProvider);
-      expect(state.weightInput, isEmpty);
-      expect(state.status, equals(FormStatus.initial));
-      expect(state.weightError, isNull);
-    });
+        final state = container.read(weightEntryViewModelProvider);
+        expect(state.weightInput, isEmpty);
+        expect(state.status, equals(FormStatus.initial));
+        expect(state.weightError, isNull);
+      },
+    );
   });
 
   group('Edit mode date immutability & validation', () {
@@ -543,9 +552,9 @@ void main() {
         expect(fakeWeightRepository.getEntriesForUser(testUser.id), isEmpty);
 
         // History reflects deletion immediately
-        final historyState = container.read(
-          weightHistoryViewModelProvider,
-        ) as WeightHistoryLoaded;
+        final historyState =
+            container.read(weightHistoryViewModelProvider)
+                as WeightHistoryLoaded;
         expect(historyState.hasEntryForDate('2026-10-01'), isFalse);
       },
     );
@@ -634,32 +643,35 @@ void main() {
       expect(await firstFuture, isTrue);
     });
 
-    test('account switch during in-flight save suppresses form and history effects', () async {
-      await container
-          .read(weightHistoryViewModelProvider.notifier)
-          .loadEntries();
+    test(
+      'account switch during in-flight save suppresses form and history effects',
+      () async {
+        await container
+            .read(weightHistoryViewModelProvider.notifier)
+            .loadEntries();
 
-      final completer = Completer<void>();
-      fakeWeightRepository.saveCompleter = completer;
+        final completer = Completer<void>();
+        fakeWeightRepository.saveCompleter = completer;
 
-      final notifier = container.read(weightEntryViewModelProvider.notifier);
-      notifier.onWeightChanged('77.0');
+        final notifier = container.read(weightEntryViewModelProvider.notifier);
+        notifier.onWeightChanged('77.0');
 
-      final future = notifier.submit();
+        final future = notifier.submit();
 
-      // Switch active account before write completes
-      fakeAuthRepository.setCurrentUser(
-        const UserEntity(id: 'u2', email: 'other@example.com'),
-      );
+        // Switch active account before write completes
+        fakeAuthRepository.setCurrentUser(
+          const UserEntity(id: 'u2', email: 'other@example.com'),
+        );
 
-      completer.complete();
-      final result = await future;
-      expect(result, isFalse);
+        completer.complete();
+        final result = await future;
+        expect(result, isFalse);
 
-      // History for testUser was not touched on current container
-      final historyState = container.read(weightHistoryViewModelProvider);
-      expect(historyState, isA<WeightHistoryInitial>());
-    });
+        // History for testUser was not touched on current container
+        final historyState = container.read(weightHistoryViewModelProvider);
+        expect(historyState, isA<WeightHistoryInitial>());
+      },
+    );
 
     test('disposal during in-flight save is inert', () async {
       final completer = Completer<void>();

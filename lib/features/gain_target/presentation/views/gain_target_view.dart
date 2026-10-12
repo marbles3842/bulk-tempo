@@ -112,8 +112,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
                 Expanded(
                   child: Text(
                     'Weekly Gain Target',
-                    style: Theme.of(context).textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -168,8 +169,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium
-                ?.copyWith(color: Theme.of(context).colorScheme.error),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
           ),
           const SizedBox(height: 16),
           FilledButton.icon(
@@ -196,8 +198,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -210,8 +213,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
               const SizedBox(width: 8),
               Text(
                 'Current target: ',
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w500),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
               Expanded(
                 child: Text(

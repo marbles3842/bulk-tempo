@@ -20,21 +20,25 @@ void main() {
     test(
       'readApiKey reads from hevy_api_key_<userId> and trims whitespace',
       () async {
-        when(() => mockSecureStorage.read(key: 'hevy_api_key_user_1'))
-            .thenAnswer((_) async => '  $validKey  ');
+        when(
+          () => mockSecureStorage.read(key: 'hevy_api_key_user_1'),
+        ).thenAnswer((_) async => '  $validKey  ');
 
         final result = await dataSource.readApiKey(userId: 'user_1');
         expect(result, validKey);
-        verify(() => mockSecureStorage.read(key: 'hevy_api_key_user_1'))
-            .called(1);
+        verify(
+          () => mockSecureStorage.read(key: 'hevy_api_key_user_1'),
+        ).called(1);
       },
     );
 
     test('readApiKey returns null when key is missing or whitespace', () async {
-      when(() => mockSecureStorage.read(key: 'hevy_api_key_user_1'))
-          .thenAnswer((_) async => null);
-      when(() => mockSecureStorage.read(key: 'hevy_api_key_user_2'))
-          .thenAnswer((_) async => '   ');
+      when(
+        () => mockSecureStorage.read(key: 'hevy_api_key_user_1'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockSecureStorage.read(key: 'hevy_api_key_user_2'),
+      ).thenAnswer((_) async => '   ');
 
       expect(await dataSource.readApiKey(userId: 'user_1'), isNull);
       expect(await dataSource.readApiKey(userId: 'user_2'), isNull);
@@ -62,28 +66,32 @@ void main() {
     );
 
     test('deleteApiKey deletes hevy_api_key_<userId>', () async {
-      when(() => mockSecureStorage.delete(key: 'hevy_api_key_user_1'))
-          .thenAnswer((_) async {});
+      when(
+        () => mockSecureStorage.delete(key: 'hevy_api_key_user_1'),
+      ).thenAnswer((_) async {});
 
       await dataSource.deleteApiKey(userId: 'user_1');
 
-      verify(() => mockSecureStorage.delete(key: 'hevy_api_key_user_1'))
-          .called(1);
+      verify(
+        () => mockSecureStorage.delete(key: 'hevy_api_key_user_1'),
+      ).called(1);
     });
 
     test(
       'wraps storage exceptions in CacheException for read, write, and delete',
       () async {
-        when(() => mockSecureStorage.read(key: any(named: 'key')))
-            .thenThrow(Exception('Keychain locked'));
+        when(
+          () => mockSecureStorage.read(key: any(named: 'key')),
+        ).thenThrow(Exception('Keychain locked'));
         when(
           () => mockSecureStorage.write(
             key: any(named: 'key'),
             value: any(named: 'value'),
           ),
         ).thenThrow(Exception('Keychain write failed'));
-        when(() => mockSecureStorage.delete(key: any(named: 'key')))
-            .thenThrow(Exception('Keychain delete failed'));
+        when(
+          () => mockSecureStorage.delete(key: any(named: 'key')),
+        ).thenThrow(Exception('Keychain delete failed'));
 
         expect(
           () => dataSource.readApiKey(userId: 'user_1'),
