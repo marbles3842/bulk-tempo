@@ -103,25 +103,27 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
 
   /// Concurrently initializes weight history, workout progress, and gain target.
   Future<void> ensureInitialized() async {
+    final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
+    final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
+    final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
+
     await Future.wait([
-      ref.read(weightHistoryViewModelProvider.notifier).ensureInitialized(),
-      ref.read(workoutProgressViewModelProvider.notifier).ensureInitialized(),
-      ref.read(gainTargetViewModelProvider.notifier).ensureInitialized(),
+      weightNotifier.ensureInitialized(),
+      workoutNotifier.ensureInitialized(),
+      gainTargetNotifier.ensureInitialized(),
     ]);
   }
 
   /// Concurrently refreshes weight history, workout progress, and gain target.
   Future<void> refreshAll() async {
+    final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
+    final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
+    final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
+
     await Future.wait([
-      ref
-          .read(weightHistoryViewModelProvider.notifier)
-          .loadEntries(showLoading: false),
-      ref
-          .read(workoutProgressViewModelProvider.notifier)
-          .loadWorkouts(showLoading: false),
-      ref
-          .read(gainTargetViewModelProvider.notifier)
-          .loadTarget(showLoading: false, isRefresh: true),
+      weightNotifier.loadEntries(showLoading: false),
+      workoutNotifier.loadWorkouts(showLoading: false),
+      gainTargetNotifier.loadTarget(showLoading: false, isRefresh: true),
     ]);
   }
 

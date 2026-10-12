@@ -1,4 +1,6 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
@@ -6,6 +8,7 @@ import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:bulk_tempo/features/gain_target/data/repositories/gain_target_repository_impl.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/data/repositories/weight_repository_impl.dart';
@@ -59,6 +62,26 @@ void main() {
     fakeWorkoutRepository.reset();
   });
 
+  List<Override> buildOverrides({
+    FakeAuthRepository? auth,
+    FakeWeightRepository? weight,
+    FakeWorkoutRepository? workout,
+    FakeGainTargetRepository? gainTarget,
+  }) {
+    return [
+      authRepositoryProvider.overrideWithValue(auth ?? fakeRepository),
+      weightRepositoryProvider.overrideWithValue(
+        weight ?? fakeWeightRepository,
+      ),
+      workoutRepositoryProvider.overrideWithValue(
+        workout ?? fakeWorkoutRepository,
+      ),
+      gainTargetRepositoryProvider.overrideWithValue(
+        gainTarget ?? fakeGainTargetRepository,
+      ),
+    ];
+  }
+
   WeightEntryEntity createEntry(String dateIso, double weightKg) {
     final parsed = DateTime.parse('${dateIso}T00:00:00.000Z');
     return WeightEntryEntity(
@@ -109,30 +132,62 @@ void main() {
     );
   }
 
-  testWidgets('renders welcome message and authenticated user email', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const HomeShellScreen(),
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Welcome to Bulk Tempo'), findsOneWidget);
-    expect(find.text('athlete@example.com'), findsOneWidget);
-    expect(find.byKey(const Key('home_logout_button')), findsOneWidget);
-  });
-
   testWidgets(
-    'tapping logout button shows confirmation dialog with Cancel and Log Out actions',
+    'renders DashboardView with KPI tiles and fl_chart cards on Home tab',
     (tester) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       await tester.pumpApp(
         const HomeShellScreen(),
-        overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+        overrides: buildOverrides(),
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('home_logout_button')));
+      expect(find.byType(DashboardView), findsOneWidget);
+      expect(find.byKey(const Key('dashboard_kpi_pace_tile')), findsOneWidget);
+      expect(
+        find.byKey(const Key('dashboard_kpi_average_tile')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('dashboard_kpi_total_gain_tile')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('dashboard_kpi_workouts_tile')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('dashboard_weight_trend_card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('dashboard_weekly_workouts_card')),
+        findsOneWidget,
+      );
+
+      expect(find.text('Welcome to Bulk Tempo'), findsNothing);
+      expect(find.byKey(const Key('home_go_to_weights_button')), findsNothing);
+      expect(find.byKey(const Key('home_go_to_workouts_button')), findsNothing);
+      expect(find.byKey(const Key('home_logout_button')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'tapping app bar logout button shows confirmation dialog with Cancel and Log Out actions',
+    (tester) async {
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        overrides: buildOverrides(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsOneWidget);
@@ -145,13 +200,10 @@ void main() {
   testWidgets('tapping Cancel dismisses dialog without logging out', (
     tester,
   ) async {
-    await tester.pumpApp(
-      const HomeShellScreen(),
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
-    );
+    await tester.pumpApp(const HomeShellScreen(), overrides: buildOverrides());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('home_logout_button')));
+    await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Cancel'));
@@ -164,48 +216,55 @@ void main() {
   testWidgets('confirming logout signs out user from repository', (
     tester,
   ) async {
-    await tester.pumpApp(
-      const HomeShellScreen(),
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
-    );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('home_logout_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('confirm_logout_button')));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(fakeRepository.currentUser, isNull);
-  });
-
-  testWidgets('tapping app bar logout icon also shows confirmation dialog', (
-    tester,
-  ) async {
-    await tester.pumpApp(
-      const HomeShellScreen(),
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
-    );
+    await tester.pumpApp(const HomeShellScreen(), overrides: buildOverrides());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
     await tester.pumpAndSettle();
 
-    expect(find.byType(AlertDialog), findsOneWidget);
-    expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('confirm_logout_button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(fakeRepository.currentUser, isNull);
   });
+
+  testWidgets(
+    'renders seeded fl_chart LineChart and BarChart widgets on Home tab',
+    (tester) async {
+      fakeWeightRepository.seedEntries(testUser.id, [
+        createEntry('2026-09-28', 80.0),
+        createEntry('2026-10-06', 80.6),
+      ]);
+      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+      fakeWorkoutRepository.seedWorkouts(testUser.id, [createSampleWorkout()]);
+
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        overrides: buildOverrides(),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LineChart), findsOneWidget);
+      expect(find.byType(BarChart), findsOneWidget);
+    },
+  );
 
   testWidgets('displays error SnackBar when logout fails', (tester) async {
     fakeRepository.signOutFailure = const ServerFailure('Sign out failed');
 
-    await tester.pumpApp(
-      const HomeShellScreen(),
-      overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
-    );
+    await tester.pumpApp(const HomeShellScreen(), overrides: buildOverrides());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('home_logout_button')));
+    await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('confirm_logout_button')));
@@ -222,12 +281,12 @@ void main() {
 
       await tester.pumpApp(
         const HomeShellScreen(),
-        overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+        overrides: buildOverrides(),
       );
       await tester.pumpAndSettle();
 
       // First logout attempt fails
-      await tester.tap(find.byKey(const Key('home_logout_button')));
+      await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('confirm_logout_button')));
       await tester.pumpAndSettle();
@@ -243,7 +302,7 @@ void main() {
       expect(find.byType(SnackBar), findsNothing);
 
       // Second logout attempt with same error
-      await tester.tap(find.byKey(const Key('home_logout_button')));
+      await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('confirm_logout_button')));
       await tester.pumpAndSettle();
@@ -255,43 +314,11 @@ void main() {
 
   group('3-Tab Navigation & Weights Integration', () {
     testWidgets(
-      'tapping quick-action button on Home tab switches to Weights tab',
-      (tester) async {
-        await tester.pumpApp(
-          const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
-        );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.byKey(const Key('home_go_to_weights_button')),
-          findsOneWidget,
-        );
-        expect(find.byType(WeightHistoryView), findsNothing);
-
-        await tester.tap(find.byKey(const Key('home_go_to_weights_button')));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(WeightHistoryView), findsOneWidget);
-        expect(
-          find.byKey(const Key('weight_history_empty_state')),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
       'navigating to Weights tab via bottom NavigationBar renders empty state when no weights',
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -317,10 +344,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -345,10 +369,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -392,14 +413,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -439,10 +453,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -486,10 +497,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -527,14 +535,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -552,75 +553,27 @@ void main() {
   });
 
   group('4-Tab Navigation, Workouts & Profile Hevy Key Integration', () {
-    testWidgets(
-      'renders 4 navigation destinations and quick-action button on Home tab',
-      (tester) async {
-        await tester.pumpApp(
-          const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
-        );
-        await tester.pumpAndSettle();
+    testWidgets('renders 4 navigation destinations on Home tab', (
+      tester,
+    ) async {
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        overrides: buildOverrides(),
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('nav_home_tab')), findsOneWidget);
-        expect(find.byKey(const Key('nav_weights_tab')), findsOneWidget);
-        expect(find.byKey(const Key('nav_workouts_tab')), findsOneWidget);
-        expect(find.byKey(const Key('nav_profile_tab')), findsOneWidget);
-        expect(
-          find.byKey(const Key('home_go_to_workouts_button')),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'tapping quick-action button on Home tab switches to Workouts tab',
-      (tester) async {
-        await tester.pumpApp(
-          const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.byType(WorkoutProgressView), findsNothing);
-
-        await tester.tap(find.byKey(const Key('home_go_to_workouts_button')));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(WorkoutProgressView), findsOneWidget);
-        expect(
-          find.byKey(const Key('workout_unconfigured_state')),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(find.byKey(const Key('nav_home_tab')), findsOneWidget);
+      expect(find.byKey(const Key('nav_weights_tab')), findsOneWidget);
+      expect(find.byKey(const Key('nav_workouts_tab')), findsOneWidget);
+      expect(find.byKey(const Key('nav_profile_tab')), findsOneWidget);
+    });
 
     testWidgets(
       'navigating to Workouts tab via bottom NavigationBar renders unconfigured state when no key',
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -683,14 +636,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -735,14 +681,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -806,14 +745,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 

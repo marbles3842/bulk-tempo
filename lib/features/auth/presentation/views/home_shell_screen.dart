@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/presentation/views/weight_history_view.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_view_model.dart';
@@ -41,57 +42,6 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildHomeTab(BuildContext context, String? email) {
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.account_circle_outlined, size: 72),
-              const SizedBox(height: 16),
-              Text(
-                'Welcome to Bulk Tempo',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                email ?? 'No email',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                key: const Key('home_go_to_weights_button'),
-                icon: const Icon(Icons.monitor_weight),
-                label: const Text('Go to Weights'),
-                onPressed: () => setState(() => _selectedIndex = 1),
-              ),
-              const SizedBox(height: 16),
-              FilledButton.tonalIcon(
-                key: const Key('home_go_to_workouts_button'),
-                icon: const Icon(Icons.fitness_center),
-                label: const Text('Go to Workouts'),
-                onPressed: () => setState(() => _selectedIndex = 2),
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                key: const Key('home_logout_button'),
-                icon: const Icon(Icons.logout),
-                label: const Text('Log Out'),
-                onPressed: () => _showLogoutDialog(context),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -248,7 +198,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
     Widget body;
     switch (_selectedIndex) {
       case 0:
-        body = _buildHomeTab(context, user?.email);
+        body = const DashboardView();
       case 1:
         body = const WeightHistoryView();
       case 2:
@@ -256,7 +206,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
       case 3:
         body = _buildProfileTab(context, user?.email);
       default:
-        body = _buildHomeTab(context, user?.email);
+        body = const DashboardView();
     }
 
     return Scaffold(

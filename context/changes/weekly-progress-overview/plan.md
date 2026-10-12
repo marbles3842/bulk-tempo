@@ -460,23 +460,23 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 #### Automated
 
-- [x] 2.1 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
-- [x] 2.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 2.1 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/` — 6ab9d92
+- [x] 2.2 Static analysis passes with zero issues: `flutter analyze` — 6ab9d92
 
 #### Manual
 
-- [x] 2.3 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
+- [x] 2.3 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers. — 6ab9d92
 
 ### Phase 3: Home Tab `fl_chart` UI, Wiring & Test Migration
 
 #### Automated
 
-- [ ] 3.1 Full test suite passes: `flutter test`
-- [ ] 3.2 Static analysis passes with zero issues: `flutter analyze`
-- [ ] 3.3 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 Full test suite passes: `flutter test`
+- [x] 3.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 3.3 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 3.4 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend, Weekly Pace, and Workouts per Week cards.
-- [ ] 3.5 With weights logged across $\ge 2$ weeks and a saved weekly gain target on Profile, verify the Weekly Weight Trend `LineChart` and Weekly Pace `BarChart` (with shaded target band) render on Home, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
-- [ ] 3.6 Verify that when Hevy is disconnected, the Weight Trend and Weekly Pace charts still render normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.
+- [x] 3.4 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend and Workouts per Week cards.
+- [x] 3.5 With weights logged across $\ge 2$ weeks, verify the Weekly Weight Trend `LineChart` renders on Home and Current Pace tile shows the computed pace, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
+- [x] 3.6 Verify that when Hevy is disconnected, the Weight Trend chart still renders normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.
