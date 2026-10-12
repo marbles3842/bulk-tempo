@@ -471,12 +471,12 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 #### Automated
 
-- [x] 3.1 Full test suite passes: `flutter test`
-- [x] 3.2 Static analysis passes with zero issues: `flutter analyze`
-- [x] 3.3 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 Full test suite passes: `flutter test` — f016ba6
+- [x] 3.2 Static analysis passes with zero issues: `flutter analyze` — f016ba6
+- [x] 3.3 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test` — f016ba6
 
 #### Manual
 
-- [x] 3.4 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend and Workouts per Week cards.
-- [x] 3.5 With weights logged across $\ge 2$ weeks, verify the Weekly Weight Trend `LineChart` renders on Home and Current Pace tile shows the computed pace, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
-- [x] 3.6 Verify that when Hevy is disconnected, the Weight Trend chart still renders normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.
+- [x] 3.4 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend and Workouts per Week cards. — f016ba6
+- [x] 3.5 With weights logged across $\ge 2$ weeks, verify the Weekly Weight Trend `LineChart` renders on Home and Current Pace tile shows the computed pace, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`. — f016ba6
+- [x] 3.6 Verify that when Hevy is disconnected, the Weight Trend chart still renders normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards. — f016ba6
