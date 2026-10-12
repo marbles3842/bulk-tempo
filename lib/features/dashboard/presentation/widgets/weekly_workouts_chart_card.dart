@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/dashboard/domain/models/weekly_progress_overview_entity.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/utils/dashboard_chart_utils.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/widgets/dashboard_card_shell.dart';
 
@@ -70,29 +71,8 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
               topTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
               ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 32,
-                  interval: 2,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (value != index.toDouble() ||
-                        index < 0 ||
-                        index >= slots.length) {
-                      return const SizedBox.shrink();
-                    }
-                    return SideTitleWidget(
-                      meta: meta,
-                      child: Text(
-                        WeekDateUtils.formatShortWeekLabel(
-                          slots[index].weekStartMonday,
-                        ),
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    );
-                  },
-                ),
+              bottomTitles: DashboardChartUtils.buildBottomWeekTitles(
+                slots: slots,
               ),
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
