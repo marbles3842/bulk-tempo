@@ -36,6 +36,64 @@ void main() {
   }
 
   group('WeeklyWorkoutCard', () {
+    for (final initiallyExpanded in [false, true]) {
+      testWidgets(
+        'restores toggled expansion and count chip from initiallyExpanded=$initiallyExpanded',
+        (tester) async {
+          final summary = createSummary();
+          final bucket = PageStorageBucket();
+          const cardKey = PageStorageKey<String>('workout_week_2026-10-05');
+
+          Future<void> pumpCard({bool visible = true}) async {
+            await tester.pumpApp(
+              Scaffold(
+                body: PageStorage(
+                  bucket: bucket,
+                  child: visible
+                      ? WeeklyWorkoutCard(
+                          key: cardKey,
+                          summary: summary,
+                          initiallyExpanded: initiallyExpanded,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ),
+            );
+            await tester.pumpAndSettle();
+          }
+
+          await pumpCard();
+          await tester.tap(
+            find.text(
+              WeekDateUtils.formatWeekRange(
+                summary.weekStartMonday,
+                summary.weekEndSunday,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final context = tester.element(find.byType(WeeklyWorkoutCard));
+          expect(
+            bucket.readState(context, identifier: cardKey),
+            !initiallyExpanded,
+          );
+
+          await pumpCard(visible: false);
+          await pumpCard();
+
+          expect(
+            find.byKey(const Key('workout_count_chip_2026-10-05')),
+            initiallyExpanded ? findsOneWidget : findsNothing,
+          );
+          expect(
+            find.text('Workout 0'),
+            initiallyExpanded ? findsNothing : findsOneWidget,
+          );
+        },
+      );
+    }
+
     testWidgets(
       'shows workout count chip when collapsed and hides it when expanded with animation',
       (tester) async {

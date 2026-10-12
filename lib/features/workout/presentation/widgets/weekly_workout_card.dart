@@ -38,7 +38,8 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final storedExpanded =
-        PageStorage.maybeOf(context)?.readState(context) as bool?;
+        PageStorage.maybeOf(context)?.readState(context, identifier: widget.key)
+            as bool?;
     final effectiveExpanded = storedExpanded ?? widget.initiallyExpanded;
     _isExpanded = effectiveExpanded;
     if (effectiveExpanded) {
@@ -81,6 +82,9 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
         controller: _controller,
         initiallyExpanded: _isExpanded,
         onExpansionChanged: (expanded) {
+          PageStorage.maybeOf(
+            context,
+          )?.writeState(context, expanded, identifier: widget.key);
           if (_isExpanded == expanded) return;
           if (SchedulerBinding.instance.schedulerPhase ==
               SchedulerPhase.persistentCallbacks) {
