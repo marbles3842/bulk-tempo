@@ -4,81 +4,60 @@ This document defines the MVVM presentation layer standards for **Bulk Tempo** u
 
 ---
 
-## 1. Modeling UI State (Pure Dart)
+## 1. Modeling UI State (Freezed)
 
-UI State must be **immutable**. Two patterns are supported depending on screen requirements:
+All UI State classes must be **immutable** and modeled using **`@freezed`**. This guarantees value equality, hashing, readable string formatting, and a type-safe `copyWith` that natively supports resetting nullable fields to `null` without awkward `_sentinel` objects or `clear...` flags.
 
-### Pattern A: Sealed Class Hierarchy (Mutually Exclusive States)
-Ideal for screens that transition strictly through distinct operational phases (e.g. Fetching data):
+Two patterns are supported depending on screen requirements:
+
+### Pattern A: Freezed Sealed Union Hierarchy (Mutually Exclusive States)
+Ideal for screens that transition strictly through distinct operational phases (e.g. initial, loading, loaded, error):
 
 ```dart
-sealed class ItemsState {
-  const ItemsState();
-}
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:bulk_tempo/features/items/domain/models/item_entity.dart';
 
-class ItemsInitial extends ItemsState {
-  const ItemsInitial();
-}
+part 'items_state.freezed.dart';
 
-class ItemsLoading extends ItemsState {
-  const ItemsLoading();
-}
-
-class ItemsLoaded extends ItemsState {
-  final List<ItemEntity> items;
-  const ItemsLoaded(this.items);
-}
-
-class ItemsError extends ItemsState {
-  final String message;
-  const ItemsError(this.message);
+@freezed
+sealed class ItemsState with _$ItemsState {
+  const factory ItemsState.initial() = ItemsInitial;
+  const factory ItemsState.loading() = ItemsLoading;
+  const factory ItemsState.loaded(List<ItemEntity> items) = ItemsLoaded;
+  const factory ItemsState.error(String message) = ItemsError;
 }
 ```
 
-*Advantage*: Leverages Dart 3 pattern matching (`switch (state)`) in the View, ensuring all visual cases are handled at compile time.
+*Advantage*: Generates pattern matching helpers (`when`, `map`) while maintaining full compatibility with Dart 3 switch expressions (`switch (state)`).
 
-### Pattern B: Immutable Data Class with `copyWith` (Composite / Form State)
-Ideal for forms or screens with multiple independent fields (e.g. text inputs, toggles, filter chips):
+### Pattern B: Freezed Data Class (Composite / Form State)
+Ideal for forms or screens with multiple independent fields (e.g. text inputs, validation errors, toggles, filter chips):
 
 ```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'login_form_state.freezed.dart';
+
 enum FormStatus { initial, submitting, success, failure }
 
-// Sentinel used by copyWith to distinguish between an omitted argument
-// and an explicitly passed `null` value for nullable fields.
-const Object _sentinel = Object();
+@freezed
+abstract class LoginFormState with _$LoginFormState {
+  const LoginFormState._();
 
-class LoginFormState {
-  final String email;
-  final String password;
-  final FormStatus status;
-  final String? errorMessage;
+  const factory LoginFormState({
+    @Default('') String email,
+    @Default('') String password,
+    @Default(FormStatus.initial) FormStatus status,
+    String? errorMessage,
+  }) = _LoginFormState;
 
-  const LoginFormState({
-    this.email = '',
-    this.password = '',
-    this.status = FormStatus.initial,
-    this.errorMessage,
-  });
-
-  LoginFormState copyWith({
-    String? email,
-    String? password,
-    FormStatus? status,
-    Object? errorMessage = _sentinel,
-  }) {
-    return LoginFormState(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      status: status ?? this.status,
-      errorMessage: identical(errorMessage, _sentinel)
-          ? this.errorMessage
-          : errorMessage as String?,
-    );
-  }
+  bool get isValid =>
+      email.trim().isNotEmpty && password.isNotEmpty;
 }
 ```
 
-*Note on nullable fields in `copyWith`*: Using an unexported sentinel (`const Object _sentinel = Object();`) ensures callers can pass `errorMessage: null` to explicitly clear errors (e.g., when transitioning back to `submitting` or `success`), rather than having `null` default to preserving the previous error.
+*Advantage of Freezed `copyWith`*:
+Callers can reset nullable fields directly with `state = state.copyWith(errorMessage: null);`. When `errorMessage` is omitted from `copyWith()`, its current value is preserved automatically without requiring custom sentinels or boolean reset flags.
 
 ---
 

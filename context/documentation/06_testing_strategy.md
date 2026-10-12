@@ -4,9 +4,10 @@ This document defines the testing architecture, layout conventions, and concrete
 
 ---
 
-## 1. Testing Directory Mirroring
+## 1. Testing Architecture & Directory Mirroring
 
-The `test/` directory mirrors `lib/` exactly:
+### A. Directory Structure
+The `test/` directory mirrors `lib/` for functional application code:
 
 ```text
 test/
@@ -18,8 +19,6 @@ test/
 │       ├── data/
 │       │   ├── datasources/<feature>_remote_data_source_test.dart
 │       │   └── repositories/<feature>_repository_impl_test.dart
-│       ├── domain/
-│       │   └── models/<feature>_entity_test.dart
 │       └── presentation/
 │           ├── view_models/<feature>_view_model_test.dart
 │           └── views/<feature>_screen_test.dart
@@ -29,6 +28,14 @@ test/
     ├── mocks.dart
     └── pump_app.dart
 ```
+
+### B. What NOT to Test (Strict Exclusions)
+
+> [!IMPORTANT]
+> **Never write dedicated unit tests for DTOs, Entities, or UI State Data Classes.**
+> - Models annotated with **`@freezed`** (Entities, DTOs, Form States, and Presentation States) have their behavioral contracts (`copyWith`, `operator ==`, `hashCode`, `toString()`, and serialization) guaranteed by code generation.
+> - Writing tests solely to assert value equality, property getters, or `copyWith` behavior on data classes is **strictly prohibited**.
+> - Conversion and serialization logic (`toEntity`, `fromEntity`, `fromJson`) must be verified through **Data Source** and **Repository** tests where data actually flows.
 
 ---
 
