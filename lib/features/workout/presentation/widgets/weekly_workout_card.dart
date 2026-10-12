@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/weekly_workout_summary_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
@@ -36,12 +37,15 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final storedExpanded = (widget.key != null
-        ? PageStorage.maybeOf(context)
-            ?.readState(context, identifier: widget.key)
-        : PageStorage.maybeOf(context)?.readState(context)) as bool?;
+    final storedExpanded =
+        PageStorage.maybeOf(context)?.readState(context) as bool?;
     final effectiveExpanded = storedExpanded ?? widget.initiallyExpanded;
     _isExpanded = effectiveExpanded;
+    if (effectiveExpanded) {
+      if (!_controller.isExpanded) _controller.expand();
+    } else {
+      if (_controller.isExpanded) _controller.collapse();
+    }
   }
 
   @override
@@ -77,12 +81,19 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
         controller: _controller,
         initiallyExpanded: _isExpanded,
         onExpansionChanged: (expanded) {
-          if (_isExpanded != expanded) {
-            _isExpanded = expanded;
+          if (_isExpanded == expanded) return;
+          if (SchedulerBinding.instance.schedulerPhase ==
+              SchedulerPhase.persistentCallbacks) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                setState(() {});
+                setState(() {
+                  _isExpanded = expanded;
+                });
               }
+            });
+          } else {
+            setState(() {
+              _isExpanded = expanded;
             });
           }
         },
