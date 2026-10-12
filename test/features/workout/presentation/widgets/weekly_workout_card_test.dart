@@ -199,7 +199,6 @@ void main() {
         );
 
         // 3. Simulate navigating away (removing widget) and navigating back
-        // (re-creating WeeklyWorkoutCard with initiallyExpanded: true and same PageStorageBucket)
         await tester.pumpApp(
           PageStorage(
             bucket: bucket,
@@ -223,7 +222,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // The card should restore its collapsed state from PageStorage,
-        // AND the count chip must be visible (not hidden due to stale _isExpanded state).
+        // AND the count chip must be visible
         expect(
           find.byKey(const Key('workout_count_chip_2026-10-05')),
           findsOneWidget,
