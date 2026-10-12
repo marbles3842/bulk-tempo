@@ -132,38 +132,41 @@ void main() {
   });
 
   group('GainTargetViewModel refresh & dirty draft', () {
-    test('refresh with dirty draft preserves draft text while updating savedTarget', () async {
-      const initial = GainTargetEntity(
-        minWeeklyGainKg: 0.15,
-        maxWeeklyGainKg: 0.25,
-      );
-      fakeRepository.seedTarget(testUserId, initial);
+    test(
+      'refresh with dirty draft preserves draft text while updating savedTarget',
+      () async {
+        const initial = GainTargetEntity(
+          minWeeklyGainKg: 0.15,
+          maxWeeklyGainKg: 0.25,
+        );
+        fakeRepository.seedTarget(testUserId, initial);
 
-      final container = createContainer();
-      final viewModel = container.read(gainTargetViewModelProvider.notifier);
-      await viewModel.loadTarget();
+        final container = createContainer();
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
+        await viewModel.loadTarget();
 
-      // User starts editing
-      viewModel.updateMinInput('0.18');
-      expect(viewModel.state.isDirty, isTrue);
-      expect(viewModel.state.minInput, equals('0.18'));
+        // User starts editing
+        viewModel.updateMinInput('0.18');
+        expect(viewModel.state.isDirty, isTrue);
+        expect(viewModel.state.minInput, equals('0.18'));
 
-      // Server updates target in background
-      const updated = GainTargetEntity(
-        minWeeklyGainKg: 0.20,
-        maxWeeklyGainKg: 0.35,
-      );
-      fakeRepository.seedTarget(testUserId, updated);
+        // Server updates target in background
+        const updated = GainTargetEntity(
+          minWeeklyGainKg: 0.20,
+          maxWeeklyGainKg: 0.35,
+        );
+        fakeRepository.seedTarget(testUserId, updated);
 
-      // Explicit refresh
-      await viewModel.loadTarget(showLoading: false, isRefresh: true);
+        // Explicit refresh
+        await viewModel.loadTarget(showLoading: false, isRefresh: true);
 
-      expect(viewModel.state.savedTarget, equals(updated));
-      expect(viewModel.state.isDirty, isTrue);
-      // Edited input is preserved
-      expect(viewModel.state.minInput, equals('0.18'));
-      expect(viewModel.state.maxInput, equals('0.25'));
-    });
+        expect(viewModel.state.savedTarget, equals(updated));
+        expect(viewModel.state.isDirty, isTrue);
+        // Edited input is preserved
+        expect(viewModel.state.minInput, equals('0.18'));
+        expect(viewModel.state.maxInput, equals('0.25'));
+      },
+    );
 
     test(
       'refresh failure preserves existing savedTarget and dirty draft',
@@ -356,8 +359,9 @@ void main() {
             Completer<Result<GainTargetEntity?, AppFailure>>();
         final saveCompleter = Completer<Result<GainTargetEntity, AppFailure>>();
 
-        when(() => mockRepository.getGainTarget(userId: any(named: 'userId')))
-            .thenAnswer((_) => refreshCompleter.future);
+        when(
+          () => mockRepository.getGainTarget(userId: any(named: 'userId')),
+        ).thenAnswer((_) => refreshCompleter.future);
         when(
           () => mockRepository.saveGainTarget(
             userId: any(named: 'userId'),
@@ -398,43 +402,46 @@ void main() {
       },
     );
 
-    test('controlled Completer verifies pending write lifecycle and read suppression', () async {
-      final saveCompleter = Completer<Result<GainTargetEntity, AppFailure>>();
-      when(
-        () => mockRepository.saveGainTarget(
-          userId: any(named: 'userId'),
-          target: any(named: 'target'),
-        ),
-      ).thenAnswer((_) => saveCompleter.future);
+    test(
+      'controlled Completer verifies pending write lifecycle and read suppression',
+      () async {
+        final saveCompleter = Completer<Result<GainTargetEntity, AppFailure>>();
+        when(
+          () => mockRepository.saveGainTarget(
+            userId: any(named: 'userId'),
+            target: any(named: 'target'),
+          ),
+        ).thenAnswer((_) => saveCompleter.future);
 
-      final container = createContainer(repository: mockRepository);
-      final viewModel = container.read(gainTargetViewModelProvider.notifier);
+        final container = createContainer(repository: mockRepository);
+        final viewModel = container.read(gainTargetViewModelProvider.notifier);
 
-      viewModel.updateMinInput('0.15');
-      viewModel.updateMaxInput('0.25');
+        viewModel.updateMinInput('0.15');
+        viewModel.updateMaxInput('0.25');
 
-      final saveFuture = viewModel.saveTarget();
-      expect(viewModel.state.isSubmitting, isTrue);
-      expect(viewModel.state.pendingTarget, isNotNull);
+        final saveFuture = viewModel.saveTarget();
+        expect(viewModel.state.isSubmitting, isTrue);
+        expect(viewModel.state.pendingTarget, isNotNull);
 
-      // Attempting to loadTarget while write is pending is suppressed
-      await viewModel.loadTarget();
-      verifyNever(
-        () => mockRepository.getGainTarget(userId: any(named: 'userId')),
-      );
+        // Attempting to loadTarget while write is pending is suppressed
+        await viewModel.loadTarget();
+        verifyNever(
+          () => mockRepository.getGainTarget(userId: any(named: 'userId')),
+        );
 
-      // Finish pending save
-      saveCompleter.complete(
-        const Result.success(
-          GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
-        ),
-      );
-      await saveFuture;
+        // Finish pending save
+        saveCompleter.complete(
+          const Result.success(
+            GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+          ),
+        );
+        await saveFuture;
 
-      expect(viewModel.state.isSubmitting, isFalse);
-      expect(viewModel.state.pendingTarget, isNull);
-      expect(viewModel.state.savedTarget, isNotNull);
-    });
+        expect(viewModel.state.isSubmitting, isFalse);
+        expect(viewModel.state.pendingTarget, isNull);
+        expect(viewModel.state.savedTarget, isNotNull);
+      },
+    );
   });
 
   group('GainTargetViewModel account switch & discard', () {

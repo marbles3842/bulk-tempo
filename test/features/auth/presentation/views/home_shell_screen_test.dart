@@ -236,8 +236,9 @@ void main() {
       expect(find.text('Sign out failed'), findsOneWidget);
 
       // Dismiss current SnackBar to verify next presentation
-      ScaffoldMessenger.of(tester.element(find.byType(HomeShellScreen)))
-          .hideCurrentSnackBar();
+      ScaffoldMessenger.of(
+        tester.element(find.byType(HomeShellScreen)),
+      ).hideCurrentSnackBar();
       await tester.pumpAndSettle();
       expect(find.byType(SnackBar), findsNothing);
 

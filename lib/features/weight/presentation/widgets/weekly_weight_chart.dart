@@ -60,8 +60,9 @@ class WeeklyWeightChart extends StatelessWidget {
           children: [
             Text(
               'Weekly Weight Trend',
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             SizedBox(

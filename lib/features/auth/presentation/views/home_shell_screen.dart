@@ -56,8 +56,9 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
               const SizedBox(height: 16),
               Text(
                 'Welcome to Bulk Tempo',
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -108,8 +109,9 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             Text(
               'Profile',
               key: const Key('profile_heading'),
-              style: Theme.of(context).textTheme.headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(

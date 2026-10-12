@@ -99,8 +99,9 @@ void main() {
     });
 
     test('throws ServerException on TimeoutException', () async {
-      when(() => mockRef.get())
-          .thenThrow(TimeoutException('Timeout waiting for database response'));
+      when(
+        () => mockRef.get(),
+      ).thenThrow(TimeoutException('Timeout waiting for database response'));
 
       expect(
         () => dataSource.getGainTarget(userId: 'user_123'),

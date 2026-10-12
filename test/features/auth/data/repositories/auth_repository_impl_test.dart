@@ -361,8 +361,9 @@ void main() {
     });
 
     test('maps NetworkException to NetworkFailure', () async {
-      when(() => mockDataSource.signOut())
-          .thenThrow(const NetworkException('Network lost'));
+      when(
+        () => mockDataSource.signOut(),
+      ).thenThrow(const NetworkException('Network lost'));
 
       final result = await repository.signOut();
 
@@ -373,8 +374,9 @@ void main() {
     });
 
     test('maps ServerException to ServerFailure with safe message', () async {
-      when(() => mockDataSource.signOut())
-          .thenThrow(const ServerException(message: 'Sign out server error'));
+      when(
+        () => mockDataSource.signOut(),
+      ).thenThrow(const ServerException(message: 'Sign out server error'));
 
       final result = await repository.signOut();
 
@@ -421,8 +423,9 @@ void main() {
 
   group('authStateChanges', () {
     test('maps UserDto stream to UserEntity stream', () async {
-      when(() => mockDataSource.authStateChanges())
-          .thenAnswer((_) => Stream.fromIterable([null, testDto, null]));
+      when(
+        () => mockDataSource.authStateChanges(),
+      ).thenAnswer((_) => Stream.fromIterable([null, testDto, null]));
 
       final stream = repository.authStateChanges();
 

@@ -38,8 +38,9 @@ void main() {
         final result = await dataSource.getWeightEntries(userId: 'user_123');
 
         expect(result, isEmpty);
-        verify(() => mockDatabase.ref('users/user_123/weight_entries'))
-            .called(1);
+        verify(
+          () => mockDatabase.ref('users/user_123/weight_entries'),
+        ).called(1);
       },
     );
 
@@ -85,8 +86,9 @@ void main() {
           };
           when(() => mockRef.get()).thenAnswer((_) async => mockSnapshot);
           when(() => mockSnapshot.exists).thenReturn(true);
-          when(() => mockSnapshot.value)
-              .thenReturn(useList ? records.values.toList() : records);
+          when(
+            () => mockSnapshot.value,
+          ).thenReturn(useList ? records.values.toList() : records);
 
           final dtos = await dataSource.getWeightEntries(userId: 'user_123');
           expect(dtos.map((dto) => dto.date), ['2026-10-06', '2026-10-05']);
@@ -184,8 +186,9 @@ void main() {
       );
 
       expect(result, equals(dto));
-      verify(() => mockDatabase.ref('users/user_123/weight_entries/2026-10-10'))
-          .called(1);
+      verify(
+        () => mockDatabase.ref('users/user_123/weight_entries/2026-10-10'),
+      ).called(1);
       verify(() => mockRef.set(dto.toJson())).called(1);
     });
 
@@ -262,8 +265,9 @@ void main() {
           dateIso: '2026-10-10',
         );
       }
-      verify(() => mockDatabase.ref('users/user_123/weight_entries/2026-10-10'))
-          .called(2);
+      verify(
+        () => mockDatabase.ref('users/user_123/weight_entries/2026-10-10'),
+      ).called(2);
       verify(() => mockRef.remove()).called(2);
       verifyNoMoreInteractions(mockRef);
       verifyNoMoreInteractions(mockDatabase);

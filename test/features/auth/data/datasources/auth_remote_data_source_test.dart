@@ -258,8 +258,9 @@ void main() {
     });
 
     test('throws NetworkException on network error during signOut', () async {
-      when(() => mockFirebaseAuth.signOut())
-          .thenThrow(FirebaseAuthException(code: 'network-request-failed'));
+      when(
+        () => mockFirebaseAuth.signOut(),
+      ).thenThrow(FirebaseAuthException(code: 'network-request-failed'));
 
       expect(() => dataSource.signOut(), throwsA(isA<NetworkException>()));
     });

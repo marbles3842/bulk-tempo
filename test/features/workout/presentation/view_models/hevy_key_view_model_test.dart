@@ -89,65 +89,71 @@ void main() {
       },
     );
 
-    test('submitKey trims whitespace, saves valid key, and triggers workoutProgressViewModel loadWorkouts', () async {
-      fakeWorkoutRepository.seedWorkouts(testUser.id, [
-        WorkoutEntity(
-          id: 'w1',
-          title: 'Push Day',
-          startTime: DateTime.utc(2026, 10, 6, 17),
-          endTime: DateTime.utc(2026, 10, 6, 18),
-          localDate: DateTime.utc(2026, 10, 6),
-          localDateIso: '2026-10-06',
-          exercises: const [],
-        ),
-      ]);
+    test(
+      'submitKey trims whitespace, saves valid key, and triggers workoutProgressViewModel loadWorkouts',
+      () async {
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          WorkoutEntity(
+            id: 'w1',
+            title: 'Push Day',
+            startTime: DateTime.utc(2026, 10, 6, 17),
+            endTime: DateTime.utc(2026, 10, 6, 18),
+            localDate: DateTime.utc(2026, 10, 6),
+            localDateIso: '2026-10-06',
+            exercises: const [],
+          ),
+        ]);
 
-      final notifier = container.read(hevyKeyViewModelProvider.notifier);
-      notifier.updateKey('  $validUuid  ');
+        final notifier = container.read(hevyKeyViewModelProvider.notifier);
+        notifier.updateKey('  $validUuid  ');
 
-      final ok = await notifier.submitKey();
-      expect(ok, isTrue);
+        final ok = await notifier.submitKey();
+        expect(ok, isTrue);
 
-      final formState = container.read(hevyKeyViewModelProvider);
-      expect(formState.status, equals(FormStatus.success));
-      expect(formState.validationError, isNull);
-      expect(formState.submitErrorMessage, isNull);
+        final formState = container.read(hevyKeyViewModelProvider);
+        expect(formState.status, equals(FormStatus.success));
+        expect(formState.validationError, isNull);
+        expect(formState.submitErrorMessage, isNull);
 
-      expect(
-        fakeWorkoutRepository.getApiKeyForUser(testUser.id),
-        equals(validUuid),
-      );
+        expect(
+          fakeWorkoutRepository.getApiKeyForUser(testUser.id),
+          equals(validUuid),
+        );
 
-      final progressState = container.read(workoutProgressViewModelProvider);
-      expect(progressState, isA<WorkoutProgressLoaded>());
-      final loaded = progressState as WorkoutProgressLoaded;
-      expect(loaded.workouts, hasLength(1));
-      expect(
-        loaded.maskedApiKey,
-        equals('••••••••-••••-••••-••••-••••••••7890'),
-      );
-    });
+        final progressState = container.read(workoutProgressViewModelProvider);
+        expect(progressState, isA<WorkoutProgressLoaded>());
+        final loaded = progressState as WorkoutProgressLoaded;
+        expect(loaded.workouts, hasLength(1));
+        expect(
+          loaded.maskedApiKey,
+          equals('••••••••-••••-••••-••••-••••••••7890'),
+        );
+      },
+    );
 
-    test('submitKey preserves rawKey and sets submitErrorMessage when repository validation fails', () async {
-      fakeWorkoutRepository.saveKeyFailure = const AuthFailure(
-        'Invalid Hevy API key or Hevy Pro subscription required.',
-      );
+    test(
+      'submitKey preserves rawKey and sets submitErrorMessage when repository validation fails',
+      () async {
+        fakeWorkoutRepository.saveKeyFailure = const AuthFailure(
+          'Invalid Hevy API key or Hevy Pro subscription required.',
+        );
 
-      final notifier = container.read(hevyKeyViewModelProvider.notifier);
-      notifier.updateKey(validUuid);
+        final notifier = container.read(hevyKeyViewModelProvider.notifier);
+        notifier.updateKey(validUuid);
 
-      final ok = await notifier.submitKey();
-      expect(ok, isFalse);
+        final ok = await notifier.submitKey();
+        expect(ok, isFalse);
 
-      final state = container.read(hevyKeyViewModelProvider);
-      expect(state.rawKey, equals(validUuid));
-      expect(state.status, equals(FormStatus.failure));
-      expect(
-        state.submitErrorMessage,
-        equals('Invalid Hevy API key or Hevy Pro subscription required.'),
-      );
-      expect(state.validationError, isNull);
-    });
+        final state = container.read(hevyKeyViewModelProvider);
+        expect(state.rawKey, equals(validUuid));
+        expect(state.status, equals(FormStatus.failure));
+        expect(
+          state.submitErrorMessage,
+          equals('Invalid Hevy API key or Hevy Pro subscription required.'),
+        );
+        expect(state.validationError, isNull);
+      },
+    );
 
     test('reset restores clean initial HevyKeyFormState', () async {
       final notifier = container.read(hevyKeyViewModelProvider.notifier);

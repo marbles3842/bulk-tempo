@@ -106,139 +106,151 @@ void main() {
   });
 
   group('Configured key & weekly grouping', () {
-    test('loadWorkouts masks key, fetches 12-week workouts, and groups by ISO week descending', () async {
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
-      fakeWorkoutRepository.seedWorkouts(testUser.id, [
-        createWorkout(
-          id: 'w1',
-          title: 'Upper A',
-          localDateIso: '2026-10-06',
-          startTime: DateTime.utc(2026, 10, 6, 17),
-          weightKg: 100.0,
-          reps: 8,
-        ),
-        createWorkout(
-          id: 'w2',
-          title: 'Lower A',
-          localDateIso: '2026-10-08',
-          startTime: DateTime.utc(2026, 10, 8, 17),
-          weightKg: 120.0,
-          reps: 5,
-        ),
-        createWorkout(
-          id: 'w3',
-          title: 'Full Body',
-          localDateIso: '2026-09-30',
-          startTime: DateTime.utc(2026, 9, 30, 17),
-          weightKg: 80.0,
-          reps: 10,
-        ),
-      ]);
+    test(
+      'loadWorkouts masks key, fetches 12-week workouts, and groups by ISO week descending',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          createWorkout(
+            id: 'w1',
+            title: 'Upper A',
+            localDateIso: '2026-10-06',
+            startTime: DateTime.utc(2026, 10, 6, 17),
+            weightKg: 100.0,
+            reps: 8,
+          ),
+          createWorkout(
+            id: 'w2',
+            title: 'Lower A',
+            localDateIso: '2026-10-08',
+            startTime: DateTime.utc(2026, 10, 8, 17),
+            weightKg: 120.0,
+            reps: 5,
+          ),
+          createWorkout(
+            id: 'w3',
+            title: 'Full Body',
+            localDateIso: '2026-09-30',
+            startTime: DateTime.utc(2026, 9, 30, 17),
+            weightKg: 80.0,
+            reps: 10,
+          ),
+        ]);
 
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      await notifier.loadWorkouts();
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.loadWorkouts();
 
-      final state = container.read(workoutProgressViewModelProvider);
-      expect(state, isA<WorkoutProgressLoaded>());
-      final loaded = state as WorkoutProgressLoaded;
-      expect(loaded.maskedApiKey, equals(expectedMaskedKey));
-      expect(loaded.workouts, hasLength(3));
-      expect(loaded.weeklySummaries, hasLength(2));
-      expect(loaded.weeklySummaries[0].weekStartIso, equals('2026-10-05'));
-      expect(loaded.weeklySummaries[0].workoutCount, equals(2));
-      expect(loaded.weeklySummaries[0].totalWorkingSets, equals(2));
-      expect(loaded.weeklySummaries[0].totalVolumeKg, equals(1400.0));
-      expect(loaded.weeklySummaries[1].weekStartIso, equals('2026-09-28'));
-      expect(loaded.weeklySummaries[1].workoutCount, equals(1));
-      expect(loaded.refreshErrorMessage, isNull);
-    });
+        final state = container.read(workoutProgressViewModelProvider);
+        expect(state, isA<WorkoutProgressLoaded>());
+        final loaded = state as WorkoutProgressLoaded;
+        expect(loaded.maskedApiKey, equals(expectedMaskedKey));
+        expect(loaded.workouts, hasLength(3));
+        expect(loaded.weeklySummaries, hasLength(2));
+        expect(loaded.weeklySummaries[0].weekStartIso, equals('2026-10-05'));
+        expect(loaded.weeklySummaries[0].workoutCount, equals(2));
+        expect(loaded.weeklySummaries[0].totalWorkingSets, equals(2));
+        expect(loaded.weeklySummaries[0].totalVolumeKg, equals(1400.0));
+        expect(loaded.weeklySummaries[1].weekStartIso, equals('2026-09-28'));
+        expect(loaded.weeklySummaries[1].workoutCount, equals(1));
+        expect(loaded.refreshErrorMessage, isNull);
+      },
+    );
 
-    test('ensureInitialized loads only from WorkoutProgressInitial and caches across subsequent calls', () async {
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
-      var fetchCalls = 0;
-      fakeWorkoutRepository.onGetWorkoutsForLastWeeks = () async {
-        fetchCalls++;
-      };
+    test(
+      'ensureInitialized loads only from WorkoutProgressInitial and caches across subsequent calls',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        var fetchCalls = 0;
+        fakeWorkoutRepository.onGetWorkoutsForLastWeeks = () async {
+          fetchCalls++;
+        };
 
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      await notifier.ensureInitialized();
-      expect(fetchCalls, equals(1));
-      expect(
-        container.read(workoutProgressViewModelProvider),
-        isA<WorkoutProgressLoaded>(),
-      );
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.ensureInitialized();
+        expect(fetchCalls, equals(1));
+        expect(
+          container.read(workoutProgressViewModelProvider),
+          isA<WorkoutProgressLoaded>(),
+        );
 
-      // Subsequent ensureInitialized calls (e.g. switching tabs) do not re-fetch
-      await notifier.ensureInitialized();
-      await notifier.ensureInitialized();
-      expect(fetchCalls, equals(1));
-    });
+        // Subsequent ensureInitialized calls (e.g. switching tabs) do not re-fetch
+        await notifier.ensureInitialized();
+        await notifier.ensureInitialized();
+        expect(fetchCalls, equals(1));
+      },
+    );
   });
 
   group('Error handling & non-destructive refresh', () {
-    test('loadWorkouts emits WorkoutProgressError with maskedApiKey when initial workout fetch fails', () async {
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
-      fakeWorkoutRepository.getWorkoutsFailure = const ServerFailure(
-        'Hevy service unavailable',
-      );
+    test(
+      'loadWorkouts emits WorkoutProgressError with maskedApiKey when initial workout fetch fails',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.getWorkoutsFailure = const ServerFailure(
+          'Hevy service unavailable',
+        );
 
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      await notifier.loadWorkouts();
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.loadWorkouts();
 
-      final state = container.read(workoutProgressViewModelProvider);
-      expect(state, isA<WorkoutProgressError>());
-      final errorState = state as WorkoutProgressError;
-      expect(errorState.message, equals('Hevy service unavailable'));
-      expect(errorState.maskedApiKey, equals(expectedMaskedKey));
-    });
+        final state = container.read(workoutProgressViewModelProvider);
+        expect(state, isA<WorkoutProgressError>());
+        final errorState = state as WorkoutProgressError;
+        expect(errorState.message, equals('Hevy service unavailable'));
+        expect(errorState.maskedApiKey, equals(expectedMaskedKey));
+      },
+    );
 
-    test('loadWorkouts(showLoading: false) preserves loaded workouts and sets refreshErrorMessage on failure', () async {
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
-      fakeWorkoutRepository.seedWorkouts(testUser.id, [
-        createWorkout(
-          id: 'w1',
-          title: 'Push',
-          localDateIso: '2026-10-06',
-          startTime: DateTime.utc(2026, 10, 6, 18),
-        ),
-      ]);
+    test(
+      'loadWorkouts(showLoading: false) preserves loaded workouts and sets refreshErrorMessage on failure',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [
+          createWorkout(
+            id: 'w1',
+            title: 'Push',
+            localDateIso: '2026-10-06',
+            startTime: DateTime.utc(2026, 10, 6, 18),
+          ),
+        ]);
 
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      await notifier.loadWorkouts();
-      expect(
-        container.read(workoutProgressViewModelProvider),
-        isA<WorkoutProgressLoaded>(),
-      );
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.loadWorkouts();
+        expect(
+          container.read(workoutProgressViewModelProvider),
+          isA<WorkoutProgressLoaded>(),
+        );
 
-      fakeWorkoutRepository.getWorkoutsFailure = const NetworkFailure(
-        'Network error. Please check your connection.',
-      );
-      await notifier.loadWorkouts(showLoading: false);
+        fakeWorkoutRepository.getWorkoutsFailure = const NetworkFailure(
+          'Network error. Please check your connection.',
+        );
+        await notifier.loadWorkouts(showLoading: false);
 
-      final state = container.read(workoutProgressViewModelProvider);
-      expect(state, isA<WorkoutProgressLoaded>());
-      final loaded = state as WorkoutProgressLoaded;
-      expect(loaded.workouts, hasLength(1));
-      expect(
-        loaded.refreshErrorMessage,
-        equals('Network error. Please check your connection.'),
-      );
+        final state = container.read(workoutProgressViewModelProvider);
+        expect(state, isA<WorkoutProgressLoaded>());
+        final loaded = state as WorkoutProgressLoaded;
+        expect(loaded.workouts, hasLength(1));
+        expect(
+          loaded.refreshErrorMessage,
+          equals('Network error. Please check your connection.'),
+        );
 
-      notifier.clearRefreshError();
-      final cleared = container.read(
-        workoutProgressViewModelProvider,
-      ) as WorkoutProgressLoaded;
-      expect(cleared.refreshErrorMessage, isNull);
-      expect(cleared.workouts, hasLength(1));
-    });
+        notifier.clearRefreshError();
+        final cleared =
+            container.read(workoutProgressViewModelProvider)
+                as WorkoutProgressLoaded;
+        expect(cleared.refreshErrorMessage, isNull);
+        expect(cleared.workouts, hasLength(1));
+      },
+    );
 
     test(
       'loadWorkouts emits WorkoutProgressError when user is unauthenticated',
@@ -269,48 +281,54 @@ void main() {
   });
 
   group('Disconnect & account isolation', () {
-    test('disconnectApiKey clears saved key and transitions to WorkoutProgressUnconfigured', () async {
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      await notifier.loadWorkouts();
-      expect(
-        container.read(workoutProgressViewModelProvider),
-        isA<WorkoutProgressLoaded>(),
-      );
+    test(
+      'disconnectApiKey clears saved key and transitions to WorkoutProgressUnconfigured',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.loadWorkouts();
+        expect(
+          container.read(workoutProgressViewModelProvider),
+          isA<WorkoutProgressLoaded>(),
+        );
 
-      final disconnected = await notifier.disconnectApiKey();
-      expect(disconnected, isTrue);
-      expect(fakeWorkoutRepository.getApiKeyForUser(testUser.id), isNull);
-      expect(
-        container.read(workoutProgressViewModelProvider),
-        equals(const WorkoutProgressUnconfigured()),
-      );
-    });
+        final disconnected = await notifier.disconnectApiKey();
+        expect(disconnected, isTrue);
+        expect(fakeWorkoutRepository.getApiKeyForUser(testUser.id), isNull);
+        expect(
+          container.read(workoutProgressViewModelProvider),
+          equals(const WorkoutProgressUnconfigured()),
+        );
+      },
+    );
 
-    test('switching authenticated user resets state to WorkoutProgressInitial and drops in-flight read', () async {
-      final completer = Completer<void>();
-      fakeWorkoutRepository.getWorkoutsCompleter = completer;
-      fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+    test(
+      'switching authenticated user resets state to WorkoutProgressInitial and drops in-flight read',
+      () async {
+        final completer = Completer<void>();
+        fakeWorkoutRepository.getWorkoutsCompleter = completer;
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
 
-      final notifier = container.read(
-        workoutProgressViewModelProvider.notifier,
-      );
-      final loadFuture = notifier.loadWorkouts();
-      await pumpEventQueue();
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        final loadFuture = notifier.loadWorkouts();
+        await pumpEventQueue();
 
-      // Switch active user while fetch is in flight
-      fakeAuthRepository.setCurrentUser(
-        const UserEntity(id: 'u2', email: 'other@example.com'),
-      );
-      await pumpEventQueue();
+        // Switch active user while fetch is in flight
+        fakeAuthRepository.setCurrentUser(
+          const UserEntity(id: 'u2', email: 'other@example.com'),
+        );
+        await pumpEventQueue();
 
-      completer.complete();
-      await loadFuture;
+        completer.complete();
+        await loadFuture;
 
-      final state = container.read(workoutProgressViewModelProvider);
-      expect(state, isA<WorkoutProgressInitial>());
-    });
+        final state = container.read(workoutProgressViewModelProvider);
+        expect(state, isA<WorkoutProgressInitial>());
+      },
+    );
   });
 }

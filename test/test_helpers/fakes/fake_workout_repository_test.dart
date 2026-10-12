@@ -90,61 +90,64 @@ void main() {
       expect(result.failureOrNull, isA<AuthFailure>());
     });
 
-    test('filters workouts to the 12-ISO-week window and isolates by userId', () async {
-      repository.seedApiKey('user_1', validUuid1);
-      repository.seedApiKey('user_2', validUuid2);
+    test(
+      'filters workouts to the 12-ISO-week window and isolates by userId',
+      () async {
+        repository.seedApiKey('user_1', validUuid1);
+        repository.seedApiKey('user_2', validUuid2);
 
-      // Reference date: Wednesday 2026-10-07 -> currentWeekMonday = 2026-10-05
-      // 12 weeks inclusive -> cutoffMonday = 2026-10-05 - 77 days = 2026-07-20
-      final referenceNow = DateTime(2026, 10, 7, 12);
+        // Reference date: Wednesday 2026-10-07 -> currentWeekMonday = 2026-10-05
+        // 12 weeks inclusive -> cutoffMonday = 2026-10-05 - 77 days = 2026-07-20
+        final referenceNow = DateTime(2026, 10, 7, 12);
 
-      final currentWeekWorkout = createWorkout(
-        id: 'w_current',
-        localDate: DateTime.utc(2026, 10, 6),
-        startTime: DateTime.utc(2026, 10, 6, 18),
-      );
-      final boundaryMondayWorkout = createWorkout(
-        id: 'w_cutoff_monday',
-        localDate: DateTime.utc(2026, 7, 20),
-        startTime: DateTime.utc(2026, 7, 20, 10),
-      );
-      final beforeCutoffSundayWorkout = createWorkout(
-        id: 'w_before_cutoff',
-        localDate: DateTime.utc(2026, 7, 19),
-        startTime: DateTime.utc(2026, 7, 19, 10),
-      );
-      final otherUserWorkout = createWorkout(
-        id: 'w_user2',
-        localDate: DateTime.utc(2026, 10, 6),
-        startTime: DateTime.utc(2026, 10, 6, 9),
-      );
+        final currentWeekWorkout = createWorkout(
+          id: 'w_current',
+          localDate: DateTime.utc(2026, 10, 6),
+          startTime: DateTime.utc(2026, 10, 6, 18),
+        );
+        final boundaryMondayWorkout = createWorkout(
+          id: 'w_cutoff_monday',
+          localDate: DateTime.utc(2026, 7, 20),
+          startTime: DateTime.utc(2026, 7, 20, 10),
+        );
+        final beforeCutoffSundayWorkout = createWorkout(
+          id: 'w_before_cutoff',
+          localDate: DateTime.utc(2026, 7, 19),
+          startTime: DateTime.utc(2026, 7, 19, 10),
+        );
+        final otherUserWorkout = createWorkout(
+          id: 'w_user2',
+          localDate: DateTime.utc(2026, 10, 6),
+          startTime: DateTime.utc(2026, 10, 6, 9),
+        );
 
-      repository.seedWorkouts('user_1', [
-        boundaryMondayWorkout,
-        currentWeekWorkout,
-        beforeCutoffSundayWorkout,
-      ]);
-      repository.seedWorkouts('user_2', [otherUserWorkout]);
+        repository.seedWorkouts('user_1', [
+          boundaryMondayWorkout,
+          currentWeekWorkout,
+          beforeCutoffSundayWorkout,
+        ]);
+        repository.seedWorkouts('user_2', [otherUserWorkout]);
 
-      final res1 = await repository.getWorkoutsForLastWeeks(
-        userId: 'user_1',
-        weeks: 12,
-        now: referenceNow,
-      );
-      final res2 = await repository.getWorkoutsForLastWeeks(
-        userId: 'user_2',
-        weeks: 12,
-        now: referenceNow,
-      );
+        final res1 = await repository.getWorkoutsForLastWeeks(
+          userId: 'user_1',
+          weeks: 12,
+          now: referenceNow,
+        );
+        final res2 = await repository.getWorkoutsForLastWeeks(
+          userId: 'user_2',
+          weeks: 12,
+          now: referenceNow,
+        );
 
-      expect(res1.isSuccess, isTrue);
-      final user1Ids = res1.dataOrNull?.map((w) => w.id).toList();
-      expect(user1Ids, ['w_current', 'w_cutoff_monday']);
+        expect(res1.isSuccess, isTrue);
+        final user1Ids = res1.dataOrNull?.map((w) => w.id).toList();
+        expect(user1Ids, ['w_current', 'w_cutoff_monday']);
 
-      expect(res2.isSuccess, isTrue);
-      final user2Ids = res2.dataOrNull?.map((w) => w.id).toList();
-      expect(user2Ids, ['w_user2']);
-    });
+        expect(res2.isSuccess, isTrue);
+        final user2Ids = res2.dataOrNull?.map((w) => w.id).toList();
+        expect(user2Ids, ['w_user2']);
+      },
+    );
 
     test('honors controllable failures and reset()', () async {
       repository.seedApiKey('user_1', validUuid1);
