@@ -48,7 +48,7 @@ Osoba budująca beztłuszczową masę dziś przenosi pomiary do arkusza i osobno
 | S-03 | correct-weight-entry | użytkownik może poprawić lub usunąć własny błędny pomiar | S-02 | FR-003, FR-004 | done |
 | S-04 | set-gain-target | użytkownik może ustawić i odczytać własny docelowy zakres przyrostu | F-01, S-01 | FR-007, FR-012 | in-progress |
 | S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | in-progress |
-| S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | in-progress |
+| S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | done |
 | S-07 | contextual-pace-assessment | użytkownik może zobaczyć ocenę tempa względem celu, wcześniejszych tygodni i treningów | S-04, S-06 | FR-008, FR-009, US-01, §Business Logic, §Non-Functional Requirements | blocked |
 
 ## Baseline
@@ -166,7 +166,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Ten widok powinien oznaczać niepełne lub nieaktualne dane, aby liczby nie wyglądały na pewne mimo przerwanego importu.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-07: Ocena tempa w kontekście masy i treningu
 
@@ -221,3 +221,4 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **S-01: Dostęp do prywatnego konta** (`private-account-access`) — Obsługa rejestracji, logowania i wylogowania użytkownika.
 - **S-02: Historia pomiarów dostępna na koncie** (`dated-weight-history`) — Zapisywanie i odczytywanie pomiarów z datą, walidacja i integracja z Firebase RTDB (PR #20).
 - **S-03: Użytkownik może edytować lub usunąć błędny pomiar i zobaczyć poprawioną historię.** — Archived 2026-10-11 → `context/archive/2026-10-11-correct-weight-entry/`. Lesson: —.
+- **S-06: Użytkownik może zobaczyć bieżące tempo zmiany masy, ostatnią średnią, łączny przyrost i liczbę treningów w tygodniu.** — Archived 2026-10-12 → `context/archive/2026-10-12-weekly-progress-overview/`. Lesson: —.
