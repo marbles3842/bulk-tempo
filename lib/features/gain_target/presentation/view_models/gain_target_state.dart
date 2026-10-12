@@ -50,6 +50,9 @@ class GainTargetState {
   /// Authenticated user identifier this state belongs to.
   final String? userId;
 
+  /// True if gain target has completed at least one load attempt in the current session.
+  final bool hasLoadedOnce;
+
   const GainTargetState({
     this.savedTarget,
     this.minInput = '',
@@ -67,6 +70,7 @@ class GainTargetState {
     this.successMessage,
     this.isDirty = false,
     this.userId,
+    this.hasLoadedOnce = false,
   });
 
   /// Effective error for the maximum input field, combining [maxError] and [rangeError].
@@ -104,6 +108,7 @@ class GainTargetState {
     bool clearSuccessMessage = false,
     bool? isDirty,
     String? userId,
+    bool? hasLoadedOnce,
   }) {
     return GainTargetState(
       savedTarget: clearSavedTarget ? null : (savedTarget ?? this.savedTarget),
@@ -132,6 +137,7 @@ class GainTargetState {
           : (successMessage ?? this.successMessage),
       isDirty: isDirty ?? this.isDirty,
       userId: userId ?? this.userId,
+      hasLoadedOnce: hasLoadedOnce ?? this.hasLoadedOnce,
     );
   }
 
@@ -155,7 +161,8 @@ class GainTargetState {
           saveErrorMessage == other.saveErrorMessage &&
           successMessage == other.successMessage &&
           isDirty == other.isDirty &&
-          userId == other.userId;
+          userId == other.userId &&
+          hasLoadedOnce == other.hasLoadedOnce;
 
   @override
   int get hashCode => Object.hashAll([
@@ -175,6 +182,7 @@ class GainTargetState {
     successMessage,
     isDirty,
     userId,
+    hasLoadedOnce,
   ]);
 
   @override
@@ -195,5 +203,6 @@ class GainTargetState {
       'saveErrorMessage: $saveErrorMessage, '
       'successMessage: $successMessage, '
       'isDirty: $isDirty, '
-      'userId: $userId)';
+      'userId: $userId, '
+      'hasLoadedOnce: $hasLoadedOnce)';
 }

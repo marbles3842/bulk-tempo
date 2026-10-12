@@ -41,6 +41,14 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
     return GainTargetState(userId: _userId);
   }
 
+  /// Triggers [loadTarget] only when the target has not yet completed a load
+  /// and is not currently loading or submitting.
+  Future<void> ensureInitialized() async {
+    if (!state.hasLoadedOnce && !state.isLoading && !state.isSubmitting) {
+      await loadTarget();
+    }
+  }
+
   /// Loads the weekly gain target for the current authenticated user.
   ///
   /// When [isRefresh] is true, preserves dirty draft inputs and existing confirmed target,
@@ -96,6 +104,7 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
             isRefreshing: false,
             clearErrorMessage: true,
             clearRefreshErrorMessage: true,
+            hasLoadedOnce: true,
           );
         } else {
           state = state.copyWith(
@@ -114,6 +123,7 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
             clearRangeError: true,
             clearErrorMessage: true,
             clearRefreshErrorMessage: true,
+            hasLoadedOnce: true,
           );
         }
       },
@@ -244,6 +254,7 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
           clearMaxError: true,
           clearRangeError: true,
           clearSaveErrorMessage: true,
+          hasLoadedOnce: true,
         );
       },
       failure: (failure) {

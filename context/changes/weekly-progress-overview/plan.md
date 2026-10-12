@@ -449,23 +449,23 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 #### Automated
 
-- [x] 1.1 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/weekly_progress_calculator_test.dart`
-- [x] 1.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 1.1 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/weekly_progress_calculator_test.dart` — e16bcb7
+- [x] 1.2 Static analysis passes with zero issues: `flutter analyze` — e16bcb7
 
 #### Manual
 
-- [x] 1.3 Confirm `WeeklyProgressCalculator` has zero Flutter widget imports and handles the W1=`80.00` to W4=`80.60` (`+0.20 kg/week`) example identically to the agreed specification.
+- [x] 1.3 Confirm `WeeklyProgressCalculator` has zero Flutter widget imports and handles the W1=`80.00` to W4=`80.60` (`+0.20 kg/week`) example identically to the agreed specification. — e16bcb7
 
 ### Phase 2: Dashboard ViewModel & Per-Card State
 
 #### Automated
 
-- [ ] 2.1 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
-- [ ] 2.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 2.1 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
+- [x] 2.2 Static analysis passes with zero issues: `flutter analyze`
 
 #### Manual
 
-- [ ] 2.3 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
+- [x] 2.3 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
 
 ### Phase 3: Home Tab `fl_chart` UI, Wiring & Test Migration
 
