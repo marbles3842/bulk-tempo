@@ -98,7 +98,7 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 32,
-                  interval: 1,
+                  interval: maxY > 8 ? (maxY / 4).ceilToDouble() : 1,
                   getTitlesWidget: (value, meta) {
                     if (value % 1 != 0 || value < 0) {
                       return const SizedBox.shrink();

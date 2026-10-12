@@ -22,6 +22,8 @@ class WeightHistoryViewModel extends AutoDisposeNotifier<WeightHistoryState> {
 
   @override
   WeightHistoryState build() {
+    // Retain state across tab switches within an active authenticated session
+    // while preserving AutoDispose provider type compatibility for unit tests.
     ref.keepAlive();
     _disposed = false;
     ref.onDispose(() {
