@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/weekly_workout_summary_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
@@ -34,6 +35,20 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final storedExpanded =
+        PageStorage.maybeOf(context)?.readState(context) as bool?;
+    final effectiveExpanded = storedExpanded ?? widget.initiallyExpanded;
+    _isExpanded = effectiveExpanded;
+    if (effectiveExpanded) {
+      if (!_controller.isExpanded) _controller.expand();
+    } else {
+      if (_controller.isExpanded) _controller.collapse();
+    }
+  }
+
+  @override
   void didUpdateWidget(WeeklyWorkoutCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
@@ -64,11 +79,23 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
       child: ExpansionTile(
         key: Key('workout_week_card_${widget.summary.weekStartIso}'),
         controller: _controller,
-        initiallyExpanded: widget.initiallyExpanded,
+        initiallyExpanded: _isExpanded,
         onExpansionChanged: (expanded) {
-          setState(() {
-            _isExpanded = expanded;
-          });
+          if (_isExpanded == expanded) return;
+          if (WidgetsBinding.instance.schedulerPhase ==
+              SchedulerPhase.persistentCallbacks) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _isExpanded = expanded;
+                });
+              }
+            });
+          } else {
+            setState(() {
+              _isExpanded = expanded;
+            });
+          }
         },
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Row(
