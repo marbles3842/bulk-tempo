@@ -328,6 +328,6 @@ dev_dependencies:
 
 ### C. Rules & Best Practices:
 1. **Never manually edit generated code**: Files with `.freezed.dart` and `.g.dart` extensions are managed solely by code generation.
-2. **Version control**: Generated files should be committed to git to ensure consistent and deterministic CI/CD builds without requiring an extra build step in pipelines.
+2. **Version control**: Generated files (`*.freezed.dart` and `*.g.dart`) are excluded from git (`.gitignore`). Developers and CI pipelines run `dart run build_runner build --delete-conflicting-outputs` before running, analyzing, testing, or building.
 3. **Always use `--delete-conflicting-outputs`**: This flag automatically resolves stale or conflicting generator artifacts when switching branches or refactoring model fields.
 
