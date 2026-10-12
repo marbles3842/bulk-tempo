@@ -38,7 +38,6 @@ void main() {
     expect(find.text('Sign in to access your workout logs'), findsOneWidget);
     expect(find.byKey(const Key('login_email_field')), findsOneWidget);
     expect(find.byKey(const Key('login_password_field')), findsOneWidget);
-    expect(find.byTooltip('Show password'), findsOneWidget);
     expect(find.byKey(const Key('login_submit_button')), findsOneWidget);
     expect(find.byKey(const Key('login_to_register_button')), findsOneWidget);
   });

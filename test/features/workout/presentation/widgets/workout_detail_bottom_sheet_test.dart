@@ -59,9 +59,6 @@ void main() {
         await tester.tap(find.text('Open'));
         await tester.pumpAndSettle();
 
-        // Close button tooltip
-        expect(find.byTooltip('Close'), findsOneWidget);
-
         // Best set chip
         expect(find.byKey(const Key('workout_best_set_0')), findsOneWidget);
         expect(find.text('Best: 105.00 kg × 6'), findsOneWidget);

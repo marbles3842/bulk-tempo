@@ -120,7 +120,6 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
                     IconButton(
                       key: const Key('workout_detail_close_button'),
                       icon: const Icon(Icons.close),
-                      tooltip: 'Close',
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],

@@ -1,6 +1,6 @@
 # Bulk Tempo
 
-Bulk Tempo is a mobile application designed to help lifters during weight gain (bulking) phases by evaluating weekly weight gain rates alongside workout progress.
+Bulk Tempo is a mobile application targeting Android and iOS, designed to help lifters during weight gain (bulking) phases by evaluating weekly weight gain rates alongside workout progress.
 
 This project was built as part of the [10xDevs course](https://www.10xdevs.pl/).
 
@@ -8,25 +8,29 @@ This project was built as part of the [10xDevs course](https://www.10xdevs.pl/).
 
 ## Tech Stack
 
-- **Flutter**: Cross-platform application framework for Android, iOS, and Web.
-- **Firebase**: Authentication and cloud data storage.
-- **Hevy API Integration**: Workout tracking integration.
+- **Flutter**: Cross-platform mobile framework for Android and iOS.
+- **Firebase**: Firebase Authentication and Realtime Database for account management and cloud sync.
+- **Hevy API Integration**: External workout tracking API integration.
 
 ---
 
-## Functionality & Structure
+## Functionality & Project Structure
 
 ### Key Features
-- **Weight Tracking**: Log, edit, and track daily body weight measurements and weekly averages.
-- **Workout Syncing**: Import workout activity (weights, reps, sets) via Hevy integration.
-- **Gain Rate Evaluation**: Dashboard assessing weight gain speed against target ranges alongside training progress.
-- **User Authentication**: Secure user login and multi-device data sync.
+- **Weight Tracking**: Log, edit, and view daily body weight measurements and weekly averages.
+- **Workout Integration**: Sync workout metrics (exercises, sets, weights, reps) from Hevy.
+- **Gain Rate Dashboard**: Evaluate weekly weight gain speed against target ranges alongside training progress.
+- **User Authentication**: Secure email/password login and multi-device data sync.
 
-### Project Structure
-The codebase follows a feature-first MVVM architecture in `lib/`:
-- `lib/app/`: Global app initialization, theme, and router configuration.
-- `lib/core/`: Shared components, utilities, and router constants.
-- `lib/features/`: Modular features (`auth`, `weight`, `workout`, `gain_target`), each containing presentation, domain, and data layers.
+### Architecture & Project Structure
+The project follows a **Feature-First MVVM** architecture augmented with **Clean Architecture boundaries** and unidirectional data flow using **Riverpod**:
+
+- `lib/app/`: App-level routing (`go_router`), theme setup, and global providers.
+- `lib/core/`: Shared cross-cutting concerns (functional `Result<T, AppFailure>` handling, router constants, design system).
+- `lib/features/`: Modular feature packages (`auth`, `weight`, `workout`, `gain_target`), structured into clear architectural layers:
+  - **Presentation Layer** (`presentation/`): Views (`ConsumerWidget`) bound to pure Dart ViewModels (`Notifier` / `AsyncNotifier`) with immutable state models.
+  - **Domain Layer** (`domain/`): Core business logic, domain entities, and abstract repository contracts with zero framework dependencies.
+  - **Data Layer** (`data/`): Data Transfer Objects (DTOs), remote/local datasources, and repository implementations converting network/storage exceptions to typed `Result` objects.
 
 ---
 
@@ -39,11 +43,8 @@ flutter pub get
 
 ### Running
 ```bash
-# Run on default connected device
+# Run on connected mobile device or emulator
 flutter run
-
-# Run on Web
-flutter run -d chrome
 ```
 
 ### Testing
@@ -56,8 +57,8 @@ flutter test
 # Build Android APK
 flutter build apk
 
-# Build Web release
-flutter build web
+# Build iOS App Bundle
+flutter build ios
 ```
 
 ---
@@ -66,4 +67,4 @@ flutter build web
 
 Firebase configuration files (`android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, and `lib/firebase_options.dart`) are excluded from git.
 
-Generate or place them directly in their respective platform directories when configuring your Firebase project.
+Place `google-services.json` in `android/app/` and `GoogleService-Info.plist` in `ios/Runner/` when setting up your Firebase project.

@@ -378,7 +378,6 @@ class _WeightEntryBottomSheetState
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),
-                          tooltip: 'Close',
                           onPressed: isSubmitting
                               ? null
                               : () => _handleDismissRequest(),
