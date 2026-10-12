@@ -154,5 +154,81 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'restores expanded state from PageStorage and keeps count chip synchronized',
+      (tester) async {
+        final summary = createSummary(workoutCount: 3);
+        final bucket = PageStorageBucket();
+
+        // 1. Initial build: initiallyExpanded is true
+        await tester.pumpApp(
+          PageStorage(
+            bucket: bucket,
+            child: Scaffold(
+              body: WeeklyWorkoutCard(
+                key: const PageStorageKey('card_key'),
+                summary: summary,
+                initiallyExpanded: true,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Initially expanded -> chip is hidden
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsNothing,
+        );
+
+        // 2. User collapses the card
+        final headerText = find.text(
+          WeekDateUtils.formatWeekRange(
+            summary.weekStartMonday,
+            summary.weekEndSunday,
+          ),
+        );
+        await tester.tap(headerText);
+        await tester.pumpAndSettle();
+
+        // Card is now collapsed -> chip is visible
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsOneWidget,
+        );
+
+        // 3. Simulate navigating away (removing widget) and navigating back
+        // (re-creating WeeklyWorkoutCard with initiallyExpanded: true and same PageStorageBucket)
+        await tester.pumpApp(
+          PageStorage(
+            bucket: bucket,
+            child: const Scaffold(body: SizedBox.shrink()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.pumpApp(
+          PageStorage(
+            bucket: bucket,
+            child: Scaffold(
+              body: WeeklyWorkoutCard(
+                key: const PageStorageKey('card_key'),
+                summary: summary,
+                initiallyExpanded: true,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The card should restore its collapsed state from PageStorage,
+        // AND the count chip must be visible (not hidden due to stale _isExpanded state).
+        expect(
+          find.byKey(const Key('workout_count_chip_2026-10-05')),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }

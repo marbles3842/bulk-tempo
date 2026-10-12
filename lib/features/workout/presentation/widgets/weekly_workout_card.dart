@@ -26,6 +26,10 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   late bool _isExpanded;
   late final ExpansibleController _controller;
 
+  PageStorageKey<String> get _defaultStorageKey => PageStorageKey<String>(
+    'workout_week_card_${widget.summary.weekStartIso}',
+  );
+
   @override
   void initState() {
     super.initState();
@@ -34,19 +38,65 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bucket = PageStorage.maybeOf(context);
+    if (bucket != null) {
+      final bool? stored = (widget.key is PageStorageKey)
+          ? (bucket.readState(context, identifier: widget.key) as bool? ??
+                bucket.readState(context, identifier: _defaultStorageKey)
+                    as bool?)
+          : (bucket.readState(context, identifier: _defaultStorageKey)
+                    as bool? ??
+                bucket.readState(context) as bool?);
+      if (stored != null) {
+        _isExpanded = stored;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          if (_isExpanded && !_controller.isExpanded) {
+            _controller.expand();
+          } else if (!_isExpanded && _controller.isExpanded) {
+            _controller.collapse();
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(WeeklyWorkoutCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
       _isExpanded = widget.initiallyExpanded;
-      if (widget.initiallyExpanded) {
-        if (!_controller.isExpanded) {
-          _controller.expand();
+      _saveExpansionState(widget.initiallyExpanded);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (widget.initiallyExpanded) {
+          if (!_controller.isExpanded) {
+            _controller.expand();
+          }
+        } else {
+          if (_controller.isExpanded) {
+            _controller.collapse();
+          }
         }
-      } else {
-        if (_controller.isExpanded) {
-          _controller.collapse();
-        }
+      });
+    }
+  }
+
+  void _saveExpansionState(bool expanded) {
+    final bucket = PageStorage.maybeOf(context);
+    if (bucket != null) {
+      if (widget.key is PageStorageKey) {
+        bucket.writeState(context, expanded, identifier: widget.key);
       }
+      bucket.writeState(context, expanded, identifier: _defaultStorageKey);
     }
   }
 
@@ -66,9 +116,15 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
         controller: _controller,
         initiallyExpanded: widget.initiallyExpanded,
         onExpansionChanged: (expanded) {
-          setState(() {
-            _isExpanded = expanded;
-          });
+          _saveExpansionState(expanded);
+          if (_isExpanded != expanded) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              setState(() {
+                _isExpanded = expanded;
+              });
+            });
+          }
         },
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Row(
