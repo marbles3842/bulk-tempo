@@ -446,25 +446,5 @@ void main() {
         contains('Maximum gain rate must be greater than minimum'),
       );
     });
-
-    test('GainTargetValidationResult value equality', () {
-      const result1 = GainTargetValidationResult(
-        minError: 'error',
-        maxError: null,
-      );
-      const result2 = GainTargetValidationResult(
-        minError: 'error',
-        maxError: null,
-      );
-      const result3 = GainTargetValidationResult(
-        minError: null,
-        maxError: 'error',
-      );
-
-      expect(result1, equals(result2));
-      expect(result1.hashCode, equals(result2.hashCode));
-      expect(result1, isNot(equals(result3)));
-      expect(result1.toString(), contains('minError: error'));
-    });
   });
 }

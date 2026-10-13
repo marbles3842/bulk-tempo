@@ -1,24 +1,22 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 
-/// Domain entity representing a single set within a workout exercise.
-class WorkoutSetEntity {
-  final int index;
-  final String type;
-  final double? weightKg;
-  final int? reps;
-  final double? distanceMeters;
-  final int? durationSeconds;
-  final double? rpe;
+part 'workout_set_entity.freezed.dart';
 
-  const WorkoutSetEntity({
-    required this.index,
-    required this.type,
-    this.weightKg,
-    this.reps,
-    this.distanceMeters,
-    this.durationSeconds,
-    this.rpe,
-  });
+/// Domain entity representing a single set within a workout exercise.
+@freezed
+abstract class WorkoutSetEntity with _$WorkoutSetEntity {
+  const WorkoutSetEntity._();
+
+  const factory WorkoutSetEntity({
+    required int index,
+    required String type,
+    double? weightKg,
+    int? reps,
+    double? distanceMeters,
+    int? durationSeconds,
+    double? rpe,
+  }) = _WorkoutSetEntity;
 
   /// Returns `true` if this set is a working set (`'normal'`, `'failure'`, or
   /// `'dropset'`), excluding `'warmup'` sets.
@@ -35,52 +33,4 @@ class WorkoutSetEntity {
     }
     return WeekDateUtils.roundToTwoDecimals(weightKg! * reps!);
   }
-
-  WorkoutSetEntity copyWith({
-    int? index,
-    String? type,
-    double? weightKg,
-    int? reps,
-    double? distanceMeters,
-    int? durationSeconds,
-    double? rpe,
-  }) {
-    return WorkoutSetEntity(
-      index: index ?? this.index,
-      type: type ?? this.type,
-      weightKg: weightKg ?? this.weightKg,
-      reps: reps ?? this.reps,
-      distanceMeters: distanceMeters ?? this.distanceMeters,
-      durationSeconds: durationSeconds ?? this.durationSeconds,
-      rpe: rpe ?? this.rpe,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WorkoutSetEntity &&
-          runtimeType == other.runtimeType &&
-          index == other.index &&
-          type == other.type &&
-          weightKg == other.weightKg &&
-          reps == other.reps &&
-          distanceMeters == other.distanceMeters &&
-          durationSeconds == other.durationSeconds &&
-          rpe == other.rpe;
-
-  @override
-  int get hashCode => Object.hash(
-    index,
-    type,
-    weightKg,
-    reps,
-    distanceMeters,
-    durationSeconds,
-    rpe,
-  );
-
-  @override
-  String toString() =>
-      'WorkoutSetEntity(index: $index, type: $type, weightKg: $weightKg, reps: $reps, distanceMeters: $distanceMeters, durationSeconds: $durationSeconds, rpe: $rpe)';
 }

@@ -1,15 +1,16 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'gain_target_entity.freezed.dart';
+
 /// Domain entity representing a user's target weekly weight gain range in kg/week.
-class GainTargetEntity {
-  /// Minimum weekly gain rate in kilograms per week.
-  final double minWeeklyGainKg;
+@freezed
+abstract class GainTargetEntity with _$GainTargetEntity {
+  const GainTargetEntity._();
 
-  /// Maximum weekly gain rate in kilograms per week.
-  final double maxWeeklyGainKg;
-
-  const GainTargetEntity({
-    required this.minWeeklyGainKg,
-    required this.maxWeeklyGainKg,
-  });
+  const factory GainTargetEntity({
+    required double minWeeklyGainKg,
+    required double maxWeeklyGainKg,
+  }) = _GainTargetEntity;
 
   /// Formatted display string representing the weekly gain range,
   /// e.g. '0.15–0.25 kg/week'.
@@ -31,29 +32,4 @@ class GainTargetEntity {
 
   /// Difference between maximum and minimum weekly gain rates.
   double get spread => maxWeeklyGainKg - minWeeklyGainKg;
-
-  GainTargetEntity copyWith({
-    double? minWeeklyGainKg,
-    double? maxWeeklyGainKg,
-  }) {
-    return GainTargetEntity(
-      minWeeklyGainKg: minWeeklyGainKg ?? this.minWeeklyGainKg,
-      maxWeeklyGainKg: maxWeeklyGainKg ?? this.maxWeeklyGainKg,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GainTargetEntity &&
-          runtimeType == other.runtimeType &&
-          minWeeklyGainKg == other.minWeeklyGainKg &&
-          maxWeeklyGainKg == other.maxWeeklyGainKg;
-
-  @override
-  int get hashCode => minWeeklyGainKg.hashCode ^ maxWeeklyGainKg.hashCode;
-
-  @override
-  String toString() =>
-      'GainTargetEntity(minWeeklyGainKg: $minWeeklyGainKg, maxWeeklyGainKg: $maxWeeklyGainKg)';
 }

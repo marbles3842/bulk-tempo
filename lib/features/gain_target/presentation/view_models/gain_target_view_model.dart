@@ -68,12 +68,9 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
     final generation = ++_generation;
 
     if (isRefresh) {
-      state = state.copyWith(
-        isRefreshing: true,
-        clearRefreshErrorMessage: true,
-      );
+      state = state.copyWith(isRefreshing: true, refreshErrorMessage: null);
     } else if (showLoading) {
-      state = state.copyWith(isLoading: true, clearErrorMessage: true);
+      state = state.copyWith(isLoading: true, errorMessage: null);
     }
 
     final result = await repository.getGainTarget(userId: currentUserId);
@@ -91,16 +88,14 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
         if (state.isDirty) {
           state = state.copyWith(
             savedTarget: target,
-            clearSavedTarget: target == null,
             isLoading: false,
             isRefreshing: false,
-            clearErrorMessage: true,
-            clearRefreshErrorMessage: true,
+            errorMessage: null,
+            refreshErrorMessage: null,
           );
         } else {
           state = state.copyWith(
             savedTarget: target,
-            clearSavedTarget: target == null,
             isLoading: false,
             isRefreshing: false,
             minInput: target != null
@@ -109,11 +104,11 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
             maxInput: target != null
                 ? target.maxWeeklyGainKg.toStringAsFixed(2)
                 : '',
-            clearMinError: true,
-            clearMaxError: true,
-            clearRangeError: true,
-            clearErrorMessage: true,
-            clearRefreshErrorMessage: true,
+            minError: null,
+            maxError: null,
+            rangeError: null,
+            errorMessage: null,
+            refreshErrorMessage: null,
           );
         }
       },
@@ -147,11 +142,9 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
       minInput: value,
       isDirty: true,
       minError: minError,
-      clearMinError: minError == null,
       rangeError: rangeError,
-      clearRangeError: rangeError == null,
-      clearSaveErrorMessage: true,
-      clearSuccessMessage: true,
+      saveErrorMessage: null,
+      successMessage: null,
     );
   }
 
@@ -169,11 +162,9 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
       maxInput: value,
       isDirty: true,
       maxError: maxError,
-      clearMaxError: maxError == null,
       rangeError: rangeError,
-      clearRangeError: rangeError == null,
-      clearSaveErrorMessage: true,
-      clearSuccessMessage: true,
+      saveErrorMessage: null,
+      successMessage: null,
     );
   }
 
@@ -191,11 +182,8 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
     if (!validationResult.isValid) {
       state = state.copyWith(
         minError: validationResult.minError,
-        clearMinError: validationResult.minError == null,
         maxError: validationResult.maxError,
-        clearMaxError: validationResult.maxError == null,
         rangeError: validationResult.rangeError,
-        clearRangeError: validationResult.rangeError == null,
       );
       return;
     }
@@ -214,11 +202,11 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
       isRefreshing: false,
       isLoading: false,
       pendingTarget: validTarget,
-      clearSaveErrorMessage: true,
-      clearSuccessMessage: true,
-      clearMinError: true,
-      clearMaxError: true,
-      clearRangeError: true,
+      saveErrorMessage: null,
+      successMessage: null,
+      minError: null,
+      maxError: null,
+      rangeError: null,
     );
 
     final result = await repository.saveGainTarget(
@@ -235,21 +223,21 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
         state = state.copyWith(
           savedTarget: saved,
           isSubmitting: false,
-          clearPendingTarget: true,
+          pendingTarget: null,
           isDirty: false,
           successMessage: 'Weekly gain target saved successfully',
           minInput: saved.minWeeklyGainKg.toStringAsFixed(2),
           maxInput: saved.maxWeeklyGainKg.toStringAsFixed(2),
-          clearMinError: true,
-          clearMaxError: true,
-          clearRangeError: true,
-          clearSaveErrorMessage: true,
+          minError: null,
+          maxError: null,
+          rangeError: null,
+          saveErrorMessage: null,
         );
       },
       failure: (failure) {
         state = state.copyWith(
           isSubmitting: false,
-          clearPendingTarget: true,
+          pendingTarget: null,
           saveErrorMessage: failure.message,
         );
       },
@@ -268,25 +256,25 @@ class GainTargetViewModel extends Notifier<GainTargetState> {
       minInput: saved != null ? saved.minWeeklyGainKg.toStringAsFixed(2) : '',
       maxInput: saved != null ? saved.maxWeeklyGainKg.toStringAsFixed(2) : '',
       isDirty: false,
-      clearMinError: true,
-      clearMaxError: true,
-      clearRangeError: true,
-      clearSaveErrorMessage: true,
+      minError: null,
+      maxError: null,
+      rangeError: null,
+      saveErrorMessage: null,
     );
   }
 
   /// Clears transient feedback messages.
   void clearMessages() {
     state = state.copyWith(
-      clearSuccessMessage: true,
-      clearSaveErrorMessage: true,
-      clearRefreshErrorMessage: true,
+      successMessage: null,
+      saveErrorMessage: null,
+      refreshErrorMessage: null,
     );
   }
 
   /// Clears fatal initial-load error message.
   void clearErrorMessage() {
-    state = state.copyWith(clearErrorMessage: true);
+    state = state.copyWith(errorMessage: null);
   }
 
   /// Resets ViewModel state and captures a new user context.

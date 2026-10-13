@@ -201,7 +201,7 @@ class WeightHistoryViewModel extends AutoDisposeNotifier<WeightHistoryState> {
   void clearRefreshError() {
     if (state is WeightHistoryLoaded) {
       final current = state as WeightHistoryLoaded;
-      state = current.copyWith(clearRefreshError: true);
+      state = current.copyWith(refreshErrorMessage: null);
     }
   }
 }
