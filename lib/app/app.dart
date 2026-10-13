@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/app/router/app_router.dart';
+import 'package:bulk_tempo/l10n/app_localizations.dart';
 
 class BulkTempoApp extends ConsumerWidget {
   const BulkTempoApp({super.key});
@@ -17,8 +18,9 @@ class BulkTempoApp extends ConsumerWidget {
         useMaterial3: true,
       ),
       locale: const Locale('en', 'GB'),
-      supportedLocales: const [Locale('en', 'GB'), Locale('en', 'US')],
+      supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

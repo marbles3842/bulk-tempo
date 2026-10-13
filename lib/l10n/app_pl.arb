@@ -1,0 +1,16 @@
+{
+  "@@locale": "pl",
+  "appTitle": "Bulk Tempo",
+  "navHome": "Start",
+  "navWeights": "Waga",
+  "navWorkouts": "Treningi",
+  "navProfile": "Profil",
+  "save": "Zapisz",
+  "cancel": "Anuluj",
+  "delete": "Usuń",
+  "edit": "Edytuj",
+  "confirm": "Zatwierdź",
+  "discard": "Odrzuć",
+  "close": "Zamknij",
+  "logOut": "Wyloguj się"
+}

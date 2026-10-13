@@ -1,0 +1,55 @@
+{
+  "@@locale": "en",
+  "appTitle": "Bulk Tempo",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Navigation label for Home"
+  },
+  "navWeights": "Weights",
+  "@navWeights": {
+    "description": "Navigation label for Weights"
+  },
+  "navWorkouts": "Workouts",
+  "@navWorkouts": {
+    "description": "Navigation label for Workouts"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Navigation label for Profile"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Generic save action button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel action button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Generic delete action button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Generic edit action button"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Generic confirm action button"
+  },
+  "discard": "Discard",
+  "@discard": {
+    "description": "Generic discard action button"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Generic close action button"
+  },
+  "logOut": "Log Out",
+  "@logOut": {
+    "description": "Generic log out button"
+  }
+}
