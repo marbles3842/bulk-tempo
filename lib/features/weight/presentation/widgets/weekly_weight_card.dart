@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
@@ -52,7 +53,7 @@ class WeeklyWeightCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${summary.loggedDaysCount}/7 days',
+                context.l10n.loggedDaysLabel(summary.loggedDaysCount),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSecondaryContainer,
                   fontWeight: FontWeight.w600,
@@ -64,7 +65,9 @@ class WeeklyWeightCard extends StatelessWidget {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text(
-            '${summary.averageWeightKg.toStringAsFixed(2)} kg avg',
+            context.l10n.weightAverageLabel(
+              summary.averageWeightKg.toStringAsFixed(2),
+            ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -98,7 +101,7 @@ class WeeklyWeightCard extends StatelessWidget {
                 IconButton(
                   key: Key('edit_entry_${entry.dateIso}'),
                   icon: const Icon(Icons.edit_outlined, size: 18),
-                  tooltip: 'Edit weight entry',
+                  tooltip: context.l10n.editWeightTooltip,
                   onPressed: onEntryTap != null
                       ? () => onEntryTap!(entry)
                       : null,

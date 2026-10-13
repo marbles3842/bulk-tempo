@@ -57,7 +57,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Connect Hevy Workouts',
+              context.l10n.connectHevyTitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -65,8 +65,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Import your last 12 weeks of workouts directly from Hevy. '
-              'Generate your Hevy Pro API key at https://hevy.com/settings?developer and enter it below.',
+              context.l10n.connectHevySubtitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -109,8 +108,8 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
               autocorrect: false,
               enableSuggestions: false,
               decoration: InputDecoration(
-                labelText: 'Hevy API Key (UUID)',
-                hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                labelText: context.l10n.hevyKeyInputLabel,
+                hintText: context.l10n.hevyKeyInputHint,
                 errorText: keyFormState.validationError?.toLocalizedMessage(
                   context.l10n,
                 ),
@@ -139,7 +138,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                       ),
                     )
                   : const Icon(Icons.link),
-              label: const Text('Connect Hevy'),
+              label: Text(context.l10n.connectHevyButton),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -170,7 +169,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
             FilledButton.icon(
               key: const Key('workout_progress_retry_button'),
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text(context.l10n.retry),
               onPressed: () {
                 ref
                     .read(workoutProgressViewModelProvider.notifier)
@@ -181,7 +180,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
             OutlinedButton.icon(
               key: const Key('workout_error_update_key_button'),
               icon: const Icon(Icons.vpn_key_outlined),
-              label: const Text('Update API Key'),
+              label: Text(context.l10n.updateApiKeyButton),
               onPressed: () => HevyKeyBottomSheet.show(context),
             ),
           ],
@@ -218,7 +217,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No workouts in the last 12 weeks',
+                        context.l10n.workoutEmptyTitle,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
@@ -226,7 +225,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Log a workout in Hevy and refresh to see your weekly training volume.',
+                        context.l10n.workoutEmptySubtitle,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
@@ -236,7 +235,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                       FilledButton.icon(
                         key: const Key('workout_empty_refresh_button'),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Refresh Workouts'),
+                        label: Text(context.l10n.refreshWorkoutsButton),
                         onPressed: () {
                           ref
                               .read(workoutProgressViewModelProvider.notifier)
@@ -269,7 +268,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Last 12 Weeks (${loaded.workouts.length} ${loaded.workouts.length == 1 ? "workout" : "workouts"})',
+                    context.l10n.last12WeeksWorkouts(loaded.workouts.length),
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
@@ -278,7 +277,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
                   TextButton.icon(
                     key: const Key('workout_refresh_button'),
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('Refresh'),
+                    label: Text(context.l10n.refreshButton),
                     onPressed: () {
                       ref
                           .read(workoutProgressViewModelProvider.notifier)
@@ -339,7 +338,7 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
               backgroundColor: Theme.of(context).colorScheme.error,
               action: SnackBarAction(
                 key: const Key('workout_progress_refresh_retry_action'),
-                label: 'Retry',
+                label: context.l10n.retry,
                 textColor: Colors.white,
                 onPressed: () {
                   ref

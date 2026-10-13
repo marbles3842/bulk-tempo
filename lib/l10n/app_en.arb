@@ -48,9 +48,481 @@
   "@close": {
     "description": "Generic close action button"
   },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Generic retry action button"
+  },
   "logOut": "Log Out",
   "@logOut": {
     "description": "Generic log out button"
+  },
+  "noEmail": "No email",
+  "@noEmail": {
+    "description": "Fallback text when user email is absent"
+  },
+  "loginTitle": "Welcome Back",
+  "@loginTitle": {
+    "description": "Header title on the login screen"
+  },
+  "loginSubtitle": "Sign in to access your workout logs",
+  "@loginSubtitle": {
+    "description": "Subtitle on the login screen"
+  },
+  "emailLabel": "Email",
+  "@emailLabel": {
+    "description": "Label for email text field"
+  },
+  "emailHint": "Enter your email",
+  "@emailHint": {
+    "description": "Hint text for email text field"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Label for password text field"
+  },
+  "passwordHint": "Enter your password",
+  "@passwordHint": {
+    "description": "Hint text for password text field"
+  },
+  "passwordHintRegister": "At least 6 characters",
+  "@passwordHintRegister": {
+    "description": "Hint text for registration password text field"
+  },
+  "showPasswordTooltip": "Show password",
+  "@showPasswordTooltip": {
+    "description": "Tooltip for showing obscured password"
+  },
+  "hidePasswordTooltip": "Hide password",
+  "@hidePasswordTooltip": {
+    "description": "Tooltip for hiding password"
+  },
+  "loginButton": "Log In",
+  "@loginButton": {
+    "description": "Button to submit login form"
+  },
+  "dontHaveAccountButton": "Don't have an account? Sign up",
+  "@dontHaveAccountButton": {
+    "description": "Button navigating from login to register screen"
+  },
+  "registerTitle": "Create Account",
+  "@registerTitle": {
+    "description": "Header title on the register screen"
+  },
+  "registerSubtitle": "Start tracking your workouts today",
+  "@registerSubtitle": {
+    "description": "Subtitle on the register screen"
+  },
+  "registerButton": "Create Account",
+  "@registerButton": {
+    "description": "Button to submit register form"
+  },
+  "alreadyHaveAccountButton": "Already have an account? Log in",
+  "@alreadyHaveAccountButton": {
+    "description": "Button navigating from register to login screen"
+  },
+  "logoutDialogTitle": "Log Out",
+  "@logoutDialogTitle": {
+    "description": "Title of logout confirmation dialog"
+  },
+  "logoutDialogContent": "Are you sure you want to log out?",
+  "@logoutDialogContent": {
+    "description": "Content of logout confirmation dialog"
+  },
+  "logoutDialogConfirm": "Log Out",
+  "@logoutDialogConfirm": {
+    "description": "Confirm button text in logout dialog"
+  },
+  "homeWelcomeTitle": "Welcome to Bulk Tempo",
+  "@homeWelcomeTitle": {
+    "description": "Greeting on home shell dashboard tab"
+  },
+  "homeGoToWeights": "Go to Weights",
+  "@homeGoToWeights": {
+    "description": "Navigation button on home screen to weights tab"
+  },
+  "homeGoToWorkouts": "Go to Workouts",
+  "@homeGoToWorkouts": {
+    "description": "Navigation button on home screen to workouts tab"
+  },
+  "logoutButton": "Log Out",
+  "@logoutButton": {
+    "description": "Button label for logging out"
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Heading for profile section"
+  },
+  "hevyIntegrationTitle": "Hevy Integration",
+  "@hevyIntegrationTitle": {
+    "description": "Heading for Hevy card on profile tab"
+  },
+  "connectionStatusLabel": "Connection status:",
+  "@connectionStatusLabel": {
+    "description": "Label for Hevy connection status"
+  },
+  "hevyNotConnected": "Not connected",
+  "@hevyNotConnected": {
+    "description": "Status text when Hevy API key is not connected"
+  },
+  "updateKeyButton": "Update Key",
+  "@updateKeyButton": {
+    "description": "Button to update configured Hevy key"
+  },
+  "connectHevyKeyButton": "Connect Hevy Key",
+  "@connectHevyKeyButton": {
+    "description": "Button to connect Hevy key on profile tab"
+  },
+  "disconnectButton": "Disconnect",
+  "@disconnectButton": {
+    "description": "Button to disconnect Hevy key"
+  },
+  "languageLabel": "Language",
+  "@languageLabel": {
+    "description": "Title for language preference card"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Segmented button label for English language"
+  },
+  "languagePolish": "Polski",
+  "@languagePolish": {
+    "description": "Segmented button label for Polish language"
+  },
+  "weightEmptyTitle": "No weight entries yet",
+  "@weightEmptyTitle": {
+    "description": "Empty state title on weight history view"
+  },
+  "weightEmptySubtitle": "Track your weight progression consistently to see trends over time.",
+  "@weightEmptySubtitle": {
+    "description": "Empty state subtitle on weight history view"
+  },
+  "addFirstWeightButton": "Add First Weight",
+  "@addFirstWeightButton": {
+    "description": "Button to add first weight on empty state"
+  },
+  "addWeightButton": "Add Weight",
+  "@addWeightButton": {
+    "description": "Extended FAB label to add a weight entry"
+  },
+  "logWeightTitle": "Log Body Weight",
+  "@logWeightTitle": {
+    "description": "Title of weight bottom sheet when logging a new entry"
+  },
+  "editWeightTitle": "Edit Weight Entry",
+  "@editWeightTitle": {
+    "description": "Title of weight bottom sheet when editing an entry"
+  },
+  "weightFieldLabel": "Weight (kg)",
+  "@weightFieldLabel": {
+    "description": "Label for weight input field"
+  },
+  "weightFieldHint": "e.g. 78.50",
+  "@weightFieldHint": {
+    "description": "Hint text for weight input field"
+  },
+  "saveWeightButton": "Save Weight",
+  "@saveWeightButton": {
+    "description": "Primary button in weight entry bottom sheet"
+  },
+  "deleteWeightButton": "Delete",
+  "@deleteWeightButton": {
+    "description": "Confirm button text in weight deletion dialog"
+  },
+  "deleteWeightEntryButton": "Delete Entry",
+  "@deleteWeightEntryButton": {
+    "description": "Outlined delete button in weight entry bottom sheet"
+  },
+  "overwriteDialogTitle": "Overwrite Weight Entry?",
+  "@overwriteDialogTitle": {
+    "description": "Title of overwrite confirmation dialog"
+  },
+  "overwriteDialogContent": "A weight of {weight} is already recorded for this date. Do you want to replace it?",
+  "@overwriteDialogContent": {
+    "description": "Content of overwrite confirmation dialog",
+    "placeholders": {
+      "weight": {
+        "type": "String",
+        "example": "80.50 kg"
+      }
+    }
+  },
+  "overwriteDialogExistingWeightFallback": "an existing weight",
+  "@overwriteDialogExistingWeightFallback": {
+    "description": "Fallback text when existing weight is unavailable in overwrite dialog"
+  },
+  "overwriteDialogConfirm": "Replace",
+  "@overwriteDialogConfirm": {
+    "description": "Confirm button in overwrite dialog"
+  },
+  "deleteWeightDialogTitle": "Delete Weight Entry?",
+  "@deleteWeightDialogTitle": {
+    "description": "Title of weight delete confirmation dialog"
+  },
+  "deleteWeightDialogContent": "Permanently delete the measurement of {weight} recorded on {date}?",
+  "@deleteWeightDialogContent": {
+    "description": "Content of weight delete confirmation dialog",
+    "placeholders": {
+      "weight": {
+        "type": "String",
+        "example": "80.50 kg"
+      },
+      "date": {
+        "type": "String",
+        "example": "Mon, 12 Oct 2026"
+      }
+    }
+  },
+  "discardDialogTitle": "Discard Changes?",
+  "@discardDialogTitle": {
+    "description": "Title of unsaved changes discard dialog"
+  },
+  "discardDialogContent": "You have unsaved changes. Do you want to discard them or keep editing?",
+  "@discardDialogContent": {
+    "description": "Content of unsaved changes discard dialog"
+  },
+  "keepEditingButton": "Keep Editing",
+  "@keepEditingButton": {
+    "description": "Button to continue editing in discard dialog"
+  },
+  "discardButton": "Discard",
+  "@discardButton": {
+    "description": "Button to confirm discarding unsaved changes"
+  },
+  "weightDeletedSuccess": "Weight entry deleted successfully",
+  "@weightDeletedSuccess": {
+    "description": "Snackbar message when a weight entry is deleted"
+  },
+  "weightSavedSuccess": "Weight entry saved successfully",
+  "@weightSavedSuccess": {
+    "description": "Snackbar message when a weight entry is saved"
+  },
+  "loggedDaysLabel": "{count}/7 days",
+  "@loggedDaysLabel": {
+    "description": "Chip label showing count of logged days in week",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "weightAverageLabel": "{weight} kg avg",
+  "@weightAverageLabel": {
+    "description": "Subtitle showing weekly average weight",
+    "placeholders": {
+      "weight": {
+        "type": "String",
+        "example": "78.50"
+      }
+    }
+  },
+  "editWeightTooltip": "Edit weight entry",
+  "@editWeightTooltip": {
+    "description": "Tooltip for edit button on daily weight item"
+  },
+  "chartNoData": "No weekly data available",
+  "@chartNoData": {
+    "description": "Message when no weekly data is available for chart"
+  },
+  "chartWeeklyTrendTitle": "Weekly Weight Trend",
+  "@chartWeeklyTrendTitle": {
+    "description": "Title header above weekly weight chart"
+  },
+  "chartSingleWeekHint": "Log weights in at least 2 weeks to see a multi-week trend line",
+  "@chartSingleWeekHint": {
+    "description": "Helper hint banner when only a single week of weight data exists"
+  },
+  "connectHevyTitle": "Connect Hevy Workouts",
+  "@connectHevyTitle": {
+    "description": "Title for unconfigured Hevy state in workouts tab"
+  },
+  "connectHevySubtitle": "Import your last 12 weeks of workouts directly from Hevy. Generate your Hevy Pro API key at https://hevy.com/settings?developer and enter it below.",
+  "@connectHevySubtitle": {
+    "description": "Description banner for unconfigured Hevy workouts"
+  },
+  "connectHevyKeyTitle": "Connect Hevy API Key",
+  "@connectHevyKeyTitle": {
+    "description": "Title in Hevy key modal bottom sheet"
+  },
+  "connectHevyKeySubtitle": "Generate your Hevy Pro API key at https://hevy.com/settings?developer and paste the UUID below.",
+  "@connectHevyKeySubtitle": {
+    "description": "Subtitle in Hevy key modal bottom sheet"
+  },
+  "hevyKeyInputLabel": "Hevy API Key (UUID)",
+  "@hevyKeyInputLabel": {
+    "description": "Label for Hevy API key input field"
+  },
+  "hevyKeyInputHint": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "@hevyKeyInputHint": {
+    "description": "Hint text for Hevy API key UUID format"
+  },
+  "connectHevyButton": "Connect Hevy",
+  "@connectHevyButton": {
+    "description": "Primary action button to submit Hevy key inline"
+  },
+  "saveAndConnectButton": "Save & Connect",
+  "@saveAndConnectButton": {
+    "description": "Primary action button in Hevy key modal bottom sheet"
+  },
+  "updateApiKeyButton": "Update API Key",
+  "@updateApiKeyButton": {
+    "description": "Button to update Hevy key from error state"
+  },
+  "workoutEmptyTitle": "No workouts in the last 12 weeks",
+  "@workoutEmptyTitle": {
+    "description": "Title displayed when user has connected Hevy but has no workouts"
+  },
+  "workoutEmptySubtitle": "Log a workout in Hevy and refresh to see your weekly training volume.",
+  "@workoutEmptySubtitle": {
+    "description": "Subtitle displayed when user has connected Hevy but has no workouts"
+  },
+  "refreshWorkoutsButton": "Refresh Workouts",
+  "@refreshWorkoutsButton": {
+    "description": "Button to refresh workouts on empty state"
+  },
+  "refreshButton": "Refresh",
+  "@refreshButton": {
+    "description": "Text button to refresh workouts list"
+  },
+  "last12WeeksWorkouts": "Last 12 Weeks ({count} {count, plural, =1{workout} other{workouts}})",
+  "@last12WeeksWorkouts": {
+    "description": "Header title displaying total workout count over last 12 weeks",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "workoutCountChip": "{count} {count, plural, =1{workout} other{workouts}}",
+  "@workoutCountChip": {
+    "description": "Chip label showing count of workouts in a weekly card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "workoutDetailSummary": "{sets} working sets • {volume} kg volume",
+  "@workoutDetailSummary": {
+    "description": "Summary line displaying working set count and volume",
+    "placeholders": {
+      "sets": {
+        "type": "int",
+        "example": "16"
+      },
+      "volume": {
+        "type": "String",
+        "example": "12500.00"
+      }
+    }
+  },
+  "exerciseCountLabel": "{count} {count, plural, =1{exercise} other{exercises}}",
+  "@exerciseCountLabel": {
+    "description": "Pluralized label for exercise count in workout card item",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "workingSetsCountLabel": "{count} working {count, plural, =1{set} other{sets}}",
+  "@workingSetsCountLabel": {
+    "description": "Pluralized label for working sets in workout card item",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "workoutNoExercises": "No exercises recorded for this workout.",
+  "@workoutNoExercises": {
+    "description": "Empty state text in workout detail bottom sheet"
+  },
+  "bestSetLabel": "Best: {performance}",
+  "@bestSetLabel": {
+    "description": "Chip label showing the best working set performance",
+    "placeholders": {
+      "performance": {
+        "type": "String",
+        "example": "100.00 kg × 8"
+      }
+    }
+  },
+  "setTypeWarmup": "Warmup",
+  "@setTypeWarmup": {
+    "description": "Badge text for warmup set"
+  },
+  "setTypeFailure": "Failure",
+  "@setTypeFailure": {
+    "description": "Badge text for set to failure"
+  },
+  "setTypeDropset": "Dropset",
+  "@setTypeDropset": {
+    "description": "Badge text for dropset"
+  },
+  "repsCount": "{count} {count, plural, =1{rep} other{reps}}",
+  "@repsCount": {
+    "description": "Pluralized repetitions count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "minutesDuration": "{minutes} min",
+  "@minutesDuration": {
+    "description": "Duration in minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "45"
+      }
+    }
+  },
+  "gainTargetTitle": "Weekly Gain Target",
+  "@gainTargetTitle": {
+    "description": "Title of weekly gain target card"
+  },
+  "gainTargetRefreshTooltip": "Refresh target",
+  "@gainTargetRefreshTooltip": {
+    "description": "Tooltip for refresh button on weekly gain target card"
+  },
+  "gainTargetCurrentLabel": "Current target: ",
+  "@gainTargetCurrentLabel": {
+    "description": "Label preceding current gain target value"
+  },
+  "gainTargetNoTargetSet": "No target set",
+  "@gainTargetNoTargetSet": {
+    "description": "Text displayed when no gain target is set"
+  },
+  "minWeeklyGainLabel": "Minimum weekly gain",
+  "@minWeeklyGainLabel": {
+    "description": "Label for minimum weekly gain input field"
+  },
+  "maxWeeklyGainLabel": "Maximum weekly gain",
+  "@maxWeeklyGainLabel": {
+    "description": "Label for maximum weekly gain input field"
+  },
+  "kgPerWeekUnit": "kg/week",
+  "@kgPerWeekUnit": {
+    "description": "Suffix unit for weekly gain rate"
+  },
+  "saveTargetButton": "Save Target",
+  "@saveTargetButton": {
+    "description": "Button to save weekly gain target"
+  },
+  "gainTargetWaitingConfirmation": "Waiting for server confirmation",
+  "@gainTargetWaitingConfirmation": {
+    "description": "Indicator text when gain target save is submitting"
+  },
+  "gainTargetSavedSuccess": "Weekly gain target saved successfully",
+  "@gainTargetSavedSuccess": {
+    "description": "Snackbar message when gain target is saved"
   },
   "weightErrorEmpty": "Please enter a weight",
   "@weightErrorEmpty": {

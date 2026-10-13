@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/weekly_workout_summary_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
@@ -68,8 +69,9 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final countLabel =
-        '${widget.summary.workoutCount} ${widget.summary.workoutCount == 1 ? "workout" : "workouts"}';
+    final countLabel = context.l10n.workoutCountChip(
+      widget.summary.workoutCount,
+    );
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -154,7 +156,10 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text(
-            '${widget.summary.totalWorkingSets} working sets • ${widget.summary.totalVolumeKg.toStringAsFixed(2)} kg volume',
+            context.l10n.workoutDetailSummary(
+              widget.summary.totalWorkingSets,
+              widget.summary.totalVolumeKg.toStringAsFixed(2),
+            ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -162,12 +167,12 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
           ),
         ),
         children: widget.summary.workouts.map((workout) {
-          final exerciseCount = workout.exercises.length;
-          final exerciseLabel =
-              '$exerciseCount ${exerciseCount == 1 ? "exercise" : "exercises"}';
-          final setsCount = workout.workingSetsCount;
-          final setsLabel =
-              '$setsCount working ${setsCount == 1 ? "set" : "sets"}';
+          final exerciseLabel = context.l10n.exerciseCountLabel(
+            workout.exercises.length,
+          );
+          final setsLabel = context.l10n.workingSetsCountLabel(
+            workout.workingSetsCount,
+          );
 
           return ListTile(
             key: Key('workout_item_${workout.id}'),

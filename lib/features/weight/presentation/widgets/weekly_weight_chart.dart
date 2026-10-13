@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
 
@@ -13,12 +14,12 @@ class WeeklyWeightChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (chartSummaries.isEmpty) {
-      return const Card(
-        key: Key('weekly_weight_chart_card'),
-        margin: EdgeInsets.all(16),
+      return Card(
+        key: const Key('weekly_weight_chart_card'),
+        margin: const EdgeInsets.all(16),
         child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: Text('No weekly data available')),
+          padding: const EdgeInsets.all(16),
+          child: Center(child: Text(context.l10n.chartNoData)),
         ),
       );
     }
@@ -59,7 +60,7 @@ class WeeklyWeightChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Weekly Weight Trend',
+              context.l10n.chartWeeklyTrendTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -142,7 +143,7 @@ class WeeklyWeightChart extends StatelessWidget {
                             Localizations.localeOf(context).languageCode,
                           );
                           return LineTooltipItem(
-                            '$range\n${summary.averageWeightKg.toStringAsFixed(2)} kg avg',
+                            '$range\n${context.l10n.weightAverageLabel(summary.averageWeightKg.toStringAsFixed(2))}',
                             const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -186,7 +187,7 @@ class WeeklyWeightChart extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Log weights in at least 2 weeks to see a multi-week trend line',
+                        context.l10n.chartSingleWeekHint,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),

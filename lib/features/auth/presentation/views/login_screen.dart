@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_form_state.dart';
@@ -92,7 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const Icon(Icons.fitness_center, size: 56),
                   const SizedBox(height: 16),
                   Text(
-                    'Welcome Back',
+                    context.l10n.loginTitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -100,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Sign in to access your workout logs',
+                    context.l10n.loginSubtitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -110,8 +111,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   AuthTextField(
                     fieldKey: const Key('login_email_field'),
                     controller: _emailController,
-                    label: 'Email',
-                    hint: 'Enter your email',
+                    label: context.l10n.emailLabel,
+                    hint: context.l10n.emailHint,
                     errorText: formState.emailError,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
@@ -121,8 +122,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   AuthTextField(
                     fieldKey: const Key('login_password_field'),
                     controller: _passwordController,
-                    label: 'Password',
-                    hint: 'Enter your password',
+                    label: context.l10n.passwordLabel,
+                    hint: context.l10n.passwordHint,
                     errorText: formState.passwordError,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
@@ -135,8 +136,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             : Icons.visibility_off_outlined,
                       ),
                       tooltip: _obscurePassword
-                          ? 'Show password'
-                          : 'Hide password',
+                          ? context.l10n.showPasswordTooltip
+                          : context.l10n.hidePasswordTooltip,
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
@@ -147,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
                   AuthButton(
                     key: const Key('login_submit_button'),
-                    text: 'Log In',
+                    text: context.l10n.loginButton,
                     isLoading: formState.status == FormStatus.submitting,
                     onPressed: _submit,
                   ),
@@ -155,7 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextButton(
                     key: const Key('login_to_register_button'),
                     onPressed: _goToRegister,
-                    child: const Text("Don't have an account? Sign up"),
+                    child: Text(context.l10n.dontHaveAccountButton),
                   ),
                 ],
               ),

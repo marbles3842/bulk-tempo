@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_state.dart';
 import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_view_model.dart';
 import 'package:bulk_tempo/features/weight/presentation/widgets/weekly_weight_card.dart';
@@ -47,7 +48,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
               backgroundColor: Theme.of(context).colorScheme.error,
               action: SnackBarAction(
                 key: const Key('weight_history_refresh_retry_action'),
-                label: 'Retry',
+                label: context.l10n.retry,
                 textColor: Colors.white,
                 onPressed: () {
                   ref
@@ -95,7 +96,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                 FilledButton.icon(
                   key: const Key('weight_history_retry_button'),
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
+                  label: Text(context.l10n.retry),
                   onPressed: () {
                     ref
                         .read(weightHistoryViewModelProvider.notifier)
@@ -131,13 +132,13 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No weight entries yet',
+                            context.l10n.weightEmptyTitle,
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Track your weight progression consistently to see trends over time.',
+                            context.l10n.weightEmptySubtitle,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
@@ -150,7 +151,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                           FilledButton.icon(
                             key: const Key('empty_state_add_weight_button'),
                             icon: const Icon(Icons.add),
-                            label: const Text('Add First Weight'),
+                            label: Text(context.l10n.addFirstWeightButton),
                             onPressed: () =>
                                 WeightEntryBottomSheet.show(context),
                           ),
@@ -196,9 +197,9 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
       body: SafeArea(child: content),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('add_weight_fab'),
-        tooltip: 'Add Weight',
+        tooltip: context.l10n.addWeightButton,
         icon: const Icon(Icons.add),
-        label: const Text('Add Weight'),
+        label: Text(context.l10n.addWeightButton),
         onPressed: () => WeightEntryBottomSheet.show(context),
       ),
     );

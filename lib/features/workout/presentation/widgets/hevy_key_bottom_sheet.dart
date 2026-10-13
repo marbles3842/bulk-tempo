@@ -77,14 +77,14 @@ class _HevyKeyBottomSheetState extends ConsumerState<HevyKeyBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Connect Hevy API Key',
+                  context.l10n.connectHevyKeyTitle,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
-                  tooltip: 'Close',
+                  tooltip: context.l10n.close,
                   onPressed: isSubmitting
                       ? null
                       : () => Navigator.of(context).pop(false),
@@ -93,7 +93,7 @@ class _HevyKeyBottomSheetState extends ConsumerState<HevyKeyBottomSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Generate your Hevy Pro API key at https://hevy.com/settings?developer and paste the UUID below.',
+              context.l10n.connectHevyKeySubtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -135,8 +135,8 @@ class _HevyKeyBottomSheetState extends ConsumerState<HevyKeyBottomSheet> {
               autocorrect: false,
               enableSuggestions: false,
               decoration: InputDecoration(
-                labelText: 'Hevy API Key (UUID)',
-                hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                labelText: context.l10n.hevyKeyInputLabel,
+                hintText: context.l10n.hevyKeyInputHint,
                 errorText: formState.validationError?.toLocalizedMessage(
                   context.l10n,
                 ),
@@ -163,7 +163,7 @@ class _HevyKeyBottomSheetState extends ConsumerState<HevyKeyBottomSheet> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Save & Connect'),
+                  : Text(context.l10n.saveAndConnectButton),
             ),
           ],
         ),

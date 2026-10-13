@@ -10,5 +10,6 @@ final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
 
 /// Convenience extension on [BuildContext] to access [AppLocalizations].
 extension AppLocalizationsX on BuildContext {
-  AppLocalizations get l10n => AppLocalizations.of(this)!;
+  AppLocalizations get l10n =>
+      AppLocalizations.of(this) ?? lookupAppLocalizations(const Locale('en'));
 }
