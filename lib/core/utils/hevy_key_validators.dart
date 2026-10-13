@@ -5,16 +5,6 @@ enum HevyKeyValidationError {
   empty,
   invalidUuid;
 
-  /// Returns the default English user-facing error message.
-  String get defaultMessage {
-    switch (this) {
-      case HevyKeyValidationError.empty:
-        return 'Hevy API key is required';
-      case HevyKeyValidationError.invalidUuid:
-        return 'Enter a valid Hevy API key (UUID format)';
-    }
-  }
-
   /// Returns the localized error message using [l10n].
   String toLocalizedMessage(AppLocalizations l10n) {
     switch (this) {
@@ -23,14 +13,6 @@ enum HevyKeyValidationError {
       case HevyKeyValidationError.invalidUuid:
         return l10n.hevyKeyErrorInvalidUuid;
     }
-  }
-
-  /// Returns the localized error message if [l10n] is provided, falling back to [defaultMessage].
-  String message([AppLocalizations? l10n]) {
-    if (l10n != null) {
-      return toLocalizedMessage(l10n);
-    }
-    return defaultMessage;
   }
 }
 
@@ -74,14 +56,5 @@ abstract final class HevyKeyValidators {
       return '••••••••';
     }
     return '••••••••-••••-••••-••••-••••••••${trimmed.substring(trimmed.length - 4)}';
-  }
-
-  /// Maps a [HevyKeyValidationError] to a user-facing string using [l10n],
-  /// or returns the English default if [l10n] is omitted.
-  static String getErrorMessage(
-    HevyKeyValidationError error, [
-    AppLocalizations? l10n,
-  ]) {
-    return error.message(l10n);
   }
 }

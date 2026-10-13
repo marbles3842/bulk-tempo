@@ -55,7 +55,7 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
     if (validationError != null) {
       state = state.copyWith(
         status: FormStatus.failure,
-        validationError: validationError.defaultMessage,
+        validationError: validationError,
         submitErrorMessage: null,
       );
       return false;

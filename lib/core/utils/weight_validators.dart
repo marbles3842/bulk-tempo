@@ -8,22 +8,6 @@ enum WeightValidationError {
   futureDate,
   lookbackExceeded;
 
-  /// Returns the default English user-facing error message.
-  String get defaultMessage {
-    switch (this) {
-      case WeightValidationError.empty:
-        return 'Please enter a weight';
-      case WeightValidationError.invalidFormat:
-        return 'Enter a valid weight with up to 2 decimal places';
-      case WeightValidationError.outOfBounds:
-        return 'Weight must be between ${WeightValidators.minWeightKg.toStringAsFixed(1)} and ${WeightValidators.maxWeightKg.toStringAsFixed(1)} kg';
-      case WeightValidationError.futureDate:
-        return 'Date cannot be in the future';
-      case WeightValidationError.lookbackExceeded:
-        return 'Date cannot be more than ${WeightValidators.maxLookbackDays} days in the past';
-    }
-  }
-
   /// Returns the localized error message using [l10n].
   String toLocalizedMessage(AppLocalizations l10n) {
     switch (this) {
@@ -43,14 +27,6 @@ enum WeightValidationError {
           WeightValidators.maxLookbackDays,
         );
     }
-  }
-
-  /// Returns the localized error message if [l10n] is provided, falling back to [defaultMessage].
-  String message([AppLocalizations? l10n]) {
-    if (l10n != null) {
-      return toLocalizedMessage(l10n);
-    }
-    return defaultMessage;
   }
 }
 
@@ -125,14 +101,5 @@ abstract final class WeightValidators {
     }
 
     return null;
-  }
-
-  /// Maps a [WeightValidationError] to a user-facing string using [l10n],
-  /// or returns the English default if [l10n] is omitted.
-  static String getErrorMessage(
-    WeightValidationError error, [
-    AppLocalizations? l10n,
-  ]) {
-    return error.message(l10n);
   }
 }

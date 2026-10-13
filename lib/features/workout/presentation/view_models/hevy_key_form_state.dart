@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:bulk_tempo/core/utils/hevy_key_validators.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/form_status.dart';
 
 export 'package:bulk_tempo/features/auth/presentation/view_models/form_status.dart';
@@ -13,7 +14,7 @@ abstract class HevyKeyFormState with _$HevyKeyFormState {
   const factory HevyKeyFormState({
     @Default('') String rawKey,
     @Default(FormStatus.initial) FormStatus status,
-    String? validationError,
+    HevyKeyValidationError? validationError,
     String? submitErrorMessage,
   }) = _HevyKeyFormState;
 

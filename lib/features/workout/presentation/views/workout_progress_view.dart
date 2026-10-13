@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/hevy_key_form_state.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/hevy_key_view_model.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_state.dart';
@@ -110,7 +111,9 @@ class _WorkoutProgressViewState extends ConsumerState<WorkoutProgressView> {
               decoration: InputDecoration(
                 labelText: 'Hevy API Key (UUID)',
                 hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-                errorText: keyFormState.validationError,
+                errorText: keyFormState.validationError?.toLocalizedMessage(
+                  context.l10n,
+                ),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.vpn_key_outlined),
               ),

@@ -76,10 +76,6 @@ void main() {
         HevyKeyValidators.validateKeyInput('   \t\n '),
         equals(HevyKeyValidationError.empty),
       );
-      expect(
-        HevyKeyValidationError.empty.defaultMessage,
-        equals('Hevy API key is required'),
-      );
     });
 
     test('returns invalidUuid error for malformed UUID', () {
@@ -90,10 +86,6 @@ void main() {
       expect(
         HevyKeyValidators.validateKeyInput('a1b2c3d4e5f64a7b8c9d0e1f2a3b4c5d'),
         equals(HevyKeyValidationError.invalidUuid),
-      );
-      expect(
-        HevyKeyValidationError.invalidUuid.defaultMessage,
-        equals('Enter a valid Hevy API key (UUID format)'),
       );
     });
 
@@ -148,30 +140,5 @@ void main() {
         equals('Wprowadź poprawny klucz API Hevy (format UUID)'),
       );
     });
-
-    test(
-      'message() helper and HevyKeyValidators.getErrorMessage fall back or localize',
-      () {
-        expect(
-          HevyKeyValidationError.empty.message(),
-          equals('Hevy API key is required'),
-        );
-        expect(
-          HevyKeyValidationError.empty.message(l10nPl),
-          equals('Klucz API Hevy jest wymagany'),
-        );
-        expect(
-          HevyKeyValidators.getErrorMessage(HevyKeyValidationError.invalidUuid),
-          equals('Enter a valid Hevy API key (UUID format)'),
-        );
-        expect(
-          HevyKeyValidators.getErrorMessage(
-            HevyKeyValidationError.invalidUuid,
-            l10nPl,
-          ),
-          equals('Wprowadź poprawny klucz API Hevy (format UUID)'),
-        );
-      },
-    );
   });
 }

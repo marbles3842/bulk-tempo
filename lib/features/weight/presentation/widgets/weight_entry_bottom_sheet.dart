@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/core/utils/weight_validators.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
@@ -429,7 +430,9 @@ class _WeightEntryBottomSheetState
                         labelText: 'Weight (kg)',
                         hintText: 'e.g. 78.50',
                         suffixText: 'kg',
-                        errorText: formState.weightError,
+                        errorText: formState.weightError?.toLocalizedMessage(
+                          context.l10n,
+                        ),
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.monitor_weight_outlined),
                       ),
@@ -469,7 +472,7 @@ class _WeightEntryBottomSheetState
                       Padding(
                         padding: const EdgeInsets.only(left: 12, top: 4),
                         child: Text(
-                          formState.dateError!,
+                          formState.dateError!.toLocalizedMessage(context.l10n),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.error,
                           ),

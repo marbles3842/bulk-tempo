@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
+import 'package:bulk_tempo/core/utils/hevy_key_validators.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/workout/data/repositories/workout_repository_impl.dart';
@@ -59,7 +60,7 @@ void main() {
         expect(ok, isFalse);
         final state = container.read(hevyKeyViewModelProvider);
         expect(state.status, equals(FormStatus.failure));
-        expect(state.validationError, equals('Hevy API key is required'));
+        expect(state.validationError, equals(HevyKeyValidationError.empty));
         expect(state.submitErrorMessage, isNull);
         expect(fakeWorkoutRepository.getApiKeyForUser(testUser.id), isNull);
       },
@@ -78,7 +79,7 @@ void main() {
         expect(state.status, equals(FormStatus.failure));
         expect(
           state.validationError,
-          equals('Enter a valid Hevy API key (UUID format)'),
+          equals(HevyKeyValidationError.invalidUuid),
         );
 
         notifier.updateKey(validUuid);

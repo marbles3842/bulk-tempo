@@ -121,7 +121,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     if (weightError != null) {
       state = state.copyWith(
         status: FormStatus.failure,
-        weightError: weightError.defaultMessage,
+        weightError: weightError,
       );
       return false;
     }
@@ -130,7 +130,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     if (parsedWeight == null) {
       state = state.copyWith(
         status: FormStatus.failure,
-        weightError: WeightValidationError.invalidFormat.defaultMessage,
+        weightError: WeightValidationError.invalidFormat,
       );
       return false;
     }
@@ -167,7 +167,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
       if (dateError != null) {
         state = state.copyWith(
           status: FormStatus.failure,
-          dateError: dateError.defaultMessage,
+          dateError: dateError,
         );
         return false;
       }
