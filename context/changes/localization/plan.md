@@ -388,10 +388,10 @@ Update test helpers to support `AppLocalizations`, add dedicated localization te
 
 #### Automated
 
-- [ ] 4.1 Code generation creates up-to-date localizations: `flutter gen-l10n`
-- [ ] 4.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test`
-- [ ] 4.3 Static analysis clean: `flutter analyze`
-- [ ] 4.4 Test suite passes: `flutter test`
+- [x] 4.1 Code generation creates up-to-date localizations: `flutter gen-l10n` — c98740b
+- [x] 4.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test` — c98740b
+- [x] 4.3 Static analysis clean: `flutter analyze` — c98740b
+- [x] 4.4 Test suite passes: `flutter test` — c98740b
 
 #### Manual
 
