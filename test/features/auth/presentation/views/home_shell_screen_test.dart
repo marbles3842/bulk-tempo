@@ -843,5 +843,48 @@ void main() {
         expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'Profile tab renders Language card and allows selecting languages',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(const Key('profile_language_card')),
+        );
+        expect(find.byKey(const Key('profile_language_card')), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_language_selector')),
+          findsOneWidget,
+        );
+        expect(find.text('Language'), findsOneWidget);
+        expect(find.text('English'), findsOneWidget);
+        expect(find.text('Polski'), findsOneWidget);
+        expect(find.text('System'), findsNothing);
+
+        // Tap Polski
+        await tester.tap(find.text('Polski'));
+        await tester.pumpAndSettle();
+
+        // Tap English
+        await tester.tap(find.text('English'));
+        await tester.pumpAndSettle();
+      },
+    );
   });
 }

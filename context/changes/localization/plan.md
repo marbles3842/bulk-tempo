@@ -351,26 +351,26 @@ Update test helpers to support `AppLocalizations`, add dedicated localization te
 
 #### Automated
 
-- [x] 1.1 Dependencies resolved successfully: `flutter pub get`
-- [x] 1.2 Localization code generation completes without errors: `flutter gen-l10n`
-- [x] 1.3 Static analysis passes: `flutter analyze`
-- [x] 1.4 Existing test suite passes: `flutter test`
+- [x] 1.1 Dependencies resolved successfully: `flutter pub get` — c7038ad
+- [x] 1.2 Localization code generation completes without errors: `flutter gen-l10n` — c7038ad
+- [x] 1.3 Static analysis passes: `flutter analyze` — c7038ad
+- [x] 1.4 Existing test suite passes: `flutter test` — c7038ad
 
 #### Manual
 
-- [x] 1.5 App compiles and runs displaying the default English strings
+- [x] 1.5 App compiles and runs displaying the default English strings — c7038ad
 
 ### Phase 2: Locale State Management & Profile Language Selector
 
 #### Automated
 
-- [ ] 2.1 Unit test for `LocaleNotifier` passes: `flutter test test/core/localization/locale_notifier_test.dart`
-- [ ] 2.2 Static analysis passes: `flutter analyze`
+- [x] 2.1 Unit test for `LocaleNotifier` passes: `flutter test test/core/localization/locale_notifier_test.dart`
+- [x] 2.2 Static analysis passes: `flutter analyze`
 
 #### Manual
 
-- [ ] 2.3 In the Profile tab, changing the language immediately switches the application locale between English and Polish
-- [ ] 2.4 Restarting the app persists the chosen language setting
+- [x] 2.3 In the Profile tab, changing the language immediately switches the application locale between English and Polish
+- [x] 2.4 Restarting the app persists the chosen language setting
 
 ### Phase 3: Core Utilities & Validation Error Localization
 
