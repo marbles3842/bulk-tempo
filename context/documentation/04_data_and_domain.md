@@ -83,7 +83,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'item_entity.freezed.dart';
 
 @freezed
-class ItemEntity with _$ItemEntity {
+abstract class ItemEntity with _$ItemEntity {
   // Private constructor enables defining custom methods/getters if needed
   const ItemEntity._();
 
@@ -129,7 +129,7 @@ part 'item_dto.freezed.dart';
 part 'item_dto.g.dart';
 
 @freezed
-class ItemDto with _$ItemDto {
+abstract class ItemDto with _$ItemDto {
   const ItemDto._();
 
   const factory ItemDto({
@@ -306,13 +306,13 @@ Because entities and DTOs rely on **Freezed** and **`json_serializable`**, runni
 
 ```yaml
 dependencies:
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
 
 dev_dependencies:
   build_runner: ^2.4.15
-  freezed: ^2.5.7
-  json_serializable: ^6.9.4
+  freezed: ^3.0.0
+  json_serializable: ^6.9.0
 ```
 
 ### B. Generation Commands:

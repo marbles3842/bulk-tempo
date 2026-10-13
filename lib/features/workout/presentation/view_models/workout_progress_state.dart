@@ -12,12 +12,12 @@ sealed class WorkoutProgressState with _$WorkoutProgressState {
 
   /// Masked Hevy API key if one is currently saved for the user, or `null`
   /// when unconfigured or not yet checked.
-  String? get maskedApiKey => whenOrNull(
-    loading: (maskedApiKey) => maskedApiKey,
-    loaded: (maskedApiKey, workouts, weeklySummaries, refreshErrorMessage) =>
-        maskedApiKey,
-    error: (message, maskedApiKey) => maskedApiKey,
-  );
+  String? get maskedApiKey => switch (this) {
+    WorkoutProgressLoading(maskedApiKey: final key) => key,
+    WorkoutProgressLoaded(maskedApiKey: final key) => key,
+    WorkoutProgressError(maskedApiKey: final key) => key,
+    _ => null,
+  };
 
   const factory WorkoutProgressState.initial() = WorkoutProgressInitial;
   const factory WorkoutProgressState.unconfigured() =
