@@ -105,6 +105,7 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
                 WeekDateUtils.formatWeekRange(
                   widget.summary.weekStartMonday,
                   widget.summary.weekEndSunday,
+                  Localizations.localeOf(context).languageCode,
                 ),
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -189,7 +190,7 @@ class _WeeklyWorkoutCardState extends State<WeeklyWorkoutCard> {
               ),
             ),
             subtitle: Text(
-              '${WeekDateUtils.formatDayWithWeekday(workout.localDate)} • $exerciseLabel • $setsLabel',
+              '${WeekDateUtils.formatDayWithWeekday(workout.localDate, Localizations.localeOf(context).languageCode)} • $exerciseLabel • $setsLabel',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

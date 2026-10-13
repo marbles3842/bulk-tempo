@@ -156,7 +156,10 @@ class _WeightEntryBottomSheetState
     final original = formState.originalEntry;
     if (original == null) return;
 
-    final formattedDate = WeekDateUtils.formatDayWithWeekday(original.date);
+    final formattedDate = WeekDateUtils.formatDayWithWeekday(
+      original.date,
+      Localizations.localeOf(context).languageCode,
+    );
     final weightText = '${original.weightKg.toStringAsFixed(2)} kg';
 
     showDialog<void>(
@@ -443,6 +446,7 @@ class _WeightEntryBottomSheetState
                       label: Text(
                         WeekDateUtils.formatDayWithWeekday(
                           formState.selectedDate,
+                          Localizations.localeOf(context).languageCode,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(

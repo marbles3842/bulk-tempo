@@ -55,8 +55,12 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
     }
   }
 
-  String _formatDateAndDuration() {
-    final dateText = WeekDateUtils.formatDayWithWeekday(workout.localDate);
+  String _formatDateAndDuration(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    final dateText = WeekDateUtils.formatDayWithWeekday(
+      workout.localDate,
+      locale,
+    );
     final durationMinutes = workout.endTime
         .difference(workout.startTime)
         .inMinutes;
@@ -101,7 +105,7 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            _formatDateAndDuration(),
+                            _formatDateAndDuration(context),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

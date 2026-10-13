@@ -1,3 +1,59 @@
+import 'package:bulk_tempo/l10n/app_localizations.dart';
+
+/// Validation error codes for body weight values and historical entry dates.
+enum WeightValidationError {
+  empty,
+  invalidFormat,
+  outOfBounds,
+  futureDate,
+  lookbackExceeded;
+
+  /// Returns the default English user-facing error message.
+  String get defaultMessage {
+    switch (this) {
+      case WeightValidationError.empty:
+        return 'Please enter a weight';
+      case WeightValidationError.invalidFormat:
+        return 'Enter a valid weight with up to 2 decimal places';
+      case WeightValidationError.outOfBounds:
+        return 'Weight must be between ${WeightValidators.minWeightKg.toStringAsFixed(1)} and ${WeightValidators.maxWeightKg.toStringAsFixed(1)} kg';
+      case WeightValidationError.futureDate:
+        return 'Date cannot be in the future';
+      case WeightValidationError.lookbackExceeded:
+        return 'Date cannot be more than ${WeightValidators.maxLookbackDays} days in the past';
+    }
+  }
+
+  /// Returns the localized error message using [l10n].
+  String toLocalizedMessage(AppLocalizations l10n) {
+    switch (this) {
+      case WeightValidationError.empty:
+        return l10n.weightErrorEmpty;
+      case WeightValidationError.invalidFormat:
+        return l10n.weightErrorInvalidFormat;
+      case WeightValidationError.outOfBounds:
+        return l10n.weightErrorOutOfBounds(
+          WeightValidators.minWeightKg.toStringAsFixed(1),
+          WeightValidators.maxWeightKg.toStringAsFixed(1),
+        );
+      case WeightValidationError.futureDate:
+        return l10n.weightErrorFutureDate;
+      case WeightValidationError.lookbackExceeded:
+        return l10n.weightErrorLookbackExceeded(
+          WeightValidators.maxLookbackDays,
+        );
+    }
+  }
+
+  /// Returns the localized error message if [l10n] is provided, falling back to [defaultMessage].
+  String message([AppLocalizations? l10n]) {
+    if (l10n != null) {
+      return toLocalizedMessage(l10n);
+    }
+    return defaultMessage;
+  }
+}
+
 /// Validation utilities for user body weight inputs and entry dates.
 abstract final class WeightValidators {
   /// Minimum allowed weight in kilograms.
@@ -26,20 +82,20 @@ abstract final class WeightValidators {
   /// Validates a raw weight string against format and bounds constraints.
   ///
   /// Returns `null` when valid (`20.0 <= value <= 300.0` and at most 2 decimals),
-  /// or a clear user-facing error message.
-  static String? validateWeightInput(String rawInput) {
+  /// or a typed [WeightValidationError].
+  static WeightValidationError? validateWeightInput(String rawInput) {
     final trimmed = rawInput.trim();
     if (trimmed.isEmpty) {
-      return 'Please enter a weight';
+      return WeightValidationError.empty;
     }
 
     final parsed = parseWeightKg(trimmed);
     if (parsed == null) {
-      return 'Enter a valid weight with up to 2 decimal places';
+      return WeightValidationError.invalidFormat;
     }
 
     if (parsed < minWeightKg || parsed > maxWeightKg) {
-      return 'Weight must be between ${minWeightKg.toStringAsFixed(1)} and ${maxWeightKg.toStringAsFixed(1)} kg';
+      return WeightValidationError.outOfBounds;
     }
 
     return null;
@@ -49,7 +105,10 @@ abstract final class WeightValidators {
   /// [maxLookbackDays] (365 days) relative to [now].
   ///
   /// Compares normalized calendar dates in UTC to avoid time-of-day or DST discrepancies.
-  static String? validateEntryDate(DateTime date, {required DateTime now}) {
+  static WeightValidationError? validateEntryDate(
+    DateTime date, {
+    required DateTime now,
+  }) {
     final entryDateUtc = DateTime.utc(date.year, date.month, date.day);
     final nowDateUtc = DateTime.utc(now.year, now.month, now.day);
     final minDateUtc = DateTime.utc(
@@ -59,12 +118,21 @@ abstract final class WeightValidators {
     );
 
     if (entryDateUtc.isAfter(nowDateUtc)) {
-      return 'Date cannot be in the future';
+      return WeightValidationError.futureDate;
     }
     if (entryDateUtc.isBefore(minDateUtc)) {
-      return 'Date cannot be more than 365 days in the past';
+      return WeightValidationError.lookbackExceeded;
     }
 
     return null;
+  }
+
+  /// Maps a [WeightValidationError] to a user-facing string using [l10n],
+  /// or returns the English default if [l10n] is omitted.
+  static String getErrorMessage(
+    WeightValidationError error, [
+    AppLocalizations? l10n,
+  ]) {
+    return error.message(l10n);
   }
 }

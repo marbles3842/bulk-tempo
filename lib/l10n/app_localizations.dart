@@ -175,6 +175,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log Out'**
   String get logOut;
+
+  /// Validation error when weight input is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a weight'**
+  String get weightErrorEmpty;
+
+  /// Validation error when weight input has invalid format
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid weight with up to 2 decimal places'**
+  String get weightErrorInvalidFormat;
+
+  /// Validation error when weight is outside allowed bounds
+  ///
+  /// In en, this message translates to:
+  /// **'Weight must be between {min} and {max} kg'**
+  String weightErrorOutOfBounds(String min, String max);
+
+  /// Validation error when weight entry date is in the future
+  ///
+  /// In en, this message translates to:
+  /// **'Date cannot be in the future'**
+  String get weightErrorFutureDate;
+
+  /// Validation error when weight entry date exceeds maximum lookback
+  ///
+  /// In en, this message translates to:
+  /// **'Date cannot be more than {days} days in the past'**
+  String weightErrorLookbackExceeded(int days);
+
+  /// Validation error when Hevy API key is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Hevy API key is required'**
+  String get hevyKeyErrorEmpty;
+
+  /// Validation error when Hevy API key is not a valid UUID
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid Hevy API key (UUID format)'**
+  String get hevyKeyErrorInvalidUuid;
+
+  /// Abbreviated Monday
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get weekdayMon;
+
+  /// Abbreviated Tuesday
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get weekdayTue;
+
+  /// Abbreviated Wednesday
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get weekdayWed;
+
+  /// Abbreviated Thursday
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get weekdayThu;
+
+  /// Abbreviated Friday
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get weekdayFri;
+
+  /// Abbreviated Saturday
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get weekdaySat;
+
+  /// Abbreviated Sunday
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get weekdaySun;
+
+  /// Abbreviated January
+  ///
+  /// In en, this message translates to:
+  /// **'Jan'**
+  String get monthJan;
+
+  /// Abbreviated February
+  ///
+  /// In en, this message translates to:
+  /// **'Feb'**
+  String get monthFeb;
+
+  /// Abbreviated March
+  ///
+  /// In en, this message translates to:
+  /// **'Mar'**
+  String get monthMar;
+
+  /// Abbreviated April
+  ///
+  /// In en, this message translates to:
+  /// **'Apr'**
+  String get monthApr;
+
+  /// Abbreviated May
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get monthMay;
+
+  /// Abbreviated June
+  ///
+  /// In en, this message translates to:
+  /// **'Jun'**
+  String get monthJun;
+
+  /// Abbreviated July
+  ///
+  /// In en, this message translates to:
+  /// **'Jul'**
+  String get monthJul;
+
+  /// Abbreviated August
+  ///
+  /// In en, this message translates to:
+  /// **'Aug'**
+  String get monthAug;
+
+  /// Abbreviated September
+  ///
+  /// In en, this message translates to:
+  /// **'Sep'**
+  String get monthSep;
+
+  /// Abbreviated October
+  ///
+  /// In en, this message translates to:
+  /// **'Oct'**
+  String get monthOct;
+
+  /// Abbreviated November
+  ///
+  /// In en, this message translates to:
+  /// **'Nov'**
+  String get monthNov;
+
+  /// Abbreviated December
+  ///
+  /// In en, this message translates to:
+  /// **'Dec'**
+  String get monthDec;
 }
 
 class _AppLocalizationsDelegate

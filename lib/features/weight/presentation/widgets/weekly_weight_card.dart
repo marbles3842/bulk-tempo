@@ -20,6 +20,7 @@ class WeeklyWeightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -37,6 +38,7 @@ class WeeklyWeightCard extends StatelessWidget {
                 WeekDateUtils.formatWeekRange(
                   summary.weekStartMonday,
                   summary.weekEndSunday,
+                  locale,
                 ),
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -80,7 +82,7 @@ class WeeklyWeightCard extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
             title: Text(
-              WeekDateUtils.formatDayWithWeekday(entry.date),
+              WeekDateUtils.formatDayWithWeekday(entry.date, locale),
               style: theme.textTheme.bodyMedium,
             ),
             trailing: Row(

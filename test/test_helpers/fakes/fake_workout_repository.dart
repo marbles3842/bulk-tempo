@@ -81,7 +81,7 @@ class FakeWorkoutRepository implements WorkoutRepository {
 
     final validationError = HevyKeyValidators.validateKeyInput(apiKey);
     if (validationError != null) {
-      return Result.failure(ValidationFailure(validationError));
+      return Result.failure(ValidationFailure(validationError.defaultMessage));
     }
 
     final failure = nextFailure ?? saveKeyFailure;

@@ -103,6 +103,7 @@ class WeeklyWeightChart extends StatelessWidget {
                             child: Text(
                               WeekDateUtils.formatShortWeekLabel(
                                 chartSummaries[index].weekStartMonday,
+                                Localizations.localeOf(context).languageCode,
                               ),
                               style: const TextStyle(fontSize: 10),
                             ),
@@ -138,6 +139,7 @@ class WeeklyWeightChart extends StatelessWidget {
                           final range = WeekDateUtils.formatWeekRange(
                             summary.weekStartMonday,
                             summary.weekEndSunday,
+                            Localizations.localeOf(context).languageCode,
                           );
                           return LineTooltipItem(
                             '$range\n${summary.averageWeightKg.toStringAsFixed(2)} kg avg',

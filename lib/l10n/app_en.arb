@@ -51,5 +51,125 @@
   "logOut": "Log Out",
   "@logOut": {
     "description": "Generic log out button"
+  },
+  "weightErrorEmpty": "Please enter a weight",
+  "@weightErrorEmpty": {
+    "description": "Validation error when weight input is empty"
+  },
+  "weightErrorInvalidFormat": "Enter a valid weight with up to 2 decimal places",
+  "@weightErrorInvalidFormat": {
+    "description": "Validation error when weight input has invalid format"
+  },
+  "weightErrorOutOfBounds": "Weight must be between {min} and {max} kg",
+  "@weightErrorOutOfBounds": {
+    "description": "Validation error when weight is outside allowed bounds",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "20.0"
+      },
+      "max": {
+        "type": "String",
+        "example": "300.0"
+      }
+    }
+  },
+  "weightErrorFutureDate": "Date cannot be in the future",
+  "@weightErrorFutureDate": {
+    "description": "Validation error when weight entry date is in the future"
+  },
+  "weightErrorLookbackExceeded": "Date cannot be more than {days} days in the past",
+  "@weightErrorLookbackExceeded": {
+    "description": "Validation error when weight entry date exceeds maximum lookback",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "365"
+      }
+    }
+  },
+  "hevyKeyErrorEmpty": "Hevy API key is required",
+  "@hevyKeyErrorEmpty": {
+    "description": "Validation error when Hevy API key is empty"
+  },
+  "hevyKeyErrorInvalidUuid": "Enter a valid Hevy API key (UUID format)",
+  "@hevyKeyErrorInvalidUuid": {
+    "description": "Validation error when Hevy API key is not a valid UUID"
+  },
+  "weekdayMon": "Mon",
+  "@weekdayMon": {
+    "description": "Abbreviated Monday"
+  },
+  "weekdayTue": "Tue",
+  "@weekdayTue": {
+    "description": "Abbreviated Tuesday"
+  },
+  "weekdayWed": "Wed",
+  "@weekdayWed": {
+    "description": "Abbreviated Wednesday"
+  },
+  "weekdayThu": "Thu",
+  "@weekdayThu": {
+    "description": "Abbreviated Thursday"
+  },
+  "weekdayFri": "Fri",
+  "@weekdayFri": {
+    "description": "Abbreviated Friday"
+  },
+  "weekdaySat": "Sat",
+  "@weekdaySat": {
+    "description": "Abbreviated Saturday"
+  },
+  "weekdaySun": "Sun",
+  "@weekdaySun": {
+    "description": "Abbreviated Sunday"
+  },
+  "monthJan": "Jan",
+  "@monthJan": {
+    "description": "Abbreviated January"
+  },
+  "monthFeb": "Feb",
+  "@monthFeb": {
+    "description": "Abbreviated February"
+  },
+  "monthMar": "Mar",
+  "@monthMar": {
+    "description": "Abbreviated March"
+  },
+  "monthApr": "Apr",
+  "@monthApr": {
+    "description": "Abbreviated April"
+  },
+  "monthMay": "May",
+  "@monthMay": {
+    "description": "Abbreviated May"
+  },
+  "monthJun": "Jun",
+  "@monthJun": {
+    "description": "Abbreviated June"
+  },
+  "monthJul": "Jul",
+  "@monthJul": {
+    "description": "Abbreviated July"
+  },
+  "monthAug": "Aug",
+  "@monthAug": {
+    "description": "Abbreviated August"
+  },
+  "monthSep": "Sep",
+  "@monthSep": {
+    "description": "Abbreviated September"
+  },
+  "monthOct": "Oct",
+  "@monthOct": {
+    "description": "Abbreviated October"
+  },
+  "monthNov": "Nov",
+  "@monthNov": {
+    "description": "Abbreviated November"
+  },
+  "monthDec": "Dec",
+  "@monthDec": {
+    "description": "Abbreviated December"
   }
 }

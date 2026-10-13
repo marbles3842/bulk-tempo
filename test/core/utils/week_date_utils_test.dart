@@ -1,7 +1,13 @@
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('en', null);
+    await initializeDateFormatting('pl', null);
+  });
+
   group('WeekDateUtils.normalizeDateUtc', () {
     test('strips time components and returns UTC midnight', () {
       final date = DateTime(2026, 10, 5, 14, 30, 45, 123);
@@ -149,6 +155,32 @@ void main() {
       );
     });
 
+    test('formatWeekRange supports explicit en and pl locales', () {
+      final monSameMonth = DateTime.utc(2026, 10, 5);
+      final sunSameMonth = DateTime.utc(2026, 10, 11);
+      final monCrossMonth = DateTime.utc(2026, 9, 28);
+      final sunCrossMonth = DateTime.utc(2026, 10, 4);
+      final monCrossYear = DateTime.utc(2026, 12, 28);
+      final sunCrossYear = DateTime.utc(2027, 1, 3);
+
+      expect(
+        WeekDateUtils.formatWeekRange(monSameMonth, sunSameMonth, 'en'),
+        equals('Oct 5 – Oct 11, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatWeekRange(monSameMonth, sunSameMonth, 'pl'),
+        equals('paź 5 – paź 11, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatWeekRange(monCrossMonth, sunCrossMonth, 'pl'),
+        equals('wrz 28 – paź 4, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatWeekRange(monCrossYear, sunCrossYear, 'pl'),
+        equals('gru 28, 2026 – sty 3, 2027'),
+      );
+    });
+
     test('formatShortWeekLabel formats month and day', () {
       expect(
         WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 10, 5)),
@@ -157,6 +189,21 @@ void main() {
       expect(
         WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 9, 28)),
         equals('Sep 28'),
+      );
+    });
+
+    test('formatShortWeekLabel supports explicit en and pl locales', () {
+      expect(
+        WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 10, 5), 'en'),
+        equals('Oct 5'),
+      );
+      expect(
+        WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 10, 5), 'pl'),
+        equals('paź 5'),
+      );
+      expect(
+        WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 9, 28), 'pl'),
+        equals('wrz 28'),
       );
     });
 
@@ -177,6 +224,25 @@ void main() {
         );
       },
     );
+
+    test('formatDayWithWeekday supports explicit en and pl locales', () {
+      expect(
+        WeekDateUtils.formatDayWithWeekday(DateTime.utc(2026, 10, 5), 'en'),
+        equals('Mon, Oct 5, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatDayWithWeekday(DateTime.utc(2026, 10, 5), 'pl'),
+        equals('pon., paź 5, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatDayWithWeekday(DateTime.utc(2026, 10, 11), 'pl'),
+        equals('niedz., paź 11, 2026'),
+      );
+      expect(
+        WeekDateUtils.formatDayWithWeekday(DateTime.utc(2027, 1, 1), 'pl'),
+        equals('pt., sty 1, 2027'),
+      );
+    });
 
     test('roundToTwoDecimals correctly rounds doubles', () {
       expect(WeekDateUtils.roundToTwoDecimals(82.456), equals(82.46));

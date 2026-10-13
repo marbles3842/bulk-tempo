@@ -376,13 +376,13 @@ Update test helpers to support `AppLocalizations`, add dedicated localization te
 
 #### Automated
 
-- [ ] 3.1 Unit tests for `WeightValidators` and `HevyKeyValidators` pass: `flutter test test/core/utils/`
-- [ ] 3.2 Unit tests for `WeekDateUtils` pass with both `en` and `pl` locales: `flutter test test/core/utils/week_date_utils_test.dart`
-- [ ] 3.3 Static analysis passes: `flutter analyze`
+- [x] 3.1 Unit tests for `WeightValidators` and `HevyKeyValidators` pass: `flutter test test/core/utils/`
+- [x] 3.2 Unit tests for `WeekDateUtils` pass with both `en` and `pl` locales: `flutter test test/core/utils/week_date_utils_test.dart`
+- [x] 3.3 Static analysis passes: `flutter analyze`
 
 #### Manual
 
-- [ ] 3.4 Dates in charts and list headers correctly format in Polish (e.g., abbreviated Polish weekdays/months) when the Polish locale is active
+- [x] 3.4 Dates in charts and list headers correctly format in Polish (e.g., abbreviated Polish weekdays/months) when the Polish locale is active
 
 ### Phase 4: Full Presentation View & Widget String Migration
 

@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 /// Provider for [FlutterSecureStorage] used by locale persistence.
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
@@ -18,6 +20,9 @@ class LocaleNotifier extends Notifier<Locale> {
 
   @override
   Locale build() {
+    initializeDateFormatting('en', null);
+    initializeDateFormatting('pl', null);
+    Intl.defaultLocale = defaultLocale.languageCode;
     loadPersistedLocale();
     return defaultLocale;
   }
@@ -34,6 +39,7 @@ class LocaleNotifier extends Notifier<Locale> {
         } else {
           state = defaultLocale;
         }
+        Intl.defaultLocale = state.languageCode;
       }
     } catch (_) {
       // Storage read failure gracefully keeps default locale
@@ -44,6 +50,7 @@ class LocaleNotifier extends Notifier<Locale> {
   Future<void> setLocale(Locale locale) async {
     ++_loadToken;
     state = locale;
+    Intl.defaultLocale = locale.languageCode;
     final storage = ref.read(secureStorageProvider);
     try {
       final value = locale.countryCode != null && locale.countryCode!.isNotEmpty
