@@ -402,10 +402,10 @@ Update test helpers to support `AppLocalizations`, add dedicated localization te
 
 #### Automated
 
-- [ ] 5.1 Code formatting check: `dart format --output=none --set-exit-if-changed lib test`
-- [ ] 5.2 Static analysis clean: `flutter analyze`
-- [ ] 5.3 All unit and widget tests pass: `flutter test`
-- [ ] 5.4 Translation parity test passes: `flutter test test/core/localization/l10n_parity_test.dart`
+- [x] 5.1 Code formatting check: `dart format --output=none --set-exit-if-changed lib test` — ec2fcf7
+- [x] 5.2 Static analysis clean: `flutter analyze` — ec2fcf7
+- [x] 5.3 All unit and widget tests pass: `flutter test` — ec2fcf7
+- [x] 5.4 Translation parity test passes: `flutter test test/core/localization/l10n_parity_test.dart` — ec2fcf7
 
 #### Manual
 
