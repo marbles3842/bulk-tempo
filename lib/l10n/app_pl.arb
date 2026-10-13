@@ -45,6 +45,7 @@
   "connectHevyKeyButton": "Połącz klucz Hevy",
   "disconnectButton": "Rozłącz",
   "languageLabel": "Język",
+  "languageSystem": "System",
   "languageEnglish": "English",
   "languagePolish": "Polski",
   "weightEmptyTitle": "Brak wpisów wagi",

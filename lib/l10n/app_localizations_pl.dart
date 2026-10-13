@@ -145,6 +145,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get languageLabel => 'Język';
 
   @override
+  String get languageSystem => 'System';
+
+  @override
   String get languageEnglish => 'English';
 
   @override

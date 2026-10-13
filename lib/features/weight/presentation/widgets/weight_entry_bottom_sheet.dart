@@ -115,13 +115,13 @@ class _WeightEntryBottomSheetState
       builder: (dialogContext) {
         final existingWeightText = existingEntry != null
             ? '${existingEntry.weightKg.toStringAsFixed(2)} kg'
-            : context.l10n.overwriteDialogExistingWeightFallback;
+            : dialogContext.l10n.overwriteDialogExistingWeightFallback;
 
         return AlertDialog(
           key: const Key('overwrite_weight_dialog'),
-          title: Text(context.l10n.overwriteDialogTitle),
+          title: Text(dialogContext.l10n.overwriteDialogTitle),
           content: Text(
-            context.l10n.overwriteDialogContent(existingWeightText),
+            dialogContext.l10n.overwriteDialogContent(existingWeightText),
           ),
           actions: [
             TextButton(
@@ -131,7 +131,7 @@ class _WeightEntryBottomSheetState
                     .read(weightEntryViewModelProvider.notifier)
                     .cancelOverwriteConfirmation();
               },
-              child: Text(context.l10n.cancel),
+              child: Text(dialogContext.l10n.cancel),
             ),
             FilledButton(
               key: const Key('confirm_overwrite_weight_button'),
@@ -141,7 +141,7 @@ class _WeightEntryBottomSheetState
                     .read(weightEntryViewModelProvider.notifier)
                     .submit(confirmOverwrite: true);
               },
-              child: Text(context.l10n.overwriteDialogConfirm),
+              child: Text(dialogContext.l10n.overwriteDialogConfirm),
             ),
           ],
         );

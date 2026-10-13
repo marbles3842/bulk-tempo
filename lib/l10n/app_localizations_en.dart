@@ -144,6 +144,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageLabel => 'Language';
 
   @override
+  String get languageSystem => 'System';
+
+  @override
   String get languageEnglish => 'English';
 
   @override

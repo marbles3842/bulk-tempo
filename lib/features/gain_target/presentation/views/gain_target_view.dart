@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/formatters/gain_target_formatter.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_state.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
 
@@ -194,7 +195,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
 
   Widget _buildFormView(BuildContext context, GainTargetState state) {
     final summaryText = state.savedTarget != null
-        ? '${state.savedTarget!.minWeeklyGainKg.toStringAsFixed(2)}–${state.savedTarget!.maxWeeklyGainKg.toStringAsFixed(2)} ${context.l10n.kgPerWeekUnit}'
+        ? '${GainTargetFormatter.formatRange(state.savedTarget!, context.l10n.localeName)} ${context.l10n.kgPerWeekUnit}'
         : context.l10n.gainTargetNoTargetSet;
 
     return Column(

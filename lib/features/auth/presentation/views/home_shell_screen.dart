@@ -253,6 +253,10 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                         key: const Key('profile_language_selector'),
                         segments: [
                           ButtonSegment<String>(
+                            value: 'system',
+                            label: Text(context.l10n.languageSystem),
+                          ),
+                          ButtonSegment<String>(
                             value: 'en',
                             label: Text(context.l10n.languageEnglish),
                           ),
@@ -262,13 +266,21 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                           ),
                         ],
                         selected: {
-                          currentLocale.languageCode == 'pl' ? 'pl' : 'en',
+                          currentLocale == null
+                              ? 'system'
+                              : currentLocale.languageCode == 'pl'
+                              ? 'pl'
+                              : 'en',
                         },
                         onSelectionChanged: (newSelection) {
                           final selectedCode = newSelection.first;
                           ref
                               .read(localeProvider.notifier)
-                              .setLocale(Locale(selectedCode));
+                              .setLocale(
+                                selectedCode == 'system'
+                                    ? null
+                                    : Locale(selectedCode),
+                              );
                         },
                       ),
                     ),

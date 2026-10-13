@@ -66,15 +66,13 @@ abstract final class WeekDateUtils {
     String? locale,
   ]) {
     final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
-    final monthFormat = DateFormat.MMM(effectiveLocale);
-    final startMonth = monthFormat.format(weekStartMonday);
-    final endMonth = monthFormat.format(weekEndSunday);
+    final dateFormat = DateFormat.yMMMd(effectiveLocale);
 
     if (weekStartMonday.year == weekEndSunday.year) {
-      return '$startMonth ${weekStartMonday.day} – $endMonth ${weekEndSunday.day}, ${weekEndSunday.year}';
+      return '${DateFormat.MMMd(effectiveLocale).format(weekStartMonday)} – ${dateFormat.format(weekEndSunday)}';
     }
 
-    return '$startMonth ${weekStartMonday.day}, ${weekStartMonday.year} – $endMonth ${weekEndSunday.day}, ${weekEndSunday.year}';
+    return '${dateFormat.format(weekStartMonday)} – ${dateFormat.format(weekEndSunday)}';
   }
 
   /// Returns a compact week label for chart axes (e.g. `"Oct 5"`).
@@ -83,16 +81,13 @@ abstract final class WeekDateUtils {
     String? locale,
   ]) {
     final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
-    final month = DateFormat.MMM(effectiveLocale).format(weekStartMonday);
-    return '$month ${weekStartMonday.day}';
+    return DateFormat.MMMd(effectiveLocale).format(weekStartMonday);
   }
 
   /// Formats a date with abbreviated weekday (e.g. `"Mon, Oct 5, 2026"`).
   static String formatDayWithWeekday(DateTime date, [String? locale]) {
     final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
-    final weekday = DateFormat.E(effectiveLocale).format(date);
-    final month = DateFormat.MMM(effectiveLocale).format(date);
-    return '$weekday, $month ${date.day}, ${date.year}';
+    return DateFormat.yMMMEd(effectiveLocale).format(date);
   }
 
   /// Rounds a floating point [value] to two decimal places using standard half-up rounding.

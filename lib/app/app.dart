@@ -14,7 +14,7 @@ class BulkTempoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final routerConfig = ref.watch(appRouterProvider);
     final currentLocale = ref.watch(localeProvider);
-    Intl.defaultLocale = currentLocale.languageCode;
+    Intl.defaultLocale = currentLocale?.languageCode;
 
     return MaterialApp.router(
       title: 'Bulk Tempo',

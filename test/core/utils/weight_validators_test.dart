@@ -218,7 +218,7 @@ void main() {
       );
       expect(
         WeightValidationError.outOfBounds.toLocalizedMessage(l10nPl),
-        equals('Waga musi mieścić się w przedziale od 20.0 do 300.0 kg'),
+        equals('Waga musi mieścić się w przedziale od 20,0 do 300,0 kg'),
       );
       expect(
         WeightValidationError.futureDate.toLocalizedMessage(l10nPl),

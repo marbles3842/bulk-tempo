@@ -169,15 +169,15 @@ void main() {
       );
       expect(
         WeekDateUtils.formatWeekRange(monSameMonth, sunSameMonth, 'pl'),
-        equals('paź 5 – paź 11, 2026'),
+        equals('5 paź – 11 paź 2026'),
       );
       expect(
         WeekDateUtils.formatWeekRange(monCrossMonth, sunCrossMonth, 'pl'),
-        equals('wrz 28 – paź 4, 2026'),
+        equals('28 wrz – 4 paź 2026'),
       );
       expect(
         WeekDateUtils.formatWeekRange(monCrossYear, sunCrossYear, 'pl'),
-        equals('gru 28, 2026 – sty 3, 2027'),
+        equals('28 gru 2026 – 3 sty 2027'),
       );
     });
 
@@ -199,11 +199,11 @@ void main() {
       );
       expect(
         WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 10, 5), 'pl'),
-        equals('paź 5'),
+        equals('5 paź'),
       );
       expect(
         WeekDateUtils.formatShortWeekLabel(DateTime.utc(2026, 9, 28), 'pl'),
-        equals('wrz 28'),
+        equals('28 wrz'),
       );
     });
 
@@ -232,15 +232,15 @@ void main() {
       );
       expect(
         WeekDateUtils.formatDayWithWeekday(DateTime.utc(2026, 10, 5), 'pl'),
-        equals('pon., paź 5, 2026'),
+        equals('pon., 5 paź 2026'),
       );
       expect(
         WeekDateUtils.formatDayWithWeekday(DateTime.utc(2026, 10, 11), 'pl'),
-        equals('niedz., paź 11, 2026'),
+        equals('niedz., 11 paź 2026'),
       );
       expect(
         WeekDateUtils.formatDayWithWeekday(DateTime.utc(2027, 1, 1), 'pl'),
-        equals('pt., sty 1, 2027'),
+        equals('pt., 1 sty 2027'),
       );
     });
 

@@ -368,6 +368,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languageLabel;
 
+  /// Language selector option that follows the device language
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get languageSystem;
+
   /// Segmented button label for English language
   ///
   /// In en, this message translates to:

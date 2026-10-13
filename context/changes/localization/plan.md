@@ -339,9 +339,9 @@ Update test helpers to support `AppLocalizations`, add dedicated localization te
 
 ## References
 
-- Architecture Overview: [01_architecture_overview.md](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/context/documentation/01_architecture_overview.md)
-- State Management (MVVM): [03_state_management_mvvm.md](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/context/documentation/03_state_management_mvvm.md)
-- Testing Strategy: [06_testing_strategy.md](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/context/documentation/06_testing_strategy.md)
+- Architecture Overview: [01_architecture_overview.md](../../documentation/01_architecture_overview.md)
+- State Management (MVVM): [03_state_management_mvvm.md](../../documentation/03_state_management_mvvm.md)
+- Testing Strategy: [06_testing_strategy.md](../../documentation/06_testing_strategy.md)
 
 ## Progress
 

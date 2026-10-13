@@ -180,6 +180,10 @@
   "@languageLabel": {
     "description": "Title for language preference card"
   },
+  "languageSystem": "System",
+  "@languageSystem": {
+    "description": "Language selector option that follows the device language"
+  },
   "languageEnglish": "English",
   "@languageEnglish": {
     "description": "Segmented button label for English language"

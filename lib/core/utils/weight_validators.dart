@@ -1,4 +1,5 @@
 import 'package:bulk_tempo/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 /// Validation error codes for body weight values and historical entry dates.
 enum WeightValidationError {
@@ -16,9 +17,13 @@ enum WeightValidationError {
       case WeightValidationError.invalidFormat:
         return l10n.weightErrorInvalidFormat;
       case WeightValidationError.outOfBounds:
+        final format = NumberFormat.decimalPatternDigits(
+          locale: l10n.localeName,
+          decimalDigits: 1,
+        );
         return l10n.weightErrorOutOfBounds(
-          WeightValidators.minWeightKg.toStringAsFixed(1),
-          WeightValidators.maxWeightKg.toStringAsFixed(1),
+          format.format(WeightValidators.minWeightKg),
+          format.format(WeightValidators.maxWeightKg),
         );
       case WeightValidationError.futureDate:
         return l10n.weightErrorFutureDate;

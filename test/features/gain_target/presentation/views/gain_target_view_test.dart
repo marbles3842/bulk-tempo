@@ -135,6 +135,28 @@ void main() {
     },
   );
 
+  testWidgets('formats both saved gain bounds in Polish with two decimals', (
+    tester,
+  ) async {
+    fakeGainTargetRepository.seedTarget(
+      testUser.id,
+      const GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.2),
+    );
+    await tester.pumpApp(
+      buildTestSubject(),
+      locale: const Locale('pl'),
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+        gainTargetRepositoryProvider.overrideWithValue(
+          fakeGainTargetRepository,
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('0,15–0,20 kg/tydz.'), findsOneWidget);
+  });
+
   testWidgets('entering invalid values shows validation errors', (
     tester,
   ) async {
