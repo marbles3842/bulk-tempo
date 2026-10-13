@@ -1,12 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 
-class UserDto {
-  final String id;
-  final String email;
-  final String? displayName;
+part 'user_dto.freezed.dart';
+part 'user_dto.g.dart';
 
-  const UserDto({required this.id, required this.email, this.displayName});
+@freezed
+abstract class UserDto with _$UserDto {
+  const UserDto._();
+
+  const factory UserDto({
+    required String id,
+    required String email,
+    String? displayName,
+  }) = _UserDto;
+
+  factory UserDto.fromJson(Map<String, dynamic> json) =>
+      _$UserDtoFromJson(json);
 
   factory UserDto.fromFirebaseUser(User user) {
     return UserDto(
@@ -27,20 +37,4 @@ class UserDto {
   UserEntity toEntity() {
     return UserEntity(id: id, email: email, displayName: displayName);
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserDto &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          email == other.email &&
-          displayName == other.displayName;
-
-  @override
-  int get hashCode => id.hashCode ^ email.hashCode ^ displayName.hashCode;
-
-  @override
-  String toString() =>
-      'UserDto(id: $id, email: $email, displayName: $displayName)';
 }

@@ -41,6 +41,11 @@ The project follows a **Feature-First MVVM** architecture augmented with **Clean
 flutter pub get
 ```
 
+### Code Generation
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
 ### Running
 ```bash
 # Run on connected mobile device or emulator

@@ -1,19 +1,20 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/features/gain_target/domain/models/gain_target_entity.dart';
+
+part 'gain_target_validator.freezed.dart';
 
 /// Result object for pair input validation containing field-level errors,
 /// range-level errors, and/or the parsed [GainTargetEntity].
-class GainTargetValidationResult {
-  final String? minError;
-  final String? maxError;
-  final String? rangeError;
-  final GainTargetEntity? target;
+@freezed
+abstract class GainTargetValidationResult with _$GainTargetValidationResult {
+  const GainTargetValidationResult._();
 
-  const GainTargetValidationResult({
-    this.minError,
-    this.maxError,
-    this.rangeError,
-    this.target,
-  });
+  const factory GainTargetValidationResult({
+    String? minError,
+    String? maxError,
+    String? rangeError,
+    GainTargetEntity? target,
+  }) = _GainTargetValidationResult;
 
   /// True when both fields and the range are valid, and target is constructed.
   bool get isValid =>
@@ -27,27 +28,6 @@ class GainTargetValidationResult {
 
   /// Effective error for the maximum input field, combining [maxError] and [rangeError].
   String? get effectiveMaxError => maxError ?? rangeError;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GainTargetValidationResult &&
-          runtimeType == other.runtimeType &&
-          minError == other.minError &&
-          maxError == other.maxError &&
-          rangeError == other.rangeError &&
-          target == other.target;
-
-  @override
-  int get hashCode =>
-      minError.hashCode ^
-      maxError.hashCode ^
-      rangeError.hashCode ^
-      target.hashCode;
-
-  @override
-  String toString() =>
-      'GainTargetValidationResult(minError: $minError, maxError: $maxError, rangeError: $rangeError, target: $target)';
 }
 
 /// Validation utilities for weekly gain target inputs and entity bounds.

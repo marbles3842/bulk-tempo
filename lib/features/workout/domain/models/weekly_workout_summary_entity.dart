@@ -1,58 +1,26 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
 
+part 'weekly_workout_summary_entity.freezed.dart';
+
 /// Domain entity representing an ISO Monday–Sunday weekly aggregate of workouts.
-class WeeklyWorkoutSummaryEntity {
-  final String weekStartIso;
-  final DateTime weekStartMonday;
-  final DateTime weekEndSunday;
-  final List<WorkoutEntity> workouts;
-  final int workoutCount;
-  final int totalWorkingSets;
-  final double totalVolumeKg;
+@freezed
+abstract class WeeklyWorkoutSummaryEntity with _$WeeklyWorkoutSummaryEntity {
+  const WeeklyWorkoutSummaryEntity._();
 
-  const WeeklyWorkoutSummaryEntity({
-    required this.weekStartIso,
-    required this.weekStartMonday,
-    required this.weekEndSunday,
-    required this.workouts,
-    required this.workoutCount,
-    required this.totalWorkingSets,
-    required this.totalVolumeKg,
-  });
-
-  WeeklyWorkoutSummaryEntity copyWith({
-    String? weekStartIso,
-    DateTime? weekStartMonday,
-    DateTime? weekEndSunday,
-    List<WorkoutEntity>? workouts,
-    int? workoutCount,
-    int? totalWorkingSets,
-    double? totalVolumeKg,
-  }) {
-    return WeeklyWorkoutSummaryEntity(
-      weekStartIso: weekStartIso ?? this.weekStartIso,
-      weekStartMonday: weekStartMonday ?? this.weekStartMonday,
-      weekEndSunday: weekEndSunday ?? this.weekEndSunday,
-      workouts: workouts ?? this.workouts,
-      workoutCount: workoutCount ?? this.workoutCount,
-      totalWorkingSets: totalWorkingSets ?? this.totalWorkingSets,
-      totalVolumeKg: totalVolumeKg ?? this.totalVolumeKg,
-    );
-  }
+  const factory WeeklyWorkoutSummaryEntity({
+    required String weekStartIso,
+    required DateTime weekStartMonday,
+    required DateTime weekEndSunday,
+    required List<WorkoutEntity> workouts,
+    required int workoutCount,
+    required int totalWorkingSets,
+    required double totalVolumeKg,
+  }) = _WeeklyWorkoutSummaryEntity;
 
   /// Groups individual workouts into ISO Monday–Sunday weeks using each
   /// workout's local calendar date ([WorkoutEntity.localDate]).
-  ///
-  /// - Deduplicates workouts by [WorkoutEntity.id], keeping the latest
-  ///   [WorkoutEntity.startTime] if duplicates exist.
-  /// - Groups workouts by ISO Monday (`WeekDateUtils.startOfIsoWeekUtc`).
-  /// - Excludes weeks with 0 workouts.
-  /// - Sorts workouts within each week descending by [WorkoutEntity.startTime]
-  ///   (newest workout first).
-  /// - Computes [workoutCount], [totalWorkingSets], and [totalVolumeKg]
-  ///   (rounded to 2 decimal places).
-  /// - Returns summaries sorted descending by [weekStartIso] (newest week first).
   static List<WeeklyWorkoutSummaryEntity> groupWorkoutsByIsoWeek(
     List<WorkoutEntity> workouts,
   ) {
@@ -125,43 +93,4 @@ class WeeklyWorkoutSummaryEntity {
     summaries.sort((a, b) => b.weekStartIso.compareTo(a.weekStartIso));
     return summaries;
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WeeklyWorkoutSummaryEntity ||
-        runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (weekStartIso != other.weekStartIso ||
-        weekStartMonday != other.weekStartMonday ||
-        weekEndSunday != other.weekEndSunday ||
-        workoutCount != other.workoutCount ||
-        totalWorkingSets != other.totalWorkingSets ||
-        totalVolumeKg != other.totalVolumeKg ||
-        workouts.length != other.workouts.length) {
-      return false;
-    }
-    for (int i = 0; i < workouts.length; i++) {
-      if (workouts[i] != other.workouts[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    weekStartIso,
-    weekStartMonday,
-    weekEndSunday,
-    Object.hashAll(workouts),
-    workoutCount,
-    totalWorkingSets,
-    totalVolumeKg,
-  );
-
-  @override
-  String toString() =>
-      'WeeklyWorkoutSummaryEntity(weekStartIso: $weekStartIso, weekStartMonday: $weekStartMonday, weekEndSunday: $weekEndSunday, workoutCount: $workoutCount, totalWorkingSets: $totalWorkingSets, totalVolumeKg: $totalVolumeKg, workouts: $workouts)';
 }

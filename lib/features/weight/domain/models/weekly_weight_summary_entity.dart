@@ -1,48 +1,25 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 
-/// Domain entity representing an ISO Monday–Sunday weekly aggregate of weight entries.
-class WeeklyWeightSummaryEntity {
-  final String weekStartIso;
-  final DateTime weekStartMonday;
-  final DateTime weekEndSunday;
-  final double averageWeightKg;
-  final List<WeightEntryEntity> entries;
+part 'weekly_weight_summary_entity.freezed.dart';
 
-  const WeeklyWeightSummaryEntity({
-    required this.weekStartIso,
-    required this.weekStartMonday,
-    required this.weekEndSunday,
-    required this.averageWeightKg,
-    required this.entries,
-  });
+/// Domain entity representing an ISO Monday–Sunday weekly aggregate of weight entries.
+@freezed
+abstract class WeeklyWeightSummaryEntity with _$WeeklyWeightSummaryEntity {
+  const WeeklyWeightSummaryEntity._();
+
+  const factory WeeklyWeightSummaryEntity({
+    required String weekStartIso,
+    required DateTime weekStartMonday,
+    required DateTime weekEndSunday,
+    required double averageWeightKg,
+    required List<WeightEntryEntity> entries,
+  }) = _WeeklyWeightSummaryEntity;
 
   int get loggedDaysCount => entries.length;
 
-  WeeklyWeightSummaryEntity copyWith({
-    String? weekStartIso,
-    DateTime? weekStartMonday,
-    DateTime? weekEndSunday,
-    double? averageWeightKg,
-    List<WeightEntryEntity>? entries,
-  }) {
-    return WeeklyWeightSummaryEntity(
-      weekStartIso: weekStartIso ?? this.weekStartIso,
-      weekStartMonday: weekStartMonday ?? this.weekStartMonday,
-      weekEndSunday: weekEndSunday ?? this.weekEndSunday,
-      averageWeightKg: averageWeightKg ?? this.averageWeightKg,
-      entries: entries ?? this.entries,
-    );
-  }
-
   /// Groups individual daily entries into ISO Monday–Sunday weeks.
-  ///
-  /// - Deduplicates entries by [dateIso], keeping the latest [updatedAt] if duplicates exist.
-  /// - Groups entries by ISO Monday.
-  /// - Excludes weeks with 0 entries.
-  /// - Sorts daily entries in each week descending by [dateIso] (newest date first).
-  /// - Computes [averageWeightKg] rounded to 2 decimal places.
-  /// - Returns summaries sorted descending by [weekStartIso] (newest week first).
   static List<WeeklyWeightSummaryEntity> groupEntriesByIsoWeek(
     List<WeightEntryEntity> entries,
   ) {
@@ -111,39 +88,4 @@ class WeeklyWeightSummaryEntity {
     summaries.sort((a, b) => b.weekStartIso.compareTo(a.weekStartIso));
     return summaries;
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WeeklyWeightSummaryEntity ||
-        runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (weekStartIso != other.weekStartIso ||
-        weekStartMonday != other.weekStartMonday ||
-        weekEndSunday != other.weekEndSunday ||
-        averageWeightKg != other.averageWeightKg ||
-        entries.length != other.entries.length) {
-      return false;
-    }
-    for (int i = 0; i < entries.length; i++) {
-      if (entries[i] != other.entries[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    weekStartIso,
-    weekStartMonday,
-    weekEndSunday,
-    averageWeightKg,
-    Object.hashAll(entries),
-  );
-
-  @override
-  String toString() =>
-      'WeeklyWeightSummaryEntity(weekStartIso: $weekStartIso, weekStartMonday: $weekStartMonday, weekEndSunday: $weekEndSunday, averageWeightKg: $averageWeightKg, entries: $entries)';
 }

@@ -1,27 +1,26 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_exercise_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_set_entity.dart';
 
-/// Data Transfer Object for a single set in a Hevy workout response.
-class WorkoutSetDto {
-  final int index;
-  final String type;
-  final double? weightKg;
-  final int? reps;
-  final double? distanceMeters;
-  final int? durationSeconds;
-  final double? rpe;
+part 'workout_dto.freezed.dart';
+part 'workout_dto.g.dart';
 
-  const WorkoutSetDto({
-    required this.index,
-    required this.type,
-    this.weightKg,
-    this.reps,
-    this.distanceMeters,
-    this.durationSeconds,
-    this.rpe,
-  });
+/// Data Transfer Object for a single set in a Hevy workout response.
+@Freezed(toJson: true)
+abstract class WorkoutSetDto with _$WorkoutSetDto {
+  const WorkoutSetDto._();
+
+  const factory WorkoutSetDto({
+    required int index,
+    required String type,
+    double? weightKg,
+    int? reps,
+    double? distanceMeters,
+    int? durationSeconds,
+    double? rpe,
+  }) = _WorkoutSetDto;
 
   factory WorkoutSetDto.fromJson(Map<String, dynamic> json) {
     final rawIndex = json['index'];
@@ -73,53 +72,21 @@ class WorkoutSetDto {
     }
     return null;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WorkoutSetDto &&
-          runtimeType == other.runtimeType &&
-          index == other.index &&
-          type == other.type &&
-          weightKg == other.weightKg &&
-          reps == other.reps &&
-          distanceMeters == other.distanceMeters &&
-          durationSeconds == other.durationSeconds &&
-          rpe == other.rpe;
-
-  @override
-  int get hashCode => Object.hash(
-    index,
-    type,
-    weightKg,
-    reps,
-    distanceMeters,
-    durationSeconds,
-    rpe,
-  );
-
-  @override
-  String toString() =>
-      'WorkoutSetDto(index: $index, type: $type, weightKg: $weightKg, reps: $reps, distanceMeters: $distanceMeters, durationSeconds: $durationSeconds, rpe: $rpe)';
 }
 
 /// Data Transfer Object for an exercise in a Hevy workout response.
-class WorkoutExerciseDto {
-  final int index;
-  final String title;
-  final String exerciseTemplateId;
-  final String? notes;
-  final int? supersetId;
-  final List<WorkoutSetDto> sets;
+@Freezed(toJson: true)
+abstract class WorkoutExerciseDto with _$WorkoutExerciseDto {
+  const WorkoutExerciseDto._();
 
-  const WorkoutExerciseDto({
-    required this.index,
-    required this.title,
-    required this.exerciseTemplateId,
-    this.notes,
-    this.supersetId,
-    required this.sets,
-  });
+  const factory WorkoutExerciseDto({
+    required int index,
+    required String title,
+    required String exerciseTemplateId,
+    String? notes,
+    int? supersetId,
+    required List<WorkoutSetDto> sets,
+  }) = _WorkoutExerciseDto;
 
   factory WorkoutExerciseDto.fromJson(Map<String, dynamic> json) {
     final rawIndex = json['index'];
@@ -165,61 +132,21 @@ class WorkoutExerciseDto {
       sets: List.unmodifiable(sets.map((s) => s.toEntity()).toList()),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WorkoutExerciseDto || runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (index != other.index ||
-        title != other.title ||
-        exerciseTemplateId != other.exerciseTemplateId ||
-        notes != other.notes ||
-        supersetId != other.supersetId ||
-        sets.length != other.sets.length) {
-      return false;
-    }
-    for (int i = 0; i < sets.length; i++) {
-      if (sets[i] != other.sets[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    index,
-    title,
-    exerciseTemplateId,
-    notes,
-    supersetId,
-    Object.hashAll(sets),
-  );
-
-  @override
-  String toString() =>
-      'WorkoutExerciseDto(index: $index, title: $title, exerciseTemplateId: $exerciseTemplateId, notes: $notes, supersetId: $supersetId, sets: $sets)';
 }
 
 /// Data Transfer Object for a single workout in a Hevy `/v1/workouts` response.
-class WorkoutDto {
-  final String id;
-  final String title;
-  final String? description;
-  final String startTime;
-  final String endTime;
-  final List<WorkoutExerciseDto> exercises;
+@Freezed(toJson: true)
+abstract class WorkoutDto with _$WorkoutDto {
+  const WorkoutDto._();
 
-  const WorkoutDto({
-    required this.id,
-    required this.title,
-    this.description,
-    required this.startTime,
-    required this.endTime,
-    required this.exercises,
-  });
+  const factory WorkoutDto({
+    required String id,
+    required String title,
+    String? description,
+    required String startTime,
+    required String endTime,
+    required List<WorkoutExerciseDto> exercises,
+  }) = _WorkoutDto;
 
   factory WorkoutDto.fromJson(Map<String, dynamic> json) {
     final rawId = json['id'];
@@ -293,55 +220,19 @@ class WorkoutDto {
       exercises: List.unmodifiable(exercises.map((e) => e.toEntity()).toList()),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WorkoutDto || runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (id != other.id ||
-        title != other.title ||
-        description != other.description ||
-        startTime != other.startTime ||
-        endTime != other.endTime ||
-        exercises.length != other.exercises.length) {
-      return false;
-    }
-    for (int i = 0; i < exercises.length; i++) {
-      if (exercises[i] != other.exercises[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    title,
-    description,
-    startTime,
-    endTime,
-    Object.hashAll(exercises),
-  );
-
-  @override
-  String toString() =>
-      'WorkoutDto(id: $id, title: $title, description: $description, startTime: $startTime, endTime: $endTime, exercises: $exercises)';
 }
 
 /// Data Transfer Object for a paginated `/v1/workouts` response from Hevy.
-class PaginatedWorkoutsResponseDto {
-  final int page;
-  final int pageCount;
-  final List<WorkoutDto> workouts;
+@Freezed(toJson: true)
+abstract class PaginatedWorkoutsResponseDto
+    with _$PaginatedWorkoutsResponseDto {
+  const PaginatedWorkoutsResponseDto._();
 
-  const PaginatedWorkoutsResponseDto({
-    required this.page,
-    required this.pageCount,
-    required this.workouts,
-  });
+  const factory PaginatedWorkoutsResponseDto({
+    required int page,
+    required int pageCount,
+    required List<WorkoutDto> workouts,
+  }) = _PaginatedWorkoutsResponseDto;
 
   factory PaginatedWorkoutsResponseDto.fromJson(Map<String, dynamic> json) {
     final rawPage = json['page'];
@@ -371,31 +262,4 @@ class PaginatedWorkoutsResponseDto {
       workouts: List.unmodifiable(parsedWorkouts),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! PaginatedWorkoutsResponseDto ||
-        runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (page != other.page ||
-        pageCount != other.pageCount ||
-        workouts.length != other.workouts.length) {
-      return false;
-    }
-    for (int i = 0; i < workouts.length; i++) {
-      if (workouts[i] != other.workouts[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(page, pageCount, Object.hashAll(workouts));
-
-  @override
-  String toString() =>
-      'PaginatedWorkoutsResponseDto(page: $page, pageCount: $pageCount, workouts: $workouts)';
 }
