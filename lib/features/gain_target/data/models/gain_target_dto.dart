@@ -1,27 +1,22 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/features/gain_target/domain/models/gain_target_entity.dart';
 import 'package:bulk_tempo/features/gain_target/domain/validation/gain_target_validator.dart';
 
+part 'gain_target_dto.freezed.dart';
+part 'gain_target_dto.g.dart';
+
 /// Data Transfer Object for serializing and deserializing weekly gain targets
 /// between Firebase Realtime Database and [GainTargetEntity].
-class GainTargetDto {
-  /// Minimum weekly gain rate in kilograms per week.
-  final double minWeeklyGainKg;
+@Freezed(toJson: true)
+abstract class GainTargetDto with _$GainTargetDto {
+  const GainTargetDto._();
 
-  /// Maximum weekly gain rate in kilograms per week.
-  final double maxWeeklyGainKg;
-
-  const GainTargetDto({
-    required this.minWeeklyGainKg,
-    required this.maxWeeklyGainKg,
-  });
+  const factory GainTargetDto({
+    required double minWeeklyGainKg,
+    required double maxWeeklyGainKg,
+  }) = _GainTargetDto;
 
   /// Deserializes a Firebase Realtime Database JSON map.
-  ///
-  /// Accepts numeric int and double values (converts via `num.toDouble()`).
-  /// Rejects missing fields, non-numeric types (e.g. strings, nulls, booleans),
-  /// nonfinite values (NaN, infinity), and invalid ordering
-  /// (`minWeeklyGainKg >= maxWeeklyGainKg` or `minWeeklyGainKg <= 0`).
-  /// Throws [FormatException] with a descriptive message on invalid payload.
   factory GainTargetDto.fromJson(Map<Object?, Object?> json) {
     final rawMin = json['minWeeklyGainKg'];
     final rawMax = json['maxWeeklyGainKg'];
@@ -62,27 +57,4 @@ class GainTargetDto {
       maxWeeklyGainKg: maxWeeklyGainKg,
     );
   }
-
-  /// Serializes to a JSON map for Firebase Realtime Database.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'minWeeklyGainKg': minWeeklyGainKg,
-      'maxWeeklyGainKg': maxWeeklyGainKg,
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GainTargetDto &&
-          runtimeType == other.runtimeType &&
-          minWeeklyGainKg == other.minWeeklyGainKg &&
-          maxWeeklyGainKg == other.maxWeeklyGainKg;
-
-  @override
-  int get hashCode => minWeeklyGainKg.hashCode ^ maxWeeklyGainKg.hashCode;
-
-  @override
-  String toString() =>
-      'GainTargetDto(minWeeklyGainKg: $minWeeklyGainKg, maxWeeklyGainKg: $maxWeeklyGainKg)';
 }

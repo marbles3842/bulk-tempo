@@ -33,8 +33,8 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
     state = state.copyWith(
       rawKey: value,
       status: FormStatus.initial,
-      clearValidationError: true,
-      clearSubmitErrorMessage: true,
+      validationError: null,
+      submitErrorMessage: null,
     );
   }
 
@@ -56,7 +56,7 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
       state = state.copyWith(
         status: FormStatus.failure,
         validationError: validationError,
-        clearSubmitErrorMessage: true,
+        submitErrorMessage: null,
       );
       return false;
     }
@@ -66,7 +66,7 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
       state = state.copyWith(
         status: FormStatus.failure,
         submitErrorMessage: 'User is not authenticated',
-        clearValidationError: true,
+        validationError: null,
       );
       return false;
     }
@@ -76,8 +76,8 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
 
     state = state.copyWith(
       status: FormStatus.submitting,
-      clearValidationError: true,
-      clearSubmitErrorMessage: true,
+      validationError: null,
+      submitErrorMessage: null,
     );
 
     final repository = ref.read(workoutRepositoryProvider);
@@ -97,15 +97,15 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
         savedOk = true;
         state = state.copyWith(
           status: FormStatus.success,
-          clearValidationError: true,
-          clearSubmitErrorMessage: true,
+          validationError: null,
+          submitErrorMessage: null,
         );
       },
       failure: (failure) {
         state = state.copyWith(
           status: FormStatus.failure,
           submitErrorMessage: failure.message,
-          clearValidationError: true,
+          validationError: null,
         );
       },
     );

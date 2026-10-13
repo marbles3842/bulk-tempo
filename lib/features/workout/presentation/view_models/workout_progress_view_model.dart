@@ -201,7 +201,7 @@ class WorkoutProgressViewModel extends Notifier<WorkoutProgressState> {
   void clearRefreshError() {
     if (state is WorkoutProgressLoaded) {
       final current = state as WorkoutProgressLoaded;
-      state = current.copyWith(clearRefreshError: true);
+      state = current.copyWith(refreshErrorMessage: null);
     }
   }
 }

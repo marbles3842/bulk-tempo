@@ -1,23 +1,22 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_set_entity.dart';
 
-/// Domain entity representing an exercise performed within a workout.
-class WorkoutExerciseEntity {
-  final int index;
-  final String title;
-  final String exerciseTemplateId;
-  final String? notes;
-  final int? supersetId;
-  final List<WorkoutSetEntity> sets;
+part 'workout_exercise_entity.freezed.dart';
 
-  const WorkoutExerciseEntity({
-    required this.index,
-    required this.title,
-    required this.exerciseTemplateId,
-    this.notes,
-    this.supersetId,
-    required this.sets,
-  });
+/// Domain entity representing an exercise performed within a workout.
+@freezed
+abstract class WorkoutExerciseEntity with _$WorkoutExerciseEntity {
+  const WorkoutExerciseEntity._();
+
+  const factory WorkoutExerciseEntity({
+    required int index,
+    required String title,
+    required String exerciseTemplateId,
+    String? notes,
+    int? supersetId,
+    required List<WorkoutSetEntity> sets,
+  }) = _WorkoutExerciseEntity;
 
   /// Returns all sets excluding warmup sets.
   List<WorkoutSetEntity> get workingSets =>
@@ -62,58 +61,4 @@ class WorkoutExerciseEntity {
     }
     return best;
   }
-
-  WorkoutExerciseEntity copyWith({
-    int? index,
-    String? title,
-    String? exerciseTemplateId,
-    String? notes,
-    int? supersetId,
-    List<WorkoutSetEntity>? sets,
-  }) {
-    return WorkoutExerciseEntity(
-      index: index ?? this.index,
-      title: title ?? this.title,
-      exerciseTemplateId: exerciseTemplateId ?? this.exerciseTemplateId,
-      notes: notes ?? this.notes,
-      supersetId: supersetId ?? this.supersetId,
-      sets: sets ?? this.sets,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WorkoutExerciseEntity || runtimeType != other.runtimeType) {
-      return false;
-    }
-    if (index != other.index ||
-        title != other.title ||
-        exerciseTemplateId != other.exerciseTemplateId ||
-        notes != other.notes ||
-        supersetId != other.supersetId ||
-        sets.length != other.sets.length) {
-      return false;
-    }
-    for (int i = 0; i < sets.length; i++) {
-      if (sets[i] != other.sets[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    index,
-    title,
-    exerciseTemplateId,
-    notes,
-    supersetId,
-    Object.hashAll(sets),
-  );
-
-  @override
-  String toString() =>
-      'WorkoutExerciseEntity(index: $index, title: $title, exerciseTemplateId: $exerciseTemplateId, notes: $notes, supersetId: $supersetId, sets: $sets)';
 }

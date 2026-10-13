@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate code (Freezed & json_serializable)
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Verify code formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
@@ -139,6 +142,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate code (Freezed & json_serializable)
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Configure Android environment and secrets
         env:
@@ -267,6 +273,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate code (Freezed & json_serializable)
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Configure iOS environment and secrets
         env:

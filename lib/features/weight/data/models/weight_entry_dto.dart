@@ -1,25 +1,24 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/core/utils/weight_validators.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weight_entry_entity.dart';
 
+part 'weight_entry_dto.freezed.dart';
+part 'weight_entry_dto.g.dart';
+
 /// Data Transfer Object for serializing and deserializing weight measurements
 /// between Firebase Realtime Database and [WeightEntryEntity].
-class WeightEntryDto {
-  final String date;
-  final double weightKg;
-  final String updatedAt;
+@Freezed(toJson: true)
+abstract class WeightEntryDto with _$WeightEntryDto {
+  const WeightEntryDto._();
 
-  const WeightEntryDto({
-    required this.date,
-    required this.weightKg,
-    required this.updatedAt,
-  });
+  const factory WeightEntryDto({
+    required String date,
+    required double weightKg,
+    required String updatedAt,
+  }) = _WeightEntryDto;
 
   /// Deserializes a Firebase Realtime Database JSON map.
-  ///
-  /// Handles `int`, `double`, or numeric strings for [weightKg].
-  /// Uses [keyDate] if the `'date'` field is absent in the map.
-  /// Throws [FormatException] for invalid dates or weights.
   factory WeightEntryDto.fromJson(
     Map<Object?, Object?> json, {
     String? keyDate,
@@ -83,29 +82,4 @@ class WeightEntryDto {
       updatedAt: parsedUpdatedAt,
     );
   }
-
-  /// Serializes to a JSON map for Firebase Realtime Database.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'date': date,
-      'weightKg': weightKg,
-      'updatedAt': updatedAt,
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WeightEntryDto &&
-          runtimeType == other.runtimeType &&
-          date == other.date &&
-          weightKg == other.weightKg &&
-          updatedAt == other.updatedAt;
-
-  @override
-  int get hashCode => date.hashCode ^ weightKg.hashCode ^ updatedAt.hashCode;
-
-  @override
-  String toString() =>
-      'WeightEntryDto(date: $date, weightKg: $weightKg, updatedAt: $updatedAt)';
 }

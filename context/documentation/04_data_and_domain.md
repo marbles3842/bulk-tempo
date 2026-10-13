@@ -1,6 +1,6 @@
 # 04. Data and Domain Layers
 
-This document outlines the data persistence, business logic modeling, serialization conventions, and typed error handling standards for **Bulk Tempo**.
+This document outlines the data persistence, business logic modeling, serialization conventions, and typed error handling standards for **Bulk Tempo**. All domain entities and data transfer objects (DTOs) strictly rely on **Freezed** to eliminate boilerplate code (`copyWith`, `operator ==`, `hashCode`, `toString`) and ensure immutable, robust models.
 
 ---
 
@@ -75,45 +75,29 @@ class UnknownFailure extends AppFailure {
 ## 2. Domain Layer Specifications
 
 ### A. Domain Entity (`domain/models/<entity>_entity.dart`)
-Pure Dart class without serialization logic:
+Pure Dart model utilizing **Freezed** for immutable state, automatic value equality (`==`), `hashCode`, and `copyWith`:
 
 ```dart
-class ItemEntity {
-  final String id;
-  final String title;
-  final bool isCompleted;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const ItemEntity({
-    required this.id,
-    required this.title,
-    required this.isCompleted,
-  });
+part 'item_entity.freezed.dart';
 
-  ItemEntity copyWith({
-    String? id,
-    String? title,
-    bool? isCompleted,
-  }) {
-    return ItemEntity(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      isCompleted: isCompleted ?? this.isCompleted,
-    );
-  }
+@freezed
+abstract class ItemEntity with _$ItemEntity {
+  // Private constructor enables defining custom methods/getters if needed
+  const ItemEntity._();
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ItemEntity &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          title == other.title &&
-          isCompleted == other.isCompleted;
-
-  @override
-  int get hashCode => id.hashCode ^ title.hashCode ^ isCompleted.hashCode;
+  const factory ItemEntity({
+    required String id,
+    required String title,
+    required bool isCompleted,
+  }) = _ItemEntity;
 }
 ```
+
+> **Domain Layer Rules:**
+> - Domain entities must **never** include serialization logic (`fromJson`/`toJson` or `*.g.dart`).
+> - Always declare `const <Entity>._();` if domain getters or business methods are needed on the class.
 
 ### B. Repository Contract (`domain/repositories/<feature>_repository.dart`)
 Abstract interface defining expected behavior:
@@ -135,37 +119,27 @@ abstract class ItemsRepository {
 ## 3. Data Layer Specifications
 
 ### A. Data Transfer Object (`data/models/<model>_dto.dart`)
-Handles pure Dart JSON parsing and entity conversion without `build_runner`:
+DTOs handle external API/database JSON serialization and deserialization, built with **Freezed** and **`json_serializable`**:
 
 ```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/features/items/domain/models/item_entity.dart';
 
-class ItemDto {
-  final String id;
-  final String title;
-  final bool completed;
+part 'item_dto.freezed.dart';
+part 'item_dto.g.dart';
 
-  const ItemDto({
-    required this.id,
-    required this.title,
-    required this.completed,
-  });
+@freezed
+abstract class ItemDto with _$ItemDto {
+  const ItemDto._();
 
-  factory ItemDto.fromJson(Map<String, dynamic> json) {
-    return ItemDto(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      completed: json['completed'] as bool? ?? false,
-    );
-  }
+  const factory ItemDto({
+    required String id,
+    required String title,
+    @Default(false) bool completed,
+  }) = _ItemDto;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'completed': completed,
-    };
-  }
+  factory ItemDto.fromJson(Map<String, dynamic> json) =>
+      _$ItemDtoFromJson(json);
 
   ItemEntity toEntity() {
     return ItemEntity(
@@ -184,6 +158,11 @@ class ItemDto {
   }
 }
 ```
+
+> **Data Layer Rules:**
+> - Always include both `part '<model>_dto.freezed.dart';` and `part '<model>_dto.g.dart';`.
+> - Use `@Default(...)` to provide safe fallbacks for missing or null JSON fields.
+> - Maintain clean bidirectional mapping between the DTO and its corresponding domain entity (`toEntity()` and `fromEntity()`).
 
 ### B. Data Source (`data/datasources/<feature>_remote_data_source.dart`)
 Calls network/storage directly and throws low-level exceptions:
@@ -316,3 +295,39 @@ class ItemsRepositoryImpl implements ItemsRepository {
   }
 }
 ```
+
+---
+
+## 4. Code Generation Guidelines (`build_runner`)
+
+Because entities and DTOs rely on **Freezed** and **`json_serializable`**, running `build_runner` is an integral part of the development workflow.
+
+### A. Required Dependencies (`pubspec.yaml`):
+
+```yaml
+dependencies:
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  build_runner: ^2.4.15
+  freezed: ^3.0.0
+  json_serializable: ^6.9.0
+```
+
+### B. Generation Commands:
+
+- **One-off build** (run after adding or updating entities/DTOs):
+  ```bash
+  dart run build_runner build --delete-conflicting-outputs
+  ```
+- **Watch mode** (continuous generation during feature development):
+  ```bash
+  dart run build_runner watch --delete-conflicting-outputs
+  ```
+
+### C. Rules & Best Practices:
+1. **Never manually edit generated code**: Files with `.freezed.dart` and `.g.dart` extensions are managed solely by code generation.
+2. **Version control**: Generated files (`*.freezed.dart` and `*.g.dart`) are excluded from git (`.gitignore`). Developers and CI pipelines run `dart run build_runner build --delete-conflicting-outputs` before running, analyzing, testing, or building.
+3. **Always use `--delete-conflicting-outputs`**: This flag automatically resolves stale or conflicting generator artifacts when switching branches or refactoring model fields.
+

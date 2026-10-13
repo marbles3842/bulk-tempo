@@ -79,8 +79,8 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
   void onWeightChanged(String value) {
     state = state.copyWith(
       weightInput: value,
-      clearWeightError: true,
-      clearErrorMessage: true,
+      weightError: null,
+      errorMessage: null,
     );
   }
 
@@ -91,17 +91,17 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     }
     state = state.copyWith(
       selectedDate: WeekDateUtils.normalizeDateUtc(date),
-      clearDateError: true,
-      clearErrorMessage: true,
+      dateError: null,
+      errorMessage: null,
       requiresOverwriteConfirmation: false,
-      clearExistingEntry: true,
+      existingEntryForDate: null,
     );
   }
 
   void cancelOverwriteConfirmation() {
     state = state.copyWith(
       requiresOverwriteConfirmation: false,
-      clearExistingEntry: true,
+      existingEntryForDate: null,
     );
   }
 
@@ -182,7 +182,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
           status: FormStatus.failure,
           errorMessage: 'Load weight history before saving. Please try again.',
           requiresOverwriteConfirmation: false,
-          clearExistingEntry: true,
+          existingEntryForDate: null,
         );
         return false;
       }
@@ -205,7 +205,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     state = state.copyWith(
       status: FormStatus.submitting,
       pendingAction: WeightEntryAction.save,
-      clearErrorMessage: true,
+      errorMessage: null,
       requiresOverwriteConfirmation: false,
     );
 
@@ -243,7 +243,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
         state = state.copyWith(
           status: FormStatus.success,
           outcome: WeightEntryOutcome.saved,
-          clearErrorMessage: true,
+          errorMessage: null,
         );
 
         // Nonblocking guarded refresh owned by history
@@ -254,7 +254,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
         state = state.copyWith(
           status: FormStatus.failure,
           errorMessage: failure.message,
-          clearPendingAction: true,
+          pendingAction: null,
         );
         return false;
       },
@@ -297,7 +297,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     state = state.copyWith(
       status: FormStatus.submitting,
       pendingAction: WeightEntryAction.delete,
-      clearErrorMessage: true,
+      errorMessage: null,
       requiresOverwriteConfirmation: false,
     );
 
@@ -328,7 +328,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
         state = state.copyWith(
           status: FormStatus.success,
           outcome: WeightEntryOutcome.deleted,
-          clearErrorMessage: true,
+          errorMessage: null,
         );
 
         // Nonblocking guarded refresh owned by history
@@ -339,7 +339,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
         state = state.copyWith(
           status: FormStatus.failure,
           errorMessage: failure.message,
-          clearPendingAction: true,
+          pendingAction: null,
         );
         return false;
       },
