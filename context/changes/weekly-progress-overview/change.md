@@ -3,7 +3,7 @@ change_id: weekly-progress-overview
 title: Weekly progress overview dashboard on Home tab
 status: implementing
 created: 2026-10-12
-updated: 2026-10-12
+updated: 2026-10-14
 archived_at: null
 ---
 
