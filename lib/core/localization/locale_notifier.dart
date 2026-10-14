@@ -12,20 +12,20 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 
 /// Riverpod notifier managing the active [Locale].
 ///
-/// A null locale follows the system setting until an override is selected.
-class LocaleNotifier extends Notifier<Locale?> {
+/// Defaults to English (`Locale('en')`).
+class LocaleNotifier extends Notifier<Locale> {
   static const String storageKey = 'app_locale';
 
   int _loadToken = 0;
   Future<void> _pendingWrite = Future<void>.value();
 
   @override
-  Locale? build() {
+  Locale build() {
     initializeDateFormatting(LocaleConstants.english, null);
     initializeDateFormatting(LocaleConstants.polish, null);
-    Intl.defaultLocale = null;
+    Intl.defaultLocale = LocaleConstants.english;
     loadPersistedLocale();
-    return null;
+    return LocaleConstants.defaultLocale;
   }
 
   /// Reads persisted locale from [FlutterSecureStorage] and updates [state].
@@ -38,33 +38,28 @@ class LocaleNotifier extends Notifier<Locale?> {
         if (code != null && code.isNotEmpty) {
           state = _parseLocale(code);
         } else {
-          state = null;
+          state = LocaleConstants.defaultLocale;
         }
-        Intl.defaultLocale = state?.languageCode;
+        Intl.defaultLocale = state.languageCode;
       }
     } catch (_) {
-      // Storage read failure keeps the current locale preference.
+      // Storage read failure gracefully keeps default locale.
     }
   }
 
   /// Updates the active locale and persists the selection to secure storage.
-  /// A null selection clears the override and follows the system locale.
-  Future<void> setLocale(Locale? locale) {
+  Future<void> setLocale(Locale locale) {
     ++_loadToken;
     state = locale;
-    Intl.defaultLocale = locale?.languageCode;
+    Intl.defaultLocale = locale.languageCode;
     final storage = ref.read(secureStorageProvider);
     _pendingWrite = _pendingWrite.then((_) async {
       try {
-        if (locale == null) {
-          await storage.delete(key: storageKey);
-        } else {
-          final value =
-              locale.countryCode != null && locale.countryCode!.isNotEmpty
-              ? '${locale.languageCode}_${locale.countryCode}'
-              : locale.languageCode;
-          await storage.write(key: storageKey, value: value);
-        }
+        final value =
+            locale.countryCode != null && locale.countryCode!.isNotEmpty
+            ? '${locale.languageCode}_${locale.countryCode}'
+            : locale.languageCode;
+        await storage.write(key: storageKey, value: value);
       } catch (_) {
         // Storage write failure should not disrupt in-memory state.
       }

@@ -877,30 +877,30 @@ void main() {
         expect(find.text('Language'), findsOneWidget);
         expect(find.text('English'), findsOneWidget);
         expect(find.text('Polski'), findsOneWidget);
-        expect(find.text('System'), findsOneWidget);
+        expect(find.text('System'), findsNothing);
         final container = ProviderScope.containerOf(
           tester.element(find.byType(HomeShellScreen)),
         );
-        expect(container.read(localeProvider), isNull);
+        expect(container.read(localeProvider), const Locale('en'));
 
         // Tap Polski
         await tester.tap(find.text('Polski'));
         await tester.pumpAndSettle();
 
         expect(container.read(localeProvider), const Locale('pl'));
+        final selectorPl = tester.widget<SegmentedButton<String>>(
+          find.byKey(const Key('profile_language_selector')),
+        );
+        expect(selectorPl.selected, {'pl'});
 
         // Tap English
         await tester.tap(find.text('English'));
         await tester.pumpAndSettle();
         expect(container.read(localeProvider), const Locale('en'));
-
-        await tester.tap(find.text('System'));
-        await tester.pumpAndSettle();
-        expect(container.read(localeProvider), isNull);
-        final selector = tester.widget<SegmentedButton<String>>(
+        final selectorEn = tester.widget<SegmentedButton<String>>(
           find.byKey(const Key('profile_language_selector')),
         );
-        expect(selector.selected, {'system'});
+        expect(selectorEn.selected, {'en'});
       },
     );
   });

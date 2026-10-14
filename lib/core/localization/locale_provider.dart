@@ -7,7 +7,7 @@ import 'package:bulk_tempo/l10n/app_localizations.dart';
 export 'package:bulk_tempo/core/constants/locale_constants.dart';
 
 /// Provider exposing the active application [Locale].
-final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(
+final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
   LocaleNotifier.new,
 );
 

@@ -4,8 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('LocaleConstants', () {
-    test('defines expected language code and special selector constants', () {
-      expect(LocaleConstants.system, 'system');
+    test('defines expected language code and selector constants', () {
       expect(LocaleConstants.english, 'en');
       expect(LocaleConstants.polish, 'pl');
       expect(LocaleConstants.defaultLocale, const Locale('en'));
@@ -18,10 +17,6 @@ void main() {
     });
 
     group('toSelectionCode', () {
-      test('maps null locale to system', () {
-        expect(LocaleConstants.toSelectionCode(null), 'system');
-      });
-
       test('maps Polish locale to pl', () {
         expect(LocaleConstants.toSelectionCode(const Locale('pl')), 'pl');
         expect(LocaleConstants.toSelectionCode(const Locale('pl', 'PL')), 'pl');
@@ -38,10 +33,6 @@ void main() {
     });
 
     group('fromSelectionCode', () {
-      test('maps system to null', () {
-        expect(LocaleConstants.fromSelectionCode('system'), isNull);
-      });
-
       test('maps pl to Polish Locale', () {
         expect(LocaleConstants.fromSelectionCode('pl'), const Locale('pl'));
       });
@@ -50,8 +41,11 @@ void main() {
         expect(LocaleConstants.fromSelectionCode('en'), const Locale('en'));
       });
 
-      test('maps unrecognized code to null', () {
-        expect(LocaleConstants.fromSelectionCode('unknown'), isNull);
+      test('defaults unrecognized code to English Locale', () {
+        expect(
+          LocaleConstants.fromSelectionCode('unknown'),
+          const Locale('en'),
+        );
       });
     });
   });
