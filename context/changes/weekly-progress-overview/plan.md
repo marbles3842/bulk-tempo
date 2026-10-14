@@ -202,7 +202,7 @@ Add `ensureInitialized()` and session-retention support to the weight and gain-t
 **Intent**: Track whether the gain target has completed at least one load attempt in the current session so opening Home does not redundantly re-fetch when the user has no saved target (`savedTarget == null`).
 
 **Contract**:
-- Add `final bool hasLoadedOnce;` (default `false`) to `GainTargetState`, include it in `copyWith`, `==`, `hashCode`, and `toString`.
+- Add `@Default(false) bool hasLoadedOnce` to the `@freezed` factory constructor of `GainTargetState` (`lib/features/gain_target/presentation/view_models/gain_target_state.dart`).
 
 **File**: `lib/features/gain_target/presentation/view_models/gain_target_view_model.dart`
 
@@ -216,21 +216,25 @@ Add `ensureInitialized()` and session-retention support to the weight and gain-t
 
 **File**: `lib/features/dashboard/presentation/view_models/dashboard_state.dart`
 
-**Intent**: Model the independent per-card states, outdated flags, error messages, optional gain target, and calculated `WeeklyProgressOverviewEntity` in an immutable pure-Dart class.
+**Intent**: Model the independent per-card states, outdated flags, error messages, optional gain target, and calculated `WeeklyProgressOverviewEntity` in an immutable `@freezed` presentation state class.
 
 **Contract**:
 - `enum DashboardCardStatus { loading, error, unconfigured, empty, loaded }`
-- `class DashboardState`:
-  - `final DashboardCardStatus weightStatus` (`loading` for `WeightHistoryInitial`/`WeightHistoryLoading`, `error` for `WeightHistoryError`, `empty` for `WeightHistoryLoaded` with `weeklySummaries.isEmpty`, `loaded` for `WeightHistoryLoaded` with `weeklySummaries.isNotEmpty`)
-  - `final DashboardCardStatus workoutStatus` (`loading` for `WorkoutProgressInitial`/`WorkoutProgressLoading`, `unconfigured` for `WorkoutProgressUnconfigured`, `error` for `WorkoutProgressError`, ` loaded` for `WorkoutProgressLoaded` — note: when `WorkoutProgressLoaded` has `0` workouts, the workouts chart still renders 12 calendar weeks of `0` bars or an empty-workouts message; see Phase 3)
-  - `final bool isWeightOutdated` (`true` when `WeightHistoryLoaded.refreshErrorMessage != null`)
-  - `final bool isWorkoutOutdated` (`true` when `WorkoutProgressLoaded.refreshErrorMessage != null`)
-  - `final bool isGainTargetOutdated` (`true` when `GainTargetState.refreshErrorMessage != null`)
-  - `final String? weightErrorMessage` (from `WeightHistoryError.message` or `WeightHistoryLoaded.refreshErrorMessage`)
-  - `final String? workoutErrorMessage` (from `WorkoutProgressError.message` or `WorkoutProgressLoaded.refreshErrorMessage`)
-  - `final GainTargetEntity? gainTarget` (from `GainTargetState.savedTarget`)
-  - `final WeeklyProgressOverviewEntity overview`
-  - `final bool hasAnyWorkoutInWindow` (`true` when `WorkoutProgressLoaded` has `weeklySummaries.isNotEmpty`)
+- `@freezed`
+  `abstract class DashboardState with _$DashboardState`:
+  - `const DashboardState._();`
+  - `const factory DashboardState({`
+    - `required DashboardCardStatus weightStatus,` (`loading` for `WeightHistoryInitial`/`WeightHistoryLoading`, `error` for `WeightHistoryError`, `empty` for `WeightHistoryLoaded` with `weeklySummaries.isEmpty`, `loaded` for `WeightHistoryLoaded` with `weeklySummaries.isNotEmpty`)
+    - `required DashboardCardStatus workoutStatus,` (`loading` for `WorkoutProgressInitial`/`WorkoutProgressLoading`, `unconfigured` for `WorkoutProgressUnconfigured`, `error` for `WorkoutProgressError`, `loaded` for `WorkoutProgressLoaded` — note: when `WorkoutProgressLoaded` has `0` workouts, the workouts chart still renders 12 calendar weeks of `0` bars or an empty-workouts message; see Phase 3)
+    - `@Default(false) bool isWeightOutdated,` (`true` when `WeightHistoryLoaded.refreshErrorMessage != null`)
+    - `@Default(false) bool isWorkoutOutdated,` (`true` when `WorkoutProgressLoaded.refreshErrorMessage != null`)
+    - `@Default(false) bool isGainTargetOutdated,` (`true` when `GainTargetState.refreshErrorMessage != null`)
+    - `String? weightErrorMessage,` (from `WeightHistoryError.message` or `WeightHistoryLoaded.refreshErrorMessage`)
+    - `String? workoutErrorMessage,` (from `WorkoutProgressError.message` or `WorkoutProgressLoaded.refreshErrorMessage`)
+    - `GainTargetEntity? gainTarget,` (from `GainTargetState.savedTarget`)
+    - `required WeeklyProgressOverviewEntity overview,`
+    - `@Default(false) bool hasAnyWorkoutInWindow,` (`true` when `WorkoutProgressLoaded` has `weeklySummaries.isNotEmpty`)
+  - `}) = _DashboardState;`
 
 #### 4. Dashboard ViewModel
 
@@ -250,6 +254,7 @@ Add `ensureInitialized()` and session-retention support to the weight and gain-t
 
 #### Automated Verification:
 
+- Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
 - Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
 - Static analysis passes with zero issues: `flutter analyze`
 
@@ -269,44 +274,78 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 ### Changes Required:
 
-#### 1. Shared Outdated Badge & Card Header Helper
+#### 1. Dashboard Localization Strings (EN & PL)
+
+**Files**: `lib/l10n/app_en.arb`, `lib/l10n/app_pl.arb`
+
+**Intent**: Add localized keys and translations for all dashboard titles, KPI cards, incomplete-week indicators, empty/unconfigured states, target labels, outdated badges, and metric units for both English and Polish, and generate localization classes via `flutter gen-l10n`.
+
+**Contract**:
+- Define the following keys in `app_en.arb` and `app_pl.arb`:
+  - `dashboardOutdatedBadge`: `"Outdated · last refresh failed"` / `"Nieaktualne · błąd odświeżania"`
+  - `dashboardKpiPaceTitle`: `"Current Pace"` / `"Bieżące tempo"`
+  - `dashboardKpiPaceSubtitleEmpty`: `"Log 2+ weeks"` / `"Zapisz min. 2 tyg."`
+  - `dashboardKpiAverageTitle`: `"Latest Average"` / `"Ostatnia średnia"`
+  - `dashboardKpiAverageSubtitleIncomplete`: `"This week · {loggedDays}/7 days logged"` / `"Ten tydzień · {loggedDays}/7 dni"` (placeholders: `loggedDays`)
+  - `dashboardKpiAverageSubtitleComplete`: `"This week · 7/7 days logged"` / `"Ten tydzień · 7/7 dni"`
+  - `dashboardKpiTotalGainTitle`: `"Total Gain"` / `"Łączny przyrost"`
+  - `dashboardKpiWorkoutsTitle`: `"Workouts This Week"` / `"Treningi w tym tygodniu"`
+  - `dashboardKpiWorkoutsThisWeek`: `"This week"` / `"W tym tygodniu"`
+  - `dashboardKpiWorkoutsNotConnected`: `"Not connected"` / `"Nie połączono"`
+  - `dashboardKpiWorkoutsSyncError`: `"Sync error"` / `"Błąd synchronizacji"`
+  - `dashboardWeightTrendTitle`: `"Weekly Weight Trend"` / `"Tygodniowy trend wagi"`
+  - `dashboardWeightEmpty`: `"No weights logged yet — add one on the Weights tab"` / `"Brak zapisanych wag — dodaj wagę w zakładce Wagi"`
+  - `dashboardPaceTitle`: `"Weekly Pace"` / `"Tygodniowe tempo"`
+  - `dashboardPaceEmpty`: `"No weights logged yet — add one on the Weights tab"` / `"Brak zapisanych wag — dodaj wagę w zakładce Wagi"`
+  - `dashboardPaceNeedTwoWeeks`: `"Log weights in at least 2 weeks to see weekly pace"` / `"Zapisz wagę w co najmniej 2 tygodniach, aby zobaczyć tempo"`
+  - `dashboardPaceTargetSubtitle`: `"Target: {target}"` / `"Cel: {target}"` (placeholders: `target`)
+  - `dashboardWorkoutsTitle`: `"Workouts per Week"` / `"Liczba treningów na tydzień"`
+  - `dashboardWorkoutsUnconfigured`: `"Hevy not connected — connect in Profile"` / `"Hevy niepołączone — połącz w Profilu"`
+  - `dashboardWorkoutsTooltip`: `"{count, plural, one{1 workout} other{{count} workouts}}"` / `"{count, plural, one{1 trening} few{{count} treningi} many{{count} treningów} other{{count} treningu}}"` (placeholders: `count`)
+  - `dashboardPaceMetric`: `"{sign}{value} {unit}"` / `"{sign}{value} {unit}"` (placeholders: `sign`, `value`, `unit`)
+  - `dashboardWeightMetric`: `"{value} kg"` / `"{value} kg"` (placeholders: `value`)
+  - `dashboardGainMetric`: `"{sign}{value} kg"` / `"{sign}{value} kg"` (placeholders: `sign`, `value`)
+- Run `flutter gen-l10n`.
+
+#### 2. Shared Outdated Badge & Card Header Helper
 
 **File**: `lib/features/dashboard/presentation/widgets/dashboard_card_shell.dart`
 
-**Intent**: Provide a consistent `Card` layout with title, optional subtitle, optional `'Outdated · last refresh failed'` chip/badge, and body slot for loading, error (with `'Retry'` button), empty/unconfigured text-only guidance, or chart content.
+**Intent**: Provide a consistent `Card` layout with title, optional subtitle, optional outdated chip/badge using `context.l10n.dashboardOutdatedBadge`, and body slot for loading, error (with `context.l10n.retry` button), empty/unconfigured text-only guidance, or chart content.
 
 **Contract**:
-- Renders an outdated badge with the provided `outdatedBadgeKey` and text `'Outdated · last refresh failed'` whenever `isOutdated == true`.
-- Never renders navigation buttons in empty or unconfigured states; only renders a `'Retry'` `FilledButton.tonal` / `TextButton` when `status == DashboardCardStatus.error`.
+- Renders an outdated badge with the provided `outdatedBadgeKey` and localized text `context.l10n.dashboardOutdatedBadge` whenever `isOutdated == true`.
+- Never renders navigation buttons in empty or unconfigured states; only renders a `'Retry'` (`context.l10n.retry`) `FilledButton.tonal` / `TextButton` when `status == DashboardCardStatus.error`.
 
-#### 2. Headline KPI Stat Tiles Row
+#### 3. Headline KPI Stat Tiles Row
 
 **File**: `lib/features/dashboard/presentation/widgets/dashboard_kpi_row.dart`
 
-**Intent**: Render the 4 headline metrics above the charts in a responsive 2×2 grid of compact stat tiles: Current Pace, Latest Average (with incomplete-week subtitle), Total Gain, and Workouts This Week.
+**Intent**: Render the 4 headline metrics above the charts in a responsive 2×2 grid of compact stat tiles (Current Pace, Latest Average with incomplete-week subtitle, Total Gain, and Workouts This Week) using localized strings from `context.l10n` and locale-aware decimal formatting via `NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 2)`.
 
 **Contract**:
+- Formatting helper uses `final locale = Localizations.localeOf(context).toString();` and `NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 2)`.
 - Keys for testability:
-  - `Key('dashboard_kpi_pace_tile')`: shows formatted `currentPaceKgPerWeek` (e.g. `'+0.20 kg/wk'` or `'-0.15 kg/wk'`), or `'—'` with `'Log 2+ weeks'` when `null`.
-  - `Key('dashboard_kpi_average_tile')`: shows formatted `latestAverageWeightKg` (e.g. `'80.60 kg'`), with subtitle `'This week · X/7 days logged'` when `isLatestWeekCurrentWeek` is true (flagged with `Key('dashboard_incomplete_week_badge')` when `isLatestWeekIncomplete` is true), or the formatted week range when from a prior week, or `'—'` when no weights exist.
-  - `Key('dashboard_kpi_total_gain_tile')`: shows formatted `totalGainKg` with sign (e.g. `'+1.40 kg'`), or `'—'` with `'Log 2+ weeks'` when `null`.
-  - `Key('dashboard_kpi_workouts_tile')`: shows `'${overview.currentWeekWorkoutCount}'` with subtitle `'This week'` when `workoutStatus == DashboardCardStatus.loaded`, `'—'` with `'Not connected'` when `unconfigured`, `'—'` with `'Sync error'` when `error`, or `'...'` when `loading`.
+  - `Key('dashboard_kpi_pace_tile')`: shows title `context.l10n.dashboardKpiPaceTitle`, formatted pace via `context.l10n.dashboardPaceMetric(sign: currentPaceKgPerWeek >= 0 ? '+' : '', value: formatter.format(currentPaceKgPerWeek.abs()), unit: context.l10n.kgPerWeekUnit)` (e.g. `'+0.20 kg/week'` or `'+0,20 kg/tydz.'`), or `'—'` with `context.l10n.dashboardKpiPaceSubtitleEmpty` when `null`.
+  - `Key('dashboard_kpi_average_tile')`: shows title `context.l10n.dashboardKpiAverageTitle`, formatted average `context.l10n.dashboardWeightMetric(formatter.format(latestAverageWeightKg))` (e.g. `'80.60 kg'` or `'80,60 kg'`), with subtitle `context.l10n.dashboardKpiAverageSubtitleIncomplete(overview.latestWeekLoggedDays)` when `isLatestWeekIncomplete` is true (flagged with `Key('dashboard_incomplete_week_badge')`), `context.l10n.dashboardKpiAverageSubtitleComplete` when `isLatestWeekCurrentWeek && !isLatestWeekIncomplete`, the formatted week range when from a prior week, or `'—'` when no weights exist.
+  - `Key('dashboard_kpi_total_gain_tile')`: shows title `context.l10n.dashboardKpiTotalGainTitle`, formatted total gain `context.l10n.dashboardGainMetric(sign: totalGainKg >= 0 ? '+' : '', value: formatter.format(totalGainKg.abs()))` (e.g. `'+1.40 kg'` or `'+1,40 kg'`), or `'—'` with `context.l10n.dashboardKpiPaceSubtitleEmpty` when `null`.
+  - `Key('dashboard_kpi_workouts_tile')`: shows title `context.l10n.dashboardKpiWorkoutsTitle`, `'${overview.currentWeekWorkoutCount}'` with subtitle `context.l10n.dashboardKpiWorkoutsThisWeek` when `workoutStatus == DashboardCardStatus.loaded`, `'—'` with `context.l10n.dashboardKpiWorkoutsNotConnected` when `unconfigured`, `'—'` with `context.l10n.dashboardKpiWorkoutsSyncError` when `error`, or `'...'` when `loading`.
 
-#### 3. Weekly Weight Trend `LineChart` Card
+#### 4. Weekly Weight Trend `LineChart` Card
 
 **File**: `lib/features/dashboard/presentation/widgets/weekly_weight_trend_card.dart`
 
-**Intent**: Display the 12-calendar-week average weight `LineChart` using `fl_chart`, aligned to the shared 12-week axis `0..11`.
+**Intent**: Display the 12-calendar-week average weight `LineChart` using `fl_chart`, aligned to the shared 12-week axis `0..11`, with localized title `context.l10n.dashboardWeightTrendTitle` and empty state `context.l10n.dashboardWeightEmpty`.
 
 **Contract**:
 - Card key: `Key('dashboard_weight_trend_card')`; outdated badge key: `Key('weight_trend_outdated_badge')`; retry button key: `Key('dashboard_weight_retry_button')`.
 - States:
   - `loading`: centered `CircularProgressIndicator`.
-  - `error`: error message + `'Retry'` button calling `onRetry`.
-  - `empty`: text-only message `'No weights logged yet — add one on the Weights tab'`.
+  - `error`: error message + `'Retry'` (`context.l10n.retry`) button calling `onRetry`.
+  - `empty`: text-only message `context.l10n.dashboardWeightEmpty`.
   - `loaded`: `LineChart` with `minX: 0`, `maxX: 11`, bottom axis labels for slots `0..11` via `WeekDateUtils.formatShortWeekLabel(slot.weekStartMonday)` (with `interval: 2` or `1` to avoid label overlap), left axis in `kg`, and spots at each slot `i` where `slot.averageWeightKg != null`. Consecutive logged weeks are connected; missing calendar weeks break the line segment (or use `FlSpot.nullSpot` between gaps) so missing weeks are visibly represented as gaps.
 
-#### 4. Weekly Pace `BarChart` Card with Target Band
+#### 5. Weekly Pace `BarChart` Card with Target Band
 
 **File**: `lib/features/dashboard/presentation/widgets/weekly_pace_chart_card.dart`
 
@@ -316,26 +355,26 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 - Card key: `Key('dashboard_weekly_pace_card')`; outdated badge key: `Key('weekly_pace_outdated_badge')`.
 - States:
   - `loading`: centered `CircularProgressIndicator`.
-  - `error`: error message + `'Retry'` button.
-  - `empty` (or `loggedWeightWeeksCount < 2` and no slot in the 12-week window has a pace): text-only message (`'No weights logged yet — add one on the Weights tab'` when `0` weeks, or `'Log weights in at least 2 weeks to see weekly pace'` when `< 2` weeks).
+  - `error`: error message + `'Retry'` (`context.l10n.retry`) button.
+  - `empty` (or `loggedWeightWeeksCount < 2` and no slot in the 12-week window has a pace): text-only message (`context.l10n.dashboardPaceEmpty` when `0` weeks, or `context.l10n.dashboardPaceNeedTwoWeeks` when `< 2` weeks).
   - `loaded` (when at least 1 slot has `paceKgPerWeek != null`): `BarChart` with 12 `BarChartGroupData(x: i, ...)` for `i` in `0..11`. Slots with `paceKgPerWeek != null` render a single `BarChartRodData(fromY: 0, toY: slot.paceKgPerWeek!, color: Theme.of(context).colorScheme.primary, width: 12)`; slots with `null` render an empty rod (`toY: 0`, `width: 0` or `show: false`).
-  - When `gainTarget != null`, sets `rangeAnnotations: RangeAnnotations(horizontalRangeAnnotations: [HorizontalRangeAnnotation(y1: gainTarget.minWeeklyGainKg, y2: gainTarget.maxWeeklyGainKg, color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.18))])`, expands `[minY, maxY]` to include `[0, gainTarget.minWeeklyGainKg, gainTarget.maxWeeklyGainKg]` plus bar values with padding, and shows subtitle `'Target: ${gainTarget.formattedTarget}'` (`Key('dashboard_pace_target_subtitle')`).
+  - When `gainTarget != null`, sets `rangeAnnotations: RangeAnnotations(horizontalRangeAnnotations: [HorizontalRangeAnnotation(y1: gainTarget.minWeeklyGainKg, y2: gainTarget.maxWeeklyGainKg, color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.18))])`, expands `[minY, maxY]` to include `[0, gainTarget.minWeeklyGainKg, gainTarget.maxWeeklyGainKg]` plus bar values with padding, and shows subtitle `context.l10n.dashboardPaceTargetSubtitle('${GainTargetFormatter.formatRange(gainTarget, Localizations.localeOf(context).toString())} ${context.l10n.kgPerWeekUnit}')` (`Key('dashboard_pace_target_subtitle')`).
 
-#### 5. Workouts per Week `BarChart` Card
+#### 6. Workouts per Week `BarChart` Card
 
 **File**: `lib/features/dashboard/presentation/widgets/weekly_workouts_chart_card.dart`
 
-**Intent**: Display the 12-calendar-week `workoutCount` `BarChart` using `fl_chart`, with independent unconfigured, loading, error, and outdated states.
+**Intent**: Display the 12-calendar-week `workoutCount` `BarChart` using `fl_chart`, with independent unconfigured, loading, error, and outdated states and localized tooltip.
 
 **Contract**:
 - Card key: `Key('dashboard_weekly_workouts_card')`; outdated badge key: `Key('weekly_workouts_outdated_badge')`; retry button key: `Key('dashboard_workouts_retry_button')`.
 - States:
   - `loading`: centered `CircularProgressIndicator`.
-  - `unconfigured`: text-only message `'Hevy not connected — connect in Profile'` (`Key('dashboard_workouts_unconfigured_text')`).
-  - `error`: error message + `'Retry'` button calling `onRetry`.
-  - `loaded`: `BarChart` with 12 `BarChartGroupData(x: i, ...)` for `i` in `0..11`, plotting `slot.workoutCount.toDouble()` (including `0` bars for weeks with zero workouts), integer left-axis interval (`>= 1`), and tooltip showing the week range and `'${slot.workoutCount} workouts'`.
+  - `unconfigured`: text-only message `context.l10n.dashboardWorkoutsUnconfigured` (`Key('dashboard_workouts_unconfigured_text')`).
+  - `error`: error message + `'Retry'` (`context.l10n.retry`) button calling `onRetry`.
+  - `loaded`: `BarChart` with 12 `BarChartGroupData(x: i, ...)` for `i` in `0..11`, plotting `slot.workoutCount.toDouble()` (including `0` bars for weeks with zero workouts), integer left-axis interval (`>= 1`), and tooltip showing the week range and `context.l10n.dashboardWorkoutsTooltip(slot.workoutCount)`.
 
-#### 6. DashboardView & HomeShellScreen Wiring
+#### 7. DashboardView & HomeShellScreen Wiring
 
 **File**: `lib/features/dashboard/presentation/views/dashboard_view.dart`
 
@@ -356,7 +395,7 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 - In `build()` (`L250-260`), cases `0` and `default` assign `body = const DashboardView();`.
 - Keep `_showLogoutDialog`, `home_app_bar_logout_button` in the `AppBar`, and `_buildProfileTab` unchanged.
 
-#### 7. Migrate Broken / Affected Widget Tests
+#### 8. Migrate Broken / Affected Widget Tests & Add Polish Smoke Test
 
 **File**: `test/features/auth/presentation/views/home_shell_screen_test.dart`
 
@@ -375,10 +414,19 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 **Contract**:
 - Instantiate `FakeWeightRepository`, `FakeWorkoutRepository`, and `FakeGainTargetRepository` in `setUp` (and reset in `tearDown`) of `app_router_test.dart`, and include their provider overrides in the `ProviderScope` of tests that render `/home`.
 
+**File**: `test/features/localization/polish_rendering_test.dart`
+
+**Intent**: Add a smoke test verifying that `HomeShellScreen` with `DashboardView` renders all card titles, KPI tiles, and empty/unconfigured states properly in Polish.
+
+**Contract**:
+- Add `testWidgets('renders home dashboard view in Polish')` pumping `HomeShellScreen` with `locale: const Locale('pl')` and all 4 repository overrides, asserting Polish strings (`'Bieżące tempo'`, `'Ostatnia średnia'`, `'Łączny przyrost'`, `'Treningi w tym tygodniu'`, `'Tygodniowy trend wagi'`, `'Tygodniowe tempo'`, `'Liczba treningów na tydzień'`).
+
 ### Success Criteria:
 
 #### Automated Verification:
 
+- Localization generation succeeds: `flutter gen-l10n`
+- Polish rendering tests pass: `flutter test test/features/localization/polish_rendering_test.dart`
 - Full test suite passes: `flutter test`
 - Static analysis passes with zero issues: `flutter analyze`
 - Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
@@ -449,34 +497,37 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 #### Automated
 
-- [x] 1.1 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/weekly_progress_calculator_test.dart`
-- [x] 1.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 1.1 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/weekly_progress_calculator_test.dart` — 6b15f39
+- [x] 1.2 Static analysis passes with zero issues: `flutter analyze` — 6b15f39
 
 #### Manual
 
-- [x] 1.3 Confirm `WeeklyProgressCalculator` has zero Flutter widget imports and handles the W1=`80.00` to W4=`80.60` (`+0.20 kg/week`) example identically to the agreed specification.
+- [x] 1.3 Confirm `WeeklyProgressCalculator` has zero Flutter widget imports and handles the W1=`80.00` to W4=`80.60` (`+0.20 kg/week`) example identically to the agreed specification. — 6b15f39
 
 ### Phase 2: Dashboard ViewModel & Per-Card State
 
 #### Automated
 
-- [ ] 2.1 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
-- [ ] 2.2 Static analysis passes with zero issues: `flutter analyze`
+- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
+- [x] 2.2 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
+- [x] 2.3 Static analysis passes with zero issues: `flutter analyze`
 
 #### Manual
 
-- [ ] 2.3 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
+- [x] 2.4 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
 
 ### Phase 3: Home Tab `fl_chart` UI, Wiring & Test Migration
 
 #### Automated
 
-- [ ] 3.1 Full test suite passes: `flutter test`
-- [ ] 3.2 Static analysis passes with zero issues: `flutter analyze`
-- [ ] 3.3 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
+- [ ] 3.1 Localization generation succeeds: `flutter gen-l10n`
+- [ ] 3.2 Polish rendering tests pass: `flutter test test/features/localization/polish_rendering_test.dart`
+- [ ] 3.3 Full test suite passes: `flutter test`
+- [ ] 3.4 Static analysis passes with zero issues: `flutter analyze`
+- [ ] 3.5 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 3.4 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend, Weekly Pace, and Workouts per Week cards.
-- [ ] 3.5 With weights logged across $\ge 2$ weeks and a saved weekly gain target on Profile, verify the Weekly Weight Trend `LineChart` and Weekly Pace `BarChart` (with shaded target band) render on Home, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
-- [ ] 3.6 Verify that when Hevy is disconnected, the Weight Trend and Weekly Pace charts still render normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.
+- [ ] 3.6 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend, Weekly Pace, and Workouts per Week cards in both English and Polish.
+- [ ] 3.7 With weights logged across $\ge 2$ weeks and a saved weekly gain target on Profile, verify the Weekly Weight Trend `LineChart` and Weekly Pace `BarChart` (with shaded target band) render on Home, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
+- [ ] 3.8 Verify that when Hevy is disconnected, the Weight Trend and Weekly Pace charts still render normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.

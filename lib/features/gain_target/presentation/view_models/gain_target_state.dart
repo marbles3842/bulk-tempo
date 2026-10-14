@@ -18,6 +18,7 @@ abstract class GainTargetState with _$GainTargetState {
     @Default(false) bool isLoading,
     @Default(false) bool isRefreshing,
     @Default(false) bool isSubmitting,
+    @Default(false) bool hasLoadedOnce,
     GainTargetEntity? pendingTarget,
     String? errorMessage,
     String? refreshErrorMessage,

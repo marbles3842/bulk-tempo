@@ -1,0 +1,133 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/providers/clock_provider.dart';
+import 'package:bulk_tempo/features/dashboard/domain/calculators/weekly_progress_calculator.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
+import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
+import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_state.dart';
+import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_view_model.dart';
+import 'package:bulk_tempo/features/workout/domain/models/weekly_workout_summary_entity.dart';
+import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_state.dart';
+import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_view_model.dart';
+
+final dashboardViewModelProvider =
+    AutoDisposeNotifierProvider<DashboardViewModel, DashboardState>(
+      DashboardViewModel.new,
+    );
+
+/// Pure-Dart ViewModel that reactively composes weight history, workout progress,
+/// and weekly gain target into a unified [DashboardState].
+class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
+  @override
+  DashboardState build() {
+    final weightState = ref.watch(weightHistoryViewModelProvider);
+    final workoutState = ref.watch(workoutProgressViewModelProvider);
+    final gainTargetState = ref.watch(gainTargetViewModelProvider);
+    final now = ref.watch(clockProvider)();
+
+    final weightSummaries = weightState is WeightHistoryLoaded
+        ? weightState.weeklySummaries
+        : const <WeeklyWeightSummaryEntity>[];
+
+    final workoutSummaries = workoutState is WorkoutProgressLoaded
+        ? workoutState.weeklySummaries
+        : const <WeeklyWorkoutSummaryEntity>[];
+
+    final overview = WeeklyProgressCalculator.calculate(
+      allWeightSummaries: weightSummaries,
+      workoutSummaries: workoutSummaries,
+      now: now,
+    );
+
+    final DashboardCardStatus weightStatus = switch (weightState) {
+      WeightHistoryInitial() ||
+      WeightHistoryLoading() => DashboardCardStatus.loading,
+      WeightHistoryError() => DashboardCardStatus.error,
+      WeightHistoryLoaded(:final weeklySummaries) =>
+        weeklySummaries.isEmpty
+            ? DashboardCardStatus.empty
+            : DashboardCardStatus.loaded,
+    };
+
+    final DashboardCardStatus workoutStatus = switch (workoutState) {
+      WorkoutProgressInitial() ||
+      WorkoutProgressLoading() => DashboardCardStatus.loading,
+      WorkoutProgressUnconfigured() => DashboardCardStatus.unconfigured,
+      WorkoutProgressError() => DashboardCardStatus.error,
+      WorkoutProgressLoaded() => DashboardCardStatus.loaded,
+    };
+
+    final isWeightOutdated =
+        weightState is WeightHistoryLoaded &&
+        weightState.refreshErrorMessage != null;
+
+    final isWorkoutOutdated =
+        workoutState is WorkoutProgressLoaded &&
+        workoutState.refreshErrorMessage != null;
+
+    final isGainTargetOutdated = gainTargetState.refreshErrorMessage != null;
+
+    final String? weightErrorMessage = switch (weightState) {
+      WeightHistoryError(:final message) => message,
+      WeightHistoryLoaded(:final refreshErrorMessage) => refreshErrorMessage,
+      _ => null,
+    };
+
+    final String? workoutErrorMessage = switch (workoutState) {
+      WorkoutProgressError(:final message) => message,
+      WorkoutProgressLoaded(:final refreshErrorMessage) => refreshErrorMessage,
+      _ => null,
+    };
+
+    final hasAnyWorkoutInWindow =
+        workoutState is WorkoutProgressLoaded &&
+        workoutState.weeklySummaries.isNotEmpty;
+
+    return DashboardState(
+      weightStatus: weightStatus,
+      workoutStatus: workoutStatus,
+      isWeightOutdated: isWeightOutdated,
+      isWorkoutOutdated: isWorkoutOutdated,
+      isGainTargetOutdated: isGainTargetOutdated,
+      weightErrorMessage: weightErrorMessage,
+      workoutErrorMessage: workoutErrorMessage,
+      gainTarget: gainTargetState.savedTarget,
+      overview: overview,
+      hasAnyWorkoutInWindow: hasAnyWorkoutInWindow,
+    );
+  }
+
+  /// Concurrently initializes the underlying weight, workout, and gain-target ViewModels.
+  Future<void> ensureInitialized() async {
+    await Future.wait([
+      ref.read(weightHistoryViewModelProvider.notifier).ensureInitialized(),
+      ref.read(workoutProgressViewModelProvider.notifier).ensureInitialized(),
+      ref.read(gainTargetViewModelProvider.notifier).ensureInitialized(),
+    ]);
+  }
+
+  /// Pull-to-refresh coordination across all three data sources without resetting state to full-screen loaders.
+  Future<void> refreshAll() async {
+    await Future.wait([
+      ref
+          .read(weightHistoryViewModelProvider.notifier)
+          .loadEntries(showLoading: false),
+      ref
+          .read(workoutProgressViewModelProvider.notifier)
+          .loadWorkouts(showLoading: false),
+      ref
+          .read(gainTargetViewModelProvider.notifier)
+          .loadTarget(showLoading: false, isRefresh: true),
+    ]);
+  }
+
+  /// Retries loading weight history entries.
+  Future<void> retryWeights() async {
+    await ref.read(weightHistoryViewModelProvider.notifier).loadEntries();
+  }
+
+  /// Retries loading workout progress history.
+  Future<void> retryWorkouts() async {
+    await ref.read(workoutProgressViewModelProvider.notifier).loadWorkouts();
+  }
+}
