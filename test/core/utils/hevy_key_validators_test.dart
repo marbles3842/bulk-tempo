@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:bulk_tempo/core/utils/hevy_key_validators.dart';
+import 'package:bulk_tempo/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -65,25 +67,25 @@ void main() {
   });
 
   group('HevyKeyValidators.validateKeyInput', () {
-    test('returns required message for empty or whitespace-only input', () {
+    test('returns empty error for empty or whitespace-only input', () {
       expect(
         HevyKeyValidators.validateKeyInput(''),
-        equals('Hevy API key is required'),
+        equals(HevyKeyValidationError.empty),
       );
       expect(
         HevyKeyValidators.validateKeyInput('   \t\n '),
-        equals('Hevy API key is required'),
+        equals(HevyKeyValidationError.empty),
       );
     });
 
-    test('returns format error message for malformed UUID', () {
+    test('returns invalidUuid error for malformed UUID', () {
       expect(
         HevyKeyValidators.validateKeyInput('not-a-uuid'),
-        equals('Enter a valid Hevy API key (UUID format)'),
+        equals(HevyKeyValidationError.invalidUuid),
       );
       expect(
         HevyKeyValidators.validateKeyInput('a1b2c3d4e5f64a7b8c9d0e1f2a3b4c5d'),
-        equals('Enter a valid Hevy API key (UUID format)'),
+        equals(HevyKeyValidationError.invalidUuid),
       );
     });
 
@@ -110,6 +112,33 @@ void main() {
       expect(HevyKeyValidators.maskApiKey(''), equals('••••••••'));
       expect(HevyKeyValidators.maskApiKey('short-key'), equals('••••••••'));
       expect(HevyKeyValidators.maskApiKey('   '), equals('••••••••'));
+    });
+  });
+
+  group('HevyKeyValidationError localization', () {
+    final l10nEn = lookupAppLocalizations(const Locale('en'));
+    final l10nPl = lookupAppLocalizations(const Locale('pl'));
+
+    test('resolves English error messages correctly', () {
+      expect(
+        HevyKeyValidationError.empty.toLocalizedMessage(l10nEn),
+        equals('Hevy API key is required'),
+      );
+      expect(
+        HevyKeyValidationError.invalidUuid.toLocalizedMessage(l10nEn),
+        equals('Enter a valid Hevy API key (UUID format)'),
+      );
+    });
+
+    test('resolves Polish error messages correctly', () {
+      expect(
+        HevyKeyValidationError.empty.toLocalizedMessage(l10nPl),
+        equals('Klucz API Hevy jest wymagany'),
+      );
+      expect(
+        HevyKeyValidationError.invalidUuid.toLocalizedMessage(l10nPl),
+        equals('Wprowadź poprawny klucz API Hevy (format UUID)'),
+      );
     });
   });
 }

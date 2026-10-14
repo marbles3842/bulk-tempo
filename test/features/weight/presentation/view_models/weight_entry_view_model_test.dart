@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
+import 'package:bulk_tempo/core/utils/weight_validators.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/form_status.dart';
@@ -106,7 +107,7 @@ void main() {
         expect(resultEmpty, isFalse);
         expect(
           container.read(weightEntryViewModelProvider).weightError,
-          equals('Please enter a weight'),
+          equals(WeightValidationError.empty),
         );
 
         notifier.onWeightChanged('10.0'); // < minWeightKg (20.0)
@@ -114,7 +115,7 @@ void main() {
         expect(resultTooLow, isFalse);
         expect(
           container.read(weightEntryViewModelProvider).weightError,
-          contains('Weight must be between'),
+          equals(WeightValidationError.outOfBounds),
         );
 
         notifier.onWeightChanged('350.0'); // > maxWeightKg (300.0)
@@ -122,7 +123,7 @@ void main() {
         expect(resultTooHigh, isFalse);
         expect(
           container.read(weightEntryViewModelProvider).weightError,
-          contains('Weight must be between'),
+          equals(WeightValidationError.outOfBounds),
         );
       },
     );
@@ -139,7 +140,7 @@ void main() {
         expect(resultFuture, isFalse);
         expect(
           container.read(weightEntryViewModelProvider).dateError,
-          equals('Date cannot be in the future'),
+          equals(WeightValidationError.futureDate),
         );
 
         // More than 365 days ago
@@ -150,7 +151,7 @@ void main() {
         expect(resultOld, isFalse);
         expect(
           container.read(weightEntryViewModelProvider).dateError,
-          equals('Date cannot be more than 365 days in the past'),
+          equals(WeightValidationError.lookbackExceeded),
         );
       },
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
@@ -841,6 +843,64 @@ void main() {
 
         expect(find.byType(WeeklyWorkoutCard), findsOneWidget);
         expect(find.text('Upper Body Hypertrophy'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Profile tab renders Language card and allows selecting languages',
+      (tester) async {
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeRepository),
+            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+            gainTargetRepositoryProvider.overrideWithValue(
+              fakeGainTargetRepository,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(const Key('profile_language_card')),
+        );
+        expect(find.byKey(const Key('profile_language_card')), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_language_selector')),
+          findsOneWidget,
+        );
+        expect(find.text('Language'), findsOneWidget);
+        expect(find.text('English'), findsOneWidget);
+        expect(find.text('Polski'), findsOneWidget);
+        expect(find.text('System'), findsOneWidget);
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(HomeShellScreen)),
+        );
+        expect(container.read(localeProvider), isNull);
+
+        // Tap Polski
+        await tester.tap(find.text('Polski'));
+        await tester.pumpAndSettle();
+
+        expect(container.read(localeProvider), const Locale('pl'));
+
+        // Tap English
+        await tester.tap(find.text('English'));
+        await tester.pumpAndSettle();
+        expect(container.read(localeProvider), const Locale('en'));
+
+        await tester.tap(find.text('System'));
+        await tester.pumpAndSettle();
+        expect(container.read(localeProvider), isNull);
+        final selector = tester.widget<SegmentedButton<String>>(
+          find.byKey(const Key('profile_language_selector')),
+        );
+        expect(selector.selected, {'system'});
       },
     );
   });

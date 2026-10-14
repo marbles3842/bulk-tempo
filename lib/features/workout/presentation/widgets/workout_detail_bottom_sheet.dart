@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_exercise_entity.dart';
 import 'package:bulk_tempo/features/workout/domain/models/workout_set_entity.dart';
+import 'package:bulk_tempo/l10n/app_localizations.dart';
 
 /// Modal bottom sheet displaying the full exercise and set breakdown for a
 /// single logged [WorkoutEntity].
@@ -22,7 +24,10 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
     );
   }
 
-  static String formatSetPerformance(WorkoutSetEntity set) {
+  static String formatSetPerformance(
+    WorkoutSetEntity set, [
+    AppLocalizations? l10n,
+  ]) {
     if (set.weightKg != null && set.reps != null) {
       return '${set.weightKg!.toStringAsFixed(2)} kg × ${set.reps}';
     }
@@ -30,6 +35,9 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
       return '${set.weightKg!.toStringAsFixed(2)} kg';
     }
     if (set.reps != null) {
+      if (l10n != null) {
+        return l10n.repsCount(set.reps!);
+      }
       return '${set.reps} ${set.reps == 1 ? "rep" : "reps"}';
     }
     if (set.durationSeconds != null) {
@@ -41,27 +49,34 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
     return '—';
   }
 
-  static String? formatSetTypeLabel(WorkoutSetEntity set) {
+  static String? formatSetTypeLabel(
+    WorkoutSetEntity set, [
+    AppLocalizations? l10n,
+  ]) {
     switch (set.type) {
       case 'warmup':
-        return 'Warmup';
+        return l10n?.setTypeWarmup ?? 'Warmup';
       case 'failure':
-        return 'Failure';
+        return l10n?.setTypeFailure ?? 'Failure';
       case 'dropset':
-        return 'Dropset';
+        return l10n?.setTypeDropset ?? 'Dropset';
       case 'normal':
       default:
         return null;
     }
   }
 
-  String _formatDateAndDuration() {
-    final dateText = WeekDateUtils.formatDayWithWeekday(workout.localDate);
+  String _formatDateAndDuration(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    final dateText = WeekDateUtils.formatDayWithWeekday(
+      workout.localDate,
+      locale,
+    );
     final durationMinutes = workout.endTime
         .difference(workout.startTime)
         .inMinutes;
     if (durationMinutes > 0) {
-      return '$dateText • $durationMinutes min';
+      return '$dateText • ${context.l10n.minutesDuration(durationMinutes)}';
     }
     return dateText;
   }
@@ -101,14 +116,17 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            _formatDateAndDuration(),
+                            _formatDateAndDuration(context),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${workout.workingSetsCount} working sets • ${workout.totalVolumeKg.toStringAsFixed(2)} kg volume',
+                            context.l10n.workoutDetailSummary(
+                              workout.workingSetsCount,
+                              workout.totalVolumeKg.toStringAsFixed(2),
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -120,7 +138,7 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
                     IconButton(
                       key: const Key('workout_detail_close_button'),
                       icon: const Icon(Icons.close),
-                      tooltip: 'Close',
+                      tooltip: context.l10n.close,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -131,7 +149,7 @@ class WorkoutDetailBottomSheet extends StatelessWidget {
                 child: workout.exercises.isEmpty
                     ? Center(
                         child: Text(
-                          'No exercises recorded for this workout.',
+                          context.l10n.workoutNoExercises,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -223,7 +241,12 @@ class _ExerciseCard extends StatelessWidget {
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              'Best: ${WorkoutDetailBottomSheet.formatSetPerformance(bestSet)}',
+                              context.l10n.bestSetLabel(
+                                WorkoutDetailBottomSheet.formatSetPerformance(
+                                  bestSet,
+                                  context.l10n,
+                                ),
+                              ),
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: isDark
@@ -256,6 +279,7 @@ class _ExerciseCard extends StatelessWidget {
               final isWarmup = !set.isWorkingSet;
               final typeLabel = WorkoutDetailBottomSheet.formatSetTypeLabel(
                 set,
+                context.l10n,
               );
               final badgeColor = isWarmup
                   ? theme.colorScheme.surfaceContainerHighest
@@ -299,7 +323,10 @@ class _ExerciseCard extends StatelessWidget {
                       ),
                     const Spacer(),
                     Text(
-                      WorkoutDetailBottomSheet.formatSetPerformance(set),
+                      WorkoutDetailBottomSheet.formatSetPerformance(
+                        set,
+                        context.l10n,
+                      ),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: isWarmup
                             ? FontWeight.normal

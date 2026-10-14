@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/formatters/gain_target_formatter.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_state.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
 
@@ -61,9 +63,13 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
 
       if (next.successMessage != null &&
           next.successMessage != previous?.successMessage) {
+        final message =
+            next.successMessage == 'Weekly gain target saved successfully'
+            ? context.l10n.gainTargetSavedSuccess
+            : next.successMessage!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.successMessage!),
+            content: Text(message),
             backgroundColor: Colors.green.shade700,
           ),
         );
@@ -111,7 +117,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
               children: [
                 Expanded(
                   child: Text(
-                    'Weekly Gain Target',
+                    context.l10n.gainTargetTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -126,7 +132,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.refresh),
-                  tooltip: 'Refresh target',
+                  tooltip: context.l10n.gainTargetRefreshTooltip,
                   onPressed: state.isSubmitting
                       ? null
                       : () => ref
@@ -177,7 +183,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           FilledButton.icon(
             key: const Key('gain_target_retry_button'),
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: Text(context.l10n.retry),
             onPressed: () => ref
                 .read(gainTargetViewModelProvider.notifier)
                 .loadTarget(showLoading: true),
@@ -189,8 +195,8 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
 
   Widget _buildFormView(BuildContext context, GainTargetState state) {
     final summaryText = state.savedTarget != null
-        ? state.savedTarget!.displayText
-        : 'No target set';
+        ? '${GainTargetFormatter.formatRange(state.savedTarget!, context.l10n.localeName)} ${context.l10n.kgPerWeekUnit}'
+        : context.l10n.gainTargetNoTargetSet;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -212,7 +218,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Current target: ',
+                context.l10n.gainTargetCurrentLabel,
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -239,9 +245,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           enabled: !state.isSubmitting,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            labelText: 'Minimum weekly gain',
+            labelText: context.l10n.minWeeklyGainLabel,
             hintText: '0.15',
-            suffixText: 'kg/week',
+            suffixText: context.l10n.kgPerWeekUnit,
             errorText: state.minError,
             border: const OutlineInputBorder(),
           ),
@@ -256,9 +262,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           enabled: !state.isSubmitting,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            labelText: 'Maximum weekly gain',
+            labelText: context.l10n.maxWeeklyGainLabel,
             hintText: '0.25',
-            suffixText: 'kg/week',
+            suffixText: context.l10n.kgPerWeekUnit,
             errorText: state.effectiveMaxError,
             border: const OutlineInputBorder(),
           ),
@@ -273,21 +279,21 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
               ? null
               : () =>
                     ref.read(gainTargetViewModelProvider.notifier).saveTarget(),
-          child: const Text('Save Target'),
+          child: Text(context.l10n.saveTargetButton),
         ),
         if (state.isSubmitting) ...[
           const SizedBox(height: 12),
           Row(
             key: const Key('gain_target_pending_indicator'),
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              SizedBox(
+            children: [
+              const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              SizedBox(width: 8),
-              Text('Waiting for server confirmation'),
+              const SizedBox(width: 8),
+              Text(context.l10n.gainTargetWaitingConfirmation),
             ],
           ),
         ],

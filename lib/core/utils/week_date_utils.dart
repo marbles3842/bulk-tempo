@@ -1,30 +1,7 @@
+import 'package:intl/intl.dart';
+
 /// Timezone-safe calendar date and ISO Monday–Sunday week utilities.
 abstract final class WeekDateUtils {
-  static const List<String> _months = <String>[
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-
-  static const List<String> _weekdays = <String>[
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun',
-  ];
-
   static final RegExp _isoDateRegex = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$');
 
   /// Normalizes a [date] to midnight UTC (`DateTime.utc(y, m, d)`).
@@ -85,29 +62,32 @@ abstract final class WeekDateUtils {
   /// Uses an en-dash (`–`) separator between dates.
   static String formatWeekRange(
     DateTime weekStartMonday,
-    DateTime weekEndSunday,
-  ) {
-    final startMonth = _months[weekStartMonday.month - 1];
-    final endMonth = _months[weekEndSunday.month - 1];
+    DateTime weekEndSunday, [
+    String? locale,
+  ]) {
+    final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
+    final dateFormat = DateFormat.yMMMd(effectiveLocale);
 
     if (weekStartMonday.year == weekEndSunday.year) {
-      return '$startMonth ${weekStartMonday.day} – $endMonth ${weekEndSunday.day}, ${weekEndSunday.year}';
+      return '${DateFormat.MMMd(effectiveLocale).format(weekStartMonday)} – ${dateFormat.format(weekEndSunday)}';
     }
 
-    return '$startMonth ${weekStartMonday.day}, ${weekStartMonday.year} – $endMonth ${weekEndSunday.day}, ${weekEndSunday.year}';
+    return '${dateFormat.format(weekStartMonday)} – ${dateFormat.format(weekEndSunday)}';
   }
 
   /// Returns a compact week label for chart axes (e.g. `"Oct 5"`).
-  static String formatShortWeekLabel(DateTime weekStartMonday) {
-    final month = _months[weekStartMonday.month - 1];
-    return '$month ${weekStartMonday.day}';
+  static String formatShortWeekLabel(
+    DateTime weekStartMonday, [
+    String? locale,
+  ]) {
+    final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
+    return DateFormat.MMMd(effectiveLocale).format(weekStartMonday);
   }
 
   /// Formats a date with abbreviated weekday (e.g. `"Mon, Oct 5, 2026"`).
-  static String formatDayWithWeekday(DateTime date) {
-    final weekday = _weekdays[date.weekday - 1];
-    final month = _months[date.month - 1];
-    return '$weekday, $month ${date.day}, ${date.year}';
+  static String formatDayWithWeekday(DateTime date, [String? locale]) {
+    final effectiveLocale = locale ?? Intl.defaultLocale ?? 'en';
+    return DateFormat.yMMMEd(effectiveLocale).format(date);
   }
 
   /// Rounds a floating point [value] to two decimal places using standard half-up rounding.

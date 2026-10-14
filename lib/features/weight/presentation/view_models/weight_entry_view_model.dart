@@ -130,7 +130,7 @@ class WeightEntryViewModel extends AutoDisposeNotifier<WeightEntryFormState> {
     if (parsedWeight == null) {
       state = state.copyWith(
         status: FormStatus.failure,
-        weightError: 'Enter a valid weight with up to 2 decimal places',
+        weightError: WeightValidationError.invalidFormat,
       );
       return false;
     }

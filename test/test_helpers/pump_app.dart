@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:bulk_tempo/l10n/app_localizations.dart';
 
 extension PumpAppExtension on WidgetTester {
   Future<void> pumpApp(
     Widget widget, {
     List<Override> overrides = const [],
+    Locale locale = const Locale('en'),
   }) async {
     await pumpWidget(
       ProviderScope(
         overrides: overrides,
         child: MaterialApp(
-          locale: const Locale('en', 'GB'),
-          supportedLocales: const [Locale('en', 'GB'), Locale('en', 'US')],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          locale: locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: widget,
         ),
       ),

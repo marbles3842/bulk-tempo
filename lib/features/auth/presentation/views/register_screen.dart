@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/register_form_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/register_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/widgets/auth_button.dart';
@@ -88,7 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const Icon(Icons.fitness_center, size: 56),
                   const SizedBox(height: 16),
                   Text(
-                    'Create Account',
+                    context.l10n.registerTitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -96,7 +97,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start tracking your workouts today',
+                    context.l10n.registerSubtitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -106,8 +107,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   AuthTextField(
                     fieldKey: const Key('register_email_field'),
                     controller: _emailController,
-                    label: 'Email',
-                    hint: 'Enter your email',
+                    label: context.l10n.emailLabel,
+                    hint: context.l10n.emailHint,
                     errorText: formState.emailError,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
@@ -117,8 +118,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   AuthTextField(
                     fieldKey: const Key('register_password_field'),
                     controller: _passwordController,
-                    label: 'Password',
-                    hint: 'At least 6 characters',
+                    label: context.l10n.passwordLabel,
+                    hint: context.l10n.passwordHintRegister,
                     errorText: formState.passwordError,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
@@ -131,8 +132,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             : Icons.visibility_off_outlined,
                       ),
                       tooltip: _obscurePassword
-                          ? 'Show password'
-                          : 'Hide password',
+                          ? context.l10n.showPasswordTooltip
+                          : context.l10n.hidePasswordTooltip,
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
@@ -143,7 +144,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 24),
                   AuthButton(
                     key: const Key('register_submit_button'),
-                    text: 'Create Account',
+                    text: context.l10n.registerButton,
                     isLoading: formState.status == FormStatus.submitting,
                     onPressed: _submit,
                   ),
@@ -151,7 +152,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   TextButton(
                     key: const Key('register_to_login_button'),
                     onPressed: _goToLogin,
-                    child: const Text('Already have an account? Log in'),
+                    child: Text(context.l10n.alreadyHaveAccountButton),
                   ),
                 ],
               ),

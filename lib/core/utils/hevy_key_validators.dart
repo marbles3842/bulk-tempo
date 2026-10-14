@@ -1,3 +1,21 @@
+import 'package:bulk_tempo/l10n/app_localizations.dart';
+
+/// Validation error codes for Hevy API keys.
+enum HevyKeyValidationError {
+  empty,
+  invalidUuid;
+
+  /// Returns the localized error message using [l10n].
+  String toLocalizedMessage(AppLocalizations l10n) {
+    switch (this) {
+      case HevyKeyValidationError.empty:
+        return l10n.hevyKeyErrorEmpty;
+      case HevyKeyValidationError.invalidUuid:
+        return l10n.hevyKeyErrorInvalidUuid;
+    }
+  }
+}
+
 /// Validation and masking utilities for user-supplied Hevy API keys.
 abstract final class HevyKeyValidators {
   static final RegExp _uuidRegex = RegExp(
@@ -16,16 +34,16 @@ abstract final class HevyKeyValidators {
 
   /// Validates [rawInput] as a Hevy API key.
   ///
-  /// Returns `'Hevy API key is required'` when empty after trimming,
-  /// `'Enter a valid Hevy API key (UUID format)'` when not a valid UUID,
+  /// Returns [HevyKeyValidationError.empty] when empty after trimming,
+  /// [HevyKeyValidationError.invalidUuid] when not a valid UUID,
   /// or `null` when valid.
-  static String? validateKeyInput(String rawInput) {
+  static HevyKeyValidationError? validateKeyInput(String rawInput) {
     final normalized = normalizeKey(rawInput);
     if (normalized.isEmpty) {
-      return 'Hevy API key is required';
+      return HevyKeyValidationError.empty;
     }
     if (!isValidUuid(normalized)) {
-      return 'Enter a valid Hevy API key (UUID format)';
+      return HevyKeyValidationError.invalidUuid;
     }
     return null;
   }

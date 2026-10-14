@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
@@ -23,12 +24,12 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Log Out'),
-          content: const Text('Are you sure you want to log out?'),
+          title: Text(context.l10n.logoutDialogTitle),
+          content: Text(context.l10n.logoutDialogContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               key: const Key('confirm_logout_button'),
@@ -36,7 +37,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                 Navigator.of(dialogContext).pop();
                 ref.read(authViewModelProvider.notifier).signOut();
               },
-              child: const Text('Log Out'),
+              child: Text(context.l10n.logoutDialogConfirm),
             ),
           ],
         );
@@ -55,14 +56,14 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
               const Icon(Icons.account_circle_outlined, size: 72),
               const SizedBox(height: 16),
               Text(
-                'Welcome to Bulk Tempo',
+                context.l10n.homeWelcomeTitle,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                email ?? 'No email',
+                email ?? context.l10n.noEmail,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -71,21 +72,21 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
               FilledButton.icon(
                 key: const Key('home_go_to_weights_button'),
                 icon: const Icon(Icons.monitor_weight),
-                label: const Text('Go to Weights'),
+                label: Text(context.l10n.homeGoToWeights),
                 onPressed: () => setState(() => _selectedIndex = 1),
               ),
               const SizedBox(height: 16),
               FilledButton.tonalIcon(
                 key: const Key('home_go_to_workouts_button'),
                 icon: const Icon(Icons.fitness_center),
-                label: const Text('Go to Workouts'),
+                label: Text(context.l10n.homeGoToWorkouts),
                 onPressed: () => setState(() => _selectedIndex = 2),
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
                 key: const Key('home_logout_button'),
                 icon: const Icon(Icons.logout),
-                label: const Text('Log Out'),
+                label: Text(context.l10n.logoutButton),
                 onPressed: () => _showLogoutDialog(context),
               ),
             ],
@@ -98,6 +99,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
   Widget _buildProfileTab(BuildContext context, String? email) {
     final workoutState = ref.watch(workoutProgressViewModelProvider);
     final maskedApiKey = workoutState.maskedApiKey;
+    final currentLocale = ref.watch(localeProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -107,7 +109,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             const Icon(Icons.person_outline, size: 72),
             const SizedBox(height: 16),
             Text(
-              'Profile',
+              context.l10n.profileTitle,
               key: const Key('profile_heading'),
               style: Theme.of(
                 context,
@@ -115,7 +117,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              email ?? 'No email',
+              email ?? context.l10n.noEmail,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -146,7 +148,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Hevy Integration',
+                          context.l10n.hevyIntegrationTitle,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
@@ -154,7 +156,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Connection status:',
+                      context.l10n.connectionStatusLabel,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -171,7 +173,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                       )
                     else
                       Text(
-                        'Not connected',
+                        context.l10n.hevyNotConnected,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -187,8 +189,8 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                             onPressed: () => HevyKeyBottomSheet.show(context),
                             child: Text(
                               maskedApiKey != null
-                                  ? 'Update Key'
-                                  : 'Connect Hevy Key',
+                                  ? context.l10n.updateKeyButton
+                                  : context.l10n.connectHevyKeyButton,
                             ),
                           ),
                         ),
@@ -205,7 +207,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                                   )
                                   .disconnectApiKey();
                             },
-                            child: const Text('Disconnect'),
+                            child: Text(context.l10n.disconnectButton),
                           ),
                         ],
                       ],
@@ -214,12 +216,77 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            _buildLanguageCard(context, currentLocale),
             const SizedBox(height: 32),
             OutlinedButton.icon(
               key: const Key('profile_logout_button'),
               icon: const Icon(Icons.logout),
-              label: const Text('Log Out'),
+              label: Text(context.l10n.logoutButton),
               onPressed: () => _showLogoutDialog(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageCard(BuildContext context, Locale? currentLocale) {
+    return Card(
+      key: const Key('profile_language_card'),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.language,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.l10n.languageLabel,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<String>(
+                key: const Key('profile_language_selector'),
+                segments: [
+                  ButtonSegment<String>(
+                    value: LocaleConstants.system,
+                    label: Text(context.l10n.languageSystem),
+                  ),
+                  ButtonSegment<String>(
+                    value: LocaleConstants.english,
+                    label: Text(context.l10n.languageEnglish),
+                  ),
+                  ButtonSegment<String>(
+                    value: LocaleConstants.polish,
+                    label: Text(context.l10n.languagePolish),
+                  ),
+                ],
+                selected: {LocaleConstants.toSelectionCode(currentLocale)},
+                onSelectionChanged: (newSelection) {
+                  final selectedLocale = LocaleConstants.fromSelectionCode(
+                    newSelection.first,
+                  );
+                  ref.read(localeProvider.notifier).setLocale(selectedLocale);
+                },
+              ),
             ),
           ],
         ),
@@ -261,12 +328,12 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bulk Tempo'),
+        title: Text(context.l10n.appTitle),
         actions: [
           IconButton(
             key: const Key('home_app_bar_logout_button'),
             icon: const Icon(Icons.logout),
-            tooltip: 'Log Out',
+            tooltip: context.l10n.logoutButton,
             onPressed: () => _showLogoutDialog(context),
           ),
         ],
@@ -284,30 +351,30 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                 .ensureInitialized();
           }
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            key: Key('nav_home_tab'),
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            key: const Key('nav_home_tab'),
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: context.l10n.navHome,
           ),
           NavigationDestination(
-            key: Key('nav_weights_tab'),
-            icon: Icon(Icons.monitor_weight_outlined),
-            selectedIcon: Icon(Icons.monitor_weight),
-            label: 'Weights',
+            key: const Key('nav_weights_tab'),
+            icon: const Icon(Icons.monitor_weight_outlined),
+            selectedIcon: const Icon(Icons.monitor_weight),
+            label: context.l10n.navWeights,
           ),
           NavigationDestination(
-            key: Key('nav_workouts_tab'),
-            icon: Icon(Icons.fitness_center_outlined),
-            selectedIcon: Icon(Icons.fitness_center),
-            label: 'Workouts',
+            key: const Key('nav_workouts_tab'),
+            icon: const Icon(Icons.fitness_center_outlined),
+            selectedIcon: const Icon(Icons.fitness_center),
+            label: context.l10n.navWorkouts,
           ),
           NavigationDestination(
-            key: Key('nav_profile_tab'),
-            icon: Icon(Icons.person_outlined),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            key: const Key('nav_profile_tab'),
+            icon: const Icon(Icons.person_outlined),
+            selectedIcon: const Icon(Icons.person),
+            label: context.l10n.navProfile,
           ),
         ],
       ),

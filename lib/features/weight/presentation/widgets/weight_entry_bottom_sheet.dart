@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/core/utils/weight_validators.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
@@ -114,14 +115,13 @@ class _WeightEntryBottomSheetState
       builder: (dialogContext) {
         final existingWeightText = existingEntry != null
             ? '${existingEntry.weightKg.toStringAsFixed(2)} kg'
-            : 'an existing weight';
+            : dialogContext.l10n.overwriteDialogExistingWeightFallback;
 
         return AlertDialog(
           key: const Key('overwrite_weight_dialog'),
-          title: const Text('Overwrite Weight Entry?'),
+          title: Text(dialogContext.l10n.overwriteDialogTitle),
           content: Text(
-            'A weight of $existingWeightText is already recorded for this date. '
-            'Do you want to replace it?',
+            dialogContext.l10n.overwriteDialogContent(existingWeightText),
           ),
           actions: [
             TextButton(
@@ -131,7 +131,7 @@ class _WeightEntryBottomSheetState
                     .read(weightEntryViewModelProvider.notifier)
                     .cancelOverwriteConfirmation();
               },
-              child: const Text('Cancel'),
+              child: Text(dialogContext.l10n.cancel),
             ),
             FilledButton(
               key: const Key('confirm_overwrite_weight_button'),
@@ -141,7 +141,7 @@ class _WeightEntryBottomSheetState
                     .read(weightEntryViewModelProvider.notifier)
                     .submit(confirmOverwrite: true);
               },
-              child: const Text('Replace'),
+              child: Text(dialogContext.l10n.overwriteDialogConfirm),
             ),
           ],
         );
@@ -156,7 +156,10 @@ class _WeightEntryBottomSheetState
     final original = formState.originalEntry;
     if (original == null) return;
 
-    final formattedDate = WeekDateUtils.formatDayWithWeekday(original.date);
+    final formattedDate = WeekDateUtils.formatDayWithWeekday(
+      original.date,
+      Localizations.localeOf(context).languageCode,
+    );
     final weightText = '${original.weightKg.toStringAsFixed(2)} kg';
 
     showDialog<void>(
@@ -164,15 +167,15 @@ class _WeightEntryBottomSheetState
       builder: (dialogContext) {
         return AlertDialog(
           key: const Key('delete_confirmation_dialog'),
-          title: const Text('Delete Weight Entry?'),
+          title: Text(context.l10n.deleteWeightDialogTitle),
           content: Text(
-            'Permanently delete the measurement of $weightText recorded on $formattedDate?',
+            context.l10n.deleteWeightDialogContent(weightText, formattedDate),
           ),
           actions: [
             TextButton(
               key: const Key('cancel_delete_button'),
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               key: const Key('confirm_delete_button'),
@@ -183,7 +186,7 @@ class _WeightEntryBottomSheetState
                 Navigator.of(dialogContext).pop();
                 ref.read(weightEntryViewModelProvider.notifier).delete();
               },
-              child: const Text('Delete'),
+              child: Text(context.l10n.deleteWeightButton),
             ),
           ],
         );
@@ -197,20 +200,18 @@ class _WeightEntryBottomSheetState
       builder: (dialogContext) {
         return AlertDialog(
           key: const Key('discard_changes_dialog'),
-          title: const Text('Discard Changes?'),
-          content: const Text(
-            'You have unsaved changes. Do you want to discard them or keep editing?',
-          ),
+          title: Text(context.l10n.discardDialogTitle),
+          content: Text(context.l10n.discardDialogContent),
           actions: [
             TextButton(
               key: const Key('keep_editing_button'),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Keep Editing'),
+              child: Text(context.l10n.keepEditingButton),
             ),
             FilledButton(
               key: const Key('discard_changes_button'),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Discard'),
+              child: Text(context.l10n.discardButton),
             ),
           ],
         );
@@ -286,8 +287,8 @@ class _WeightEntryBottomSheetState
           });
           Navigator.of(context).pop();
           final message = next.outcome == WeightEntryOutcome.deleted
-              ? 'Weight entry deleted successfully'
-              : 'Weight entry saved successfully';
+              ? context.l10n.weightDeletedSuccess
+              : context.l10n.weightSavedSuccess;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               key: const Key('weight_entry_success_snackbar'),
@@ -370,15 +371,15 @@ class _WeightEntryBottomSheetState
                       children: [
                         Text(
                           formState.isEdit
-                              ? 'Edit Weight Entry'
-                              : 'Log Body Weight',
+                              ? context.l10n.editWeightTitle
+                              : context.l10n.logWeightTitle,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),
-                          tooltip: 'Close',
+                          tooltip: context.l10n.close,
                           onPressed: isSubmitting
                               ? null
                               : () => _handleDismissRequest(),
@@ -423,10 +424,12 @@ class _WeightEntryBottomSheetState
                       ),
                       enabled: !isSubmitting,
                       decoration: InputDecoration(
-                        labelText: 'Weight (kg)',
-                        hintText: 'e.g. 78.50',
+                        labelText: context.l10n.weightFieldLabel,
+                        hintText: context.l10n.weightFieldHint,
                         suffixText: 'kg',
-                        errorText: formState.weightError,
+                        errorText: formState.weightError?.toLocalizedMessage(
+                          context.l10n,
+                        ),
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.monitor_weight_outlined),
                       ),
@@ -443,6 +446,7 @@ class _WeightEntryBottomSheetState
                       label: Text(
                         WeekDateUtils.formatDayWithWeekday(
                           formState.selectedDate,
+                          Localizations.localeOf(context).languageCode,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -465,7 +469,7 @@ class _WeightEntryBottomSheetState
                       Padding(
                         padding: const EdgeInsets.only(left: 12, top: 4),
                         child: Text(
-                          formState.dateError!,
+                          formState.dateError!.toLocalizedMessage(context.l10n),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.error,
                           ),
@@ -494,7 +498,7 @@ class _WeightEntryBottomSheetState
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Save Weight'),
+                          : Text(context.l10n.saveWeightButton),
                     ),
                     if (formState.isEdit) ...[
                       const SizedBox(height: 12),
@@ -520,7 +524,7 @@ class _WeightEntryBottomSheetState
                                   color: theme.colorScheme.error,
                                 ),
                               )
-                            : const Text('Delete Entry'),
+                            : Text(context.l10n.deleteWeightEntryButton),
                       ),
                     ],
                   ],
