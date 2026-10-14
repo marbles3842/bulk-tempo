@@ -231,7 +231,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
     );
   }
 
-  Widget _buildLanguageCard(BuildContext context, Locale? currentLocale) {
+  Widget _buildLanguageCard(BuildContext context, Locale currentLocale) {
     return Card(
       key: const Key('profile_language_card'),
       elevation: 0,
@@ -266,10 +266,6 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
               child: SegmentedButton<String>(
                 key: const Key('profile_language_selector'),
                 segments: [
-                  ButtonSegment<String>(
-                    value: LocaleConstants.system,
-                    label: Text(context.l10n.languageSystem),
-                  ),
                   ButtonSegment<String>(
                     value: LocaleConstants.english,
                     label: Text(context.l10n.languageEnglish),

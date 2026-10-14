@@ -38,40 +38,39 @@ void main() {
       ),
     ).thenAnswer((_) async {});
 
-    when(
-      () => mockSecureStorage.delete(key: any(named: 'key')),
-    ).thenAnswer((_) async {});
-
     return ProviderContainer(
       overrides: [secureStorageProvider.overrideWithValue(mockSecureStorage)],
     );
   }
 
   group('LocaleNotifier', () {
-    test('initial state follows System when no locale is stored', () async {
-      final container = createContainer(initialStoredLocale: null);
-      addTearDown(container.dispose);
+    test(
+      'initial state defaults to English when no locale is stored',
+      () async {
+        final container = createContainer(initialStoredLocale: null);
+        addTearDown(container.dispose);
 
-      final notifier = container.read(localeProvider.notifier);
-      expect(container.read(localeProvider), isNull);
-      await notifier.loadPersistedLocale();
+        final notifier = container.read(localeProvider.notifier);
+        expect(container.read(localeProvider), const Locale('en'));
+        await notifier.loadPersistedLocale();
 
-      expect(container.read(localeProvider), isNull);
-      verify(
-        () => mockSecureStorage.read(key: LocaleNotifier.storageKey),
-      ).called(greaterThanOrEqualTo(1));
-    });
+        expect(container.read(localeProvider), const Locale('en'));
+        verify(
+          () => mockSecureStorage.read(key: LocaleNotifier.storageKey),
+        ).called(greaterThanOrEqualTo(1));
+      },
+    );
 
-    test('empty storage follows System', () async {
+    test('empty storage defaults to English', () async {
       final container = createContainer(initialStoredLocale: '');
       addTearDown(container.dispose);
 
       await container.read(localeProvider.notifier).loadPersistedLocale();
 
-      expect(container.read(localeProvider), isNull);
+      expect(container.read(localeProvider), const Locale('en'));
     });
 
-    test('stored English remains an explicit override', () async {
+    test('stored English remains English', () async {
       final container = createContainer(initialStoredLocale: 'en');
       addTearDown(container.dispose);
 
@@ -80,25 +79,8 @@ void main() {
       expect(container.read(localeProvider), const Locale('en'));
     });
 
-    test('selecting System clears the stored override', () async {
-      final container = createContainer(initialStoredLocale: 'en');
-      addTearDown(container.dispose);
-      final notifier = container.read(localeProvider.notifier);
-      await notifier.loadPersistedLocale();
-
-      final update = notifier.setLocale(null);
-      expect(container.read(localeProvider), isNull);
-      await update;
-
-      verify(
-        () => mockSecureStorage.delete(key: LocaleNotifier.storageKey),
-      ).called(1);
-      await notifier.setLocale(const Locale('en'));
-      expect(container.read(localeProvider), const Locale('en'));
-    });
-
     test(
-      'a delayed storage read cannot replace a manual selection or System',
+      'a delayed storage read cannot replace a newer manual selection',
       () async {
         final container = createContainer();
         addTearDown(container.dispose);
@@ -109,12 +91,11 @@ void main() {
         final notifier = container.read(localeProvider.notifier);
         final load = notifier.loadPersistedLocale();
 
-        await notifier.setLocale(const Locale('en'));
-        await notifier.setLocale(null);
-        storedLocale.complete('pl');
+        await notifier.setLocale(const Locale('pl'));
+        storedLocale.complete('en');
         await load;
 
-        expect(container.read(localeProvider), isNull);
+        expect(container.read(localeProvider), const Locale('pl'));
       },
     );
 
@@ -143,25 +124,17 @@ void main() {
           }
           persistedLocale = value;
         });
-        when(
-          () => mockSecureStorage.delete(key: LocaleNotifier.storageKey),
-        ).thenAnswer((_) async {
-          operations.add('system');
-          persistedLocale = null;
-        });
 
         final polish = notifier.setLocale(const Locale('pl'));
         await firstWriteStarted.future;
-        final system = notifier.setLocale(null);
-        expect(container.read(localeProvider), isNull);
         final english = notifier.setLocale(const Locale('en'));
         expect(container.read(localeProvider), const Locale('en'));
         expect(operations, ['pl']);
 
         firstWrite.complete();
-        await Future.wait([polish, system, english]);
+        await Future.wait([polish, english]);
 
-        expect(operations, ['pl', 'system', 'en']);
+        expect(operations, ['pl', 'en']);
         expect(persistedLocale, 'en');
       },
     );
@@ -231,7 +204,7 @@ void main() {
         final notifier = container.read(localeProvider.notifier);
         await notifier.loadPersistedLocale();
 
-        expect(container.read(localeProvider), isNull);
+        expect(container.read(localeProvider), const Locale('en'));
       },
     );
 

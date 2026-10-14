@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bulk_tempo/core/localization/locale_notifier.dart';
@@ -12,60 +12,45 @@ import 'test_helpers/fakes/fake_auth_repository.dart';
 import 'test_helpers/mocks.dart';
 
 void main() {
-  testWidgets(
-    'System follows device changes and differs from explicit English',
-    (tester) async {
-      tester.binding.platformDispatcher.localesTestValue = [const Locale('pl')];
-      addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
-      final storage = MockFlutterSecureStorage();
-      when(
-        () => storage.read(key: LocaleNotifier.storageKey),
-      ).thenAnswer((_) async => null);
-      when(
-        () => storage.write(
-          key: any(named: 'key'),
-          value: any(named: 'value'),
-        ),
-      ).thenAnswer((_) async {});
-      when(
-        () => storage.delete(key: LocaleNotifier.storageKey),
-      ).thenAnswer((_) async {});
-      final repository = FakeAuthRepository();
-      addTearDown(repository.dispose);
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(repository),
-            secureStorageProvider.overrideWithValue(storage),
-          ],
-          child: const BulkTempoApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(BulkTempoApp)),
-      );
-      final notifier = container.read(localeProvider.notifier);
-      expect(container.read(localeProvider), isNull);
-      expect(find.text('Witaj ponownie'), findsOneWidget);
+  testWidgets('BulkTempoApp defaults to English and reacts to locale changes', (
+    tester,
+  ) async {
+    final storage = MockFlutterSecureStorage();
+    when(
+      () => storage.read(key: LocaleNotifier.storageKey),
+    ).thenAnswer((_) async => null);
+    when(
+      () => storage.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((_) async {});
+    final repository = FakeAuthRepository();
+    addTearDown(repository.dispose);
 
-      await notifier.setLocale(const Locale('en'));
-      await tester.pumpAndSettle();
-      expect(find.text('Welcome Back'), findsOneWidget);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(repository),
+          secureStorageProvider.overrideWithValue(storage),
+        ],
+        child: const BulkTempoApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await notifier.setLocale(null);
-      await tester.pumpAndSettle();
-      expect(find.text('Witaj ponownie'), findsOneWidget);
-      expect(
-        tester.widget<MaterialApp>(find.byType(MaterialApp)).locale,
-        isNull,
-      );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(BulkTempoApp)),
+    );
+    expect(container.read(localeProvider), const Locale('en'));
+    expect(find.text('Welcome Back'), findsOneWidget);
 
-      tester.binding.platformDispatcher.localesTestValue = [const Locale('en')];
-      await tester.pumpAndSettle();
-      expect(find.text('Welcome Back'), findsOneWidget);
-    },
-  );
+    await container.read(localeProvider.notifier).setLocale(const Locale('pl'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(localeProvider), const Locale('pl'));
+    expect(find.text('Witaj ponownie'), findsOneWidget);
+  });
 
   testWidgets(
     'BulkTempoApp mounts and navigates to LoginScreen when unauthenticated',
