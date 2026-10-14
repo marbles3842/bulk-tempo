@@ -508,26 +508,26 @@ Build `DashboardView` and its KPI row and three `fl_chart` chart cards (`WeeklyW
 
 #### Automated
 
-- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
-- [x] 2.2 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/`
-- [x] 2.3 Static analysis passes with zero issues: `flutter analyze`
+- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs` — e0755ce
+- [x] 2.2 Existing weight and gain-target ViewModel unit tests continue to pass: `flutter test test/features/weight/presentation/view_models/ test/features/gain_target/presentation/view_models/` — e0755ce
+- [x] 2.3 Static analysis passes with zero issues: `flutter analyze` — e0755ce
 
 #### Manual
 
-- [x] 2.4 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers.
+- [x] 2.4 Verify `DashboardViewModel` and `DashboardState` contain zero `package:flutter/material.dart` imports and derive state purely from the watched providers. — e0755ce
 
 ### Phase 3: Home Tab `fl_chart` UI, Wiring & Test Migration
 
 #### Automated
 
-- [ ] 3.1 Localization generation succeeds: `flutter gen-l10n`
-- [ ] 3.2 Polish rendering tests pass: `flutter test test/features/localization/polish_rendering_test.dart`
-- [ ] 3.3 Full test suite passes: `flutter test`
-- [ ] 3.4 Static analysis passes with zero issues: `flutter analyze`
-- [ ] 3.5 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 Localization generation succeeds: `flutter gen-l10n`
+- [x] 3.2 Polish rendering tests pass: `flutter test test/features/localization/polish_rendering_test.dart`
+- [x] 3.3 Full test suite passes: `flutter test`
+- [x] 3.4 Static analysis passes with zero issues: `flutter analyze`
+- [x] 3.5 Code formatting passes cleanly: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 
-- [ ] 3.6 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend, Weekly Pace, and Workouts per Week cards in both English and Polish.
-- [ ] 3.7 With weights logged across $\ge 2$ weeks and a saved weekly gain target on Profile, verify the Weekly Weight Trend `LineChart` and Weekly Pace `BarChart` (with shaded target band) render on Home, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
-- [ ] 3.8 Verify that when Hevy is disconnected, the Weight Trend and Weekly Pace charts still render normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.
+- [x] 3.6 Launch the app (`flutter run -d chrome` or mobile target), sign in, and confirm the Home tab has no welcome text, email, or navigation/logout buttons, and renders the 4 KPI stat tiles plus the Weight Trend, Weekly Pace, and Workouts per Week cards in both English and Polish.
+- [x] 3.7 With weights logged across $\ge 2$ weeks and a saved weekly gain target on Profile, verify the Weekly Weight Trend `LineChart` and Weekly Pace `BarChart` (with shaded target band) render on Home, and that logging a weight in the current partial week shows `'This week · X/7 days logged'`.
+- [x] 3.8 Verify that when Hevy is disconnected, the Weight Trend and Weekly Pace charts still render normally while the Workouts per Week card displays `'Hevy not connected — connect in Profile'`, and pulling down on Home refreshes all cards.

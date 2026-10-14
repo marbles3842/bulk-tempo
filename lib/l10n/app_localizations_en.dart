@@ -484,4 +484,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monthDec => 'Dec';
+
+  @override
+  String get dashboardOutdatedBadge => 'Outdated · last refresh failed';
+
+  @override
+  String get dashboardKpiPaceTitle => 'Current Pace';
+
+  @override
+  String get dashboardKpiPaceSubtitleEmpty => 'Log 2+ weeks';
+
+  @override
+  String get dashboardKpiAverageTitle => 'Latest Average';
+
+  @override
+  String dashboardKpiAverageSubtitleIncomplete(int loggedDays) {
+    return 'This week · $loggedDays/7 days logged';
+  }
+
+  @override
+  String get dashboardKpiAverageSubtitleComplete =>
+      'This week · 7/7 days logged';
+
+  @override
+  String get dashboardKpiTotalGainTitle => 'Total Gain';
+
+  @override
+  String get dashboardKpiWorkoutsTitle => 'Workouts This Week';
+
+  @override
+  String get dashboardKpiWorkoutsThisWeek => 'This week';
+
+  @override
+  String get dashboardKpiWorkoutsNotConnected => 'Not connected';
+
+  @override
+  String get dashboardKpiWorkoutsSyncError => 'Sync error';
+
+  @override
+  String get dashboardWeightTrendTitle => 'Weekly Weight Trend';
+
+  @override
+  String get dashboardWeightEmpty =>
+      'No weights logged yet — add one on the Weights tab';
+
+  @override
+  String get dashboardPaceTitle => 'Weekly Pace';
+
+  @override
+  String get dashboardPaceEmpty =>
+      'No weights logged yet — add one on the Weights tab';
+
+  @override
+  String get dashboardPaceNeedTwoWeeks =>
+      'Log weights in at least 2 weeks to see weekly pace';
+
+  @override
+  String dashboardPaceTargetSubtitle(String target) {
+    return 'Target: $target';
+  }
+
+  @override
+  String get dashboardWorkoutsTitle => 'Workouts per Week';
+
+  @override
+  String get dashboardWorkoutsUnconfigured =>
+      'Hevy not connected — connect in Profile';
+
+  @override
+  String dashboardWorkoutsTooltip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count workouts',
+      one: '1 workout',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dashboardPaceMetric(String sign, String value, String unit) {
+    return '$sign$value $unit';
+  }
+
+  @override
+  String dashboardWeightMetric(String value) {
+    return '$value kg';
+  }
+
+  @override
+  String dashboardGainMetric(String sign, String value) {
+    return '$sign$value kg';
+  }
 }

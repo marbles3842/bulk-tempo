@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/login_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/register_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/splash_screen.dart';
@@ -150,6 +151,37 @@ void main() {
       expect(find.text('Minimalny tygodniowy przyrost'), findsOneWidget);
       expect(find.text('Maksymalny tygodniowy przyrost'), findsOneWidget);
       expect(find.text('Zapisz cel'), findsOneWidget);
+    });
+
+    testWidgets('renders home dashboard view in Polish', (tester) async {
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        locale: const Locale('pl'),
+        overrides: [
+          authRepositoryProvider.overrideWithValue(authRepository),
+          weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
+          workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
+          gainTargetRepositoryProvider.overrideWithValue(
+            fakeGainTargetRepository,
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Bieżące tempo'), findsOneWidget);
+      expect(find.text('Ostatnia średnia'), findsOneWidget);
+      expect(find.text('Łączny przyrost'), findsOneWidget);
+      expect(find.text('Treningi w tym tygodniu'), findsOneWidget);
+      expect(find.text('Tygodniowy trend wagi'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Tygodniowe tempo'), 100);
+      expect(find.text('Tygodniowe tempo'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Liczba treningów na tydzień'),
+        100,
+      );
+      expect(find.text('Liczba treningów na tydzień'), findsOneWidget);
     });
   });
 }

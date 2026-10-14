@@ -13,7 +13,14 @@ import 'package:bulk_tempo/features/auth/presentation/views/login_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/register_screen.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/splash_screen.dart';
 
+import 'package:bulk_tempo/features/gain_target/data/repositories/gain_target_repository_impl.dart';
+import 'package:bulk_tempo/features/weight/data/repositories/weight_repository_impl.dart';
+import 'package:bulk_tempo/features/workout/data/repositories/workout_repository_impl.dart';
+
 import '../../test_helpers/fakes/fake_auth_repository.dart';
+import '../../test_helpers/fakes/fake_gain_target_repository.dart';
+import '../../test_helpers/fakes/fake_weight_repository.dart';
+import '../../test_helpers/fakes/fake_workout_repository.dart';
 
 class FakeAuthViewModel extends AuthViewModel {
   final AuthState initialState;
@@ -26,13 +33,22 @@ class FakeAuthViewModel extends AuthViewModel {
 void main() {
   group('AppRouter redirect guards', () {
     late FakeAuthRepository fakeRepo;
+    late FakeWeightRepository fakeWeightRepo;
+    late FakeWorkoutRepository fakeWorkoutRepo;
+    late FakeGainTargetRepository fakeGainTargetRepo;
 
     setUp(() {
       fakeRepo = FakeAuthRepository();
+      fakeWeightRepo = FakeWeightRepository();
+      fakeWorkoutRepo = FakeWorkoutRepository();
+      fakeGainTargetRepo = FakeGainTargetRepository();
     });
 
     tearDown(() {
       fakeRepo.dispose();
+      fakeWeightRepo.reset();
+      fakeWorkoutRepo.reset();
+      fakeGainTargetRepo.reset();
     });
 
     testWidgets(
@@ -134,6 +150,11 @@ void main() {
           ProviderScope(
             overrides: [
               authRepositoryProvider.overrideWithValue(authenticatedRepo),
+              weightRepositoryProvider.overrideWithValue(fakeWeightRepo),
+              workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepo),
+              gainTargetRepositoryProvider.overrideWithValue(
+                fakeGainTargetRepo,
+              ),
             ],
             child: Consumer(
               builder: (context, ref, _) {
@@ -172,7 +193,14 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
+            overrides: [
+              authRepositoryProvider.overrideWithValue(fakeRepo),
+              weightRepositoryProvider.overrideWithValue(fakeWeightRepo),
+              workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepo),
+              gainTargetRepositoryProvider.overrideWithValue(
+                fakeGainTargetRepo,
+              ),
+            ],
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
@@ -221,6 +249,11 @@ void main() {
           ProviderScope(
             overrides: [
               authRepositoryProvider.overrideWithValue(authenticatedRepo),
+              weightRepositoryProvider.overrideWithValue(fakeWeightRepo),
+              workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepo),
+              gainTargetRepositoryProvider.overrideWithValue(
+                fakeGainTargetRepo,
+              ),
             ],
             child: Consumer(
               builder: (context, ref, _) {
