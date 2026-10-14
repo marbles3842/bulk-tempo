@@ -217,83 +217,76 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            Card(
-              key: const Key('profile_language_card'),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.language,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          context.l10n.languageLabel,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: SegmentedButton<String>(
-                        key: const Key('profile_language_selector'),
-                        segments: [
-                          ButtonSegment<String>(
-                            value: 'system',
-                            label: Text(context.l10n.languageSystem),
-                          ),
-                          ButtonSegment<String>(
-                            value: 'en',
-                            label: Text(context.l10n.languageEnglish),
-                          ),
-                          ButtonSegment<String>(
-                            value: 'pl',
-                            label: Text(context.l10n.languagePolish),
-                          ),
-                        ],
-                        selected: {
-                          currentLocale == null
-                              ? 'system'
-                              : currentLocale.languageCode == 'pl'
-                              ? 'pl'
-                              : 'en',
-                        },
-                        onSelectionChanged: (newSelection) {
-                          final selectedCode = newSelection.first;
-                          ref
-                              .read(localeProvider.notifier)
-                              .setLocale(
-                                selectedCode == 'system'
-                                    ? null
-                                    : Locale(selectedCode),
-                              );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildLanguageCard(context, currentLocale),
             const SizedBox(height: 32),
             OutlinedButton.icon(
               key: const Key('profile_logout_button'),
               icon: const Icon(Icons.logout),
               label: Text(context.l10n.logoutButton),
               onPressed: () => _showLogoutDialog(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageCard(BuildContext context, Locale? currentLocale) {
+    return Card(
+      key: const Key('profile_language_card'),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.language,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.l10n.languageLabel,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<String>(
+                key: const Key('profile_language_selector'),
+                segments: [
+                  ButtonSegment<String>(
+                    value: LocaleConstants.system,
+                    label: Text(context.l10n.languageSystem),
+                  ),
+                  ButtonSegment<String>(
+                    value: LocaleConstants.english,
+                    label: Text(context.l10n.languageEnglish),
+                  ),
+                  ButtonSegment<String>(
+                    value: LocaleConstants.polish,
+                    label: Text(context.l10n.languagePolish),
+                  ),
+                ],
+                selected: {LocaleConstants.toSelectionCode(currentLocale)},
+                onSelectionChanged: (newSelection) {
+                  final selectedLocale = LocaleConstants.fromSelectionCode(
+                    newSelection.first,
+                  );
+                  ref.read(localeProvider.notifier).setLocale(selectedLocale);
+                },
+              ),
             ),
           ],
         ),

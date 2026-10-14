@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bulk_tempo/core/constants/locale_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,8 +21,8 @@ class LocaleNotifier extends Notifier<Locale?> {
 
   @override
   Locale? build() {
-    initializeDateFormatting('en', null);
-    initializeDateFormatting('pl', null);
+    initializeDateFormatting(LocaleConstants.english, null);
+    initializeDateFormatting(LocaleConstants.polish, null);
     Intl.defaultLocale = null;
     loadPersistedLocale();
     return null;

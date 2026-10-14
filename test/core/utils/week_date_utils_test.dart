@@ -1,11 +1,12 @@
+import 'package:bulk_tempo/core/constants/locale_constants.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   setUpAll(() async {
-    await initializeDateFormatting('en', null);
-    await initializeDateFormatting('pl', null);
+    await initializeDateFormatting(LocaleConstants.english, null);
+    await initializeDateFormatting(LocaleConstants.polish, null);
   });
 
   group('WeekDateUtils.normalizeDateUtc', () {
