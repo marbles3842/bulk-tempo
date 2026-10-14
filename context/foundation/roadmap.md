@@ -3,7 +3,7 @@ project: Bulk Tempo
 version: 1
 status: draft
 created: 2026-10-07
-updated: 2026-10-11
+updated: 2026-10-12
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -48,7 +48,7 @@ Osoba budująca beztłuszczową masę dziś przenosi pomiary do arkusza i osobno
 | S-03 | correct-weight-entry | użytkownik może poprawić lub usunąć własny błędny pomiar | S-02 | FR-003, FR-004 | done |
 | S-04 | set-gain-target | użytkownik może ustawić i odczytać własny docelowy zakres przyrostu | F-01, S-01 | FR-007, FR-012 | in-progress |
 | S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | in-progress |
-| S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | proposed |
+| S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | in-progress |
 | S-07 | contextual-pace-assessment | użytkownik może zobaczyć ocenę tempa względem celu, wcześniejszych tygodni i treningów | S-04, S-06 | FR-008, FR-009, US-01, §Business Logic, §Non-Functional Requirements | blocked |
 
 ## Baseline
@@ -166,7 +166,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Ten widok powinien oznaczać niepełne lub nieaktualne dane, aby liczby nie wyglądały na pewne mimo przerwanego importu.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-07: Ocena tempa w kontekście masy i treningu
 
