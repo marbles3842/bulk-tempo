@@ -886,5 +886,42 @@ void main() {
         expect(selectorEn.selected, {'en'});
       },
     );
+
+    testWidgets(
+      'Home tab shows error state on pace card when initial gain target fails and recovers on retry',
+      (tester) async {
+        fakeGainTargetRepository.getFailure = const NetworkFailure(
+          'Failed to load target',
+        );
+        fakeWeightRepository.seedEntries(testUser.id, [
+          createEntry('2026-10-06', 80.0),
+          createEntry('2026-10-13', 80.5),
+        ]);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: buildOverrides(),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.drag(
+          find.byKey(const Key('dashboard_scroll_view')),
+          const Offset(0, -300),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Failed to load target'), findsOneWidget);
+        expect(
+          find.byKey(const Key('dashboard_pace_retry_button')),
+          findsOneWidget,
+        );
+
+        // Clear failure and tap retry
+        fakeGainTargetRepository.getFailure = null;
+        await tester.tap(find.byKey(const Key('dashboard_pace_retry_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Failed to load target'), findsNothing);
+      },
+    );
   });
 }

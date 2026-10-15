@@ -15,11 +15,13 @@ abstract class DashboardState with _$DashboardState {
   const factory DashboardState({
     required DashboardCardStatus weightStatus,
     required DashboardCardStatus workoutStatus,
+    @Default(DashboardCardStatus.loaded) DashboardCardStatus gainTargetStatus,
     @Default(false) bool isWeightOutdated,
     @Default(false) bool isWorkoutOutdated,
     @Default(false) bool isGainTargetOutdated,
     String? weightErrorMessage,
     String? workoutErrorMessage,
+    String? gainTargetErrorMessage,
     GainTargetEntity? gainTarget,
     required WeeklyProgressOverviewEntity overview,
     @Default(false) bool hasAnyWorkoutInWindow,

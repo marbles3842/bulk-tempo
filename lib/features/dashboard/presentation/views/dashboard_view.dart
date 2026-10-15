@@ -57,7 +57,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           WeeklyPaceChartCard(
             state: state,
             onRetry: () =>
-                ref.read(dashboardViewModelProvider.notifier).retryWeights(),
+                ref.read(dashboardViewModelProvider.notifier).retryPace(),
           ),
           WeeklyWorkoutsChartCard(
             state: state,

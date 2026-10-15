@@ -38,9 +38,9 @@ class WorkoutProgressViewModel extends Notifier<WorkoutProgressState> {
 
   /// Triggers [loadWorkouts] only when the ViewModel is still in
   /// [WorkoutProgressInitial], preserving session-cached state across tab switches.
-  Future<void> ensureInitialized() async {
+  Future<void> ensureInitialized({DateTime? now}) async {
     if (state is WorkoutProgressInitial) {
-      await loadWorkouts();
+      await loadWorkouts(now: now);
     }
   }
 
@@ -50,7 +50,7 @@ class WorkoutProgressViewModel extends Notifier<WorkoutProgressState> {
   /// When [showLoading] is `false` and state is already [WorkoutProgressLoaded],
   /// failures are surfaced non-destructively via
   /// [WorkoutProgressLoaded.refreshErrorMessage] while preserving loaded data.
-  Future<void> loadWorkouts({bool showLoading = true}) async {
+  Future<void> loadWorkouts({bool showLoading = true, DateTime? now}) async {
     final authState = ref.read(authViewModelProvider);
     final user = authState.user;
 
@@ -118,6 +118,7 @@ class WorkoutProgressViewModel extends Notifier<WorkoutProgressState> {
 
     final workoutsResult = await repository.getWorkoutsForLastWeeks(
       userId: requestUserId,
+      now: now,
     );
 
     if (_disposed) return;

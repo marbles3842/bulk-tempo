@@ -82,6 +82,18 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
 
     final isGainTargetOutdated = gainTargetState.refreshErrorMessage != null;
 
+    final DashboardCardStatus gainTargetStatus = switch (gainTargetState) {
+      _ when gainTargetState.isLoading && !gainTargetState.hasLoadedOnce =>
+        DashboardCardStatus.loading,
+      _
+          when gainTargetState.errorMessage != null &&
+              !gainTargetState.hasLoadedOnce =>
+        DashboardCardStatus.error,
+      _ => DashboardCardStatus.loaded,
+    };
+
+    final String? gainTargetErrorMessage = gainTargetState.errorMessage;
+
     final String? weightErrorMessage = switch (weightState) {
       WeightHistoryError(:final message) => message,
       WeightHistoryLoaded(:final refreshErrorMessage) => refreshErrorMessage,
@@ -101,11 +113,13 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
     return DashboardState(
       weightStatus: weightStatus,
       workoutStatus: workoutStatus,
+      gainTargetStatus: gainTargetStatus,
       isWeightOutdated: isWeightOutdated,
       isWorkoutOutdated: isWorkoutOutdated,
       isGainTargetOutdated: isGainTargetOutdated,
       weightErrorMessage: weightErrorMessage,
       workoutErrorMessage: workoutErrorMessage,
+      gainTargetErrorMessage: gainTargetErrorMessage,
       gainTarget: gainTargetState.savedTarget,
       overview: overview,
       hasAnyWorkoutInWindow: hasAnyWorkoutInWindow,
@@ -116,24 +130,26 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
   Future<void> ensureInitialized() async {
     final user = ref.read(authViewModelProvider).user;
     if (user == null) return;
+    final now = ref.read(clockProvider)();
     final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
     final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
     final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
     await Future.wait([
       weightNotifier.ensureInitialized(),
-      workoutNotifier.ensureInitialized(),
+      workoutNotifier.ensureInitialized(now: now),
       gainTargetNotifier.ensureInitialized(),
     ]);
   }
 
   /// Pull-to-refresh coordination across all three data sources without resetting state to full-screen loaders.
   Future<void> refreshAll() async {
+    final now = ref.read(clockProvider)();
     final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
     final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
     final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
     await Future.wait([
       weightNotifier.loadEntries(showLoading: false),
-      workoutNotifier.loadWorkouts(showLoading: false),
+      workoutNotifier.loadWorkouts(showLoading: false, now: now),
       gainTargetNotifier.loadTarget(showLoading: false, isRefresh: true),
     ]);
   }
@@ -145,6 +161,19 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
 
   /// Retries loading workout progress history.
   Future<void> retryWorkouts() async {
-    await ref.read(workoutProgressViewModelProvider.notifier).loadWorkouts();
+    final now = ref.read(clockProvider)();
+    await ref
+        .read(workoutProgressViewModelProvider.notifier)
+        .loadWorkouts(now: now);
+  }
+
+  /// Retries loading data needed for the weekly pace card (weight history and gain target).
+  Future<void> retryPace() async {
+    final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
+    final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
+    await Future.wait([
+      weightNotifier.loadEntries(),
+      gainTargetNotifier.loadTarget(),
+    ]);
   }
 }

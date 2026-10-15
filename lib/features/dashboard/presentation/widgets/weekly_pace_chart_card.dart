@@ -42,10 +42,22 @@ class WeeklyPaceChartCard extends StatelessWidget {
     final high = bounds.reduce(math.max);
     final padding = math.max((high - low) * 0.15, 0.1);
     final color = Theme.of(context).colorScheme.primary;
-    final status =
-        state.weightStatus == DashboardCardStatus.loaded && values.isEmpty
-        ? DashboardCardStatus.empty
-        : state.weightStatus;
+    final DashboardCardStatus status;
+    if (state.weightStatus == DashboardCardStatus.loading ||
+        state.gainTargetStatus == DashboardCardStatus.loading) {
+      status = DashboardCardStatus.loading;
+    } else if (state.weightStatus == DashboardCardStatus.error ||
+        state.gainTargetStatus == DashboardCardStatus.error) {
+      status = DashboardCardStatus.error;
+    } else if (state.weightStatus == DashboardCardStatus.loaded &&
+        values.isEmpty) {
+      status = DashboardCardStatus.empty;
+    } else {
+      status = state.weightStatus;
+    }
+
+    final errorMessage =
+        state.weightErrorMessage ?? state.gainTargetErrorMessage;
 
     return DashboardCardShell(
       cardKey: const Key('dashboard_weekly_pace_card'),
@@ -59,8 +71,9 @@ class WeeklyPaceChartCard extends StatelessWidget {
       status: status,
       isOutdated: state.isWeightOutdated || state.isGainTargetOutdated,
       outdatedBadgeKey: const Key('weekly_pace_outdated_badge'),
-      errorMessage: state.weightErrorMessage,
+      errorMessage: errorMessage,
       onRetry: onRetry,
+      retryButtonKey: const Key('dashboard_pace_retry_button'),
       emptyMessage: state.overview.loggedWeightWeeksCount == 0
           ? context.l10n.dashboardPaceEmpty
           : context.l10n.dashboardPaceNeedTwoWeeks,
