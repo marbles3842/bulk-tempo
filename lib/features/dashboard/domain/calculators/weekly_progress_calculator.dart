@@ -116,9 +116,16 @@ abstract final class WeeklyProgressCalculator {
   }) {
     final latestWeight = sortedWeights.isEmpty ? null : sortedWeights.last;
     final earliestWeight = sortedWeights.isEmpty ? null : sortedWeights.first;
+    final currentWeekIso = calendarWeeks.last.weekStartIso;
+    final latestWeekIso = latestWeight?.weekStartIso;
+    final isCurrentWeek =
+        latestWeight != null && latestWeekIso == currentWeekIso;
+    final isLatestWeekRecent =
+        isCurrentWeek ||
+        latestWeekIso == calendarWeeks[calendarWeeks.length - 2].weekStartIso;
 
     final hasAtLeastTwoWeeks = sortedWeights.length >= 2;
-    final currentPace = hasAtLeastTwoWeeks
+    final currentPace = hasAtLeastTwoWeeks && isLatestWeekRecent
         ? paceByWeekIso[latestWeight!.weekStartIso]
         : null;
     final totalGain = hasAtLeastTwoWeeks
@@ -127,10 +134,6 @@ abstract final class WeeklyProgressCalculator {
           )
         : null;
 
-    final currentWeekIso = calendarWeeks.last.weekStartIso;
-    final latestWeekIso = latestWeight?.weekStartIso;
-    final isCurrentWeek =
-        latestWeight != null && latestWeekIso == currentWeekIso;
     final loggedDays = latestWeight?.loggedDaysCount ?? 0;
 
     return WeeklyProgressOverviewEntity(

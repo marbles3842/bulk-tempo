@@ -57,7 +57,7 @@ class WeeklyPaceChartCard extends StatelessWidget {
             ),
       subtitleKey: const Key('dashboard_pace_target_subtitle'),
       status: status,
-      isOutdated: state.isWeightOutdated,
+      isOutdated: state.isWeightOutdated || state.isGainTargetOutdated,
       outdatedBadgeKey: const Key('weekly_pace_outdated_badge'),
       errorMessage: state.weightErrorMessage,
       onRetry: onRetry,

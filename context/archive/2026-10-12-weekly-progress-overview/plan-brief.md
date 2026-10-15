@@ -1,6 +1,6 @@
 # Weekly Progress Overview — Plan Brief
 
-> Full plan: `context/changes/weekly-progress-overview/plan.md`
+> Full plan: `context/archive/2026-10-12-weekly-progress-overview/plan.md`
 
 ## What & Why
 

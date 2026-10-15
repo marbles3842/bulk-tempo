@@ -228,6 +228,45 @@ void main() {
       },
     );
 
+    for (final latestWeekIso in [
+      '2026-10-05', // Previous week: still current enough for the KPI.
+      '2026-09-28', // Two weeks ago: historical pace only.
+      '2026-07-20', // Outside the chart window.
+      '2026-10-19', // Future data must not become current pace.
+    ]) {
+      test('current pace recency for latest week $latestWeekIso', () {
+        final latestMonday = WeekDateUtils.tryParseIsoDate(latestWeekIso)!;
+        final overview = WeeklyProgressCalculator.calculate(
+          allWeightSummaries: [
+            _createWeightSummary(
+              weekStartIso: WeekDateUtils.toIsoDateString(
+                latestMonday.subtract(const Duration(days: 7)),
+              ),
+              averageWeightKg: 80.0,
+            ),
+            _createWeightSummary(
+              weekStartIso: latestWeekIso,
+              averageWeightKg: 80.2,
+            ),
+          ],
+          workoutSummaries: const [],
+          now: refNow,
+        );
+
+        expect(
+          overview.currentPaceKgPerWeek,
+          latestWeekIso == '2026-10-05' ? equals(0.2) : isNull,
+        );
+        expect(overview.totalGainKg, equals(0.2));
+        expect(overview.latestAverageWeightKg, equals(80.2));
+        for (final slot in overview.calendarWeeks) {
+          if (slot.weekStartIso == latestWeekIso) {
+            expect(slot.paceKgPerWeek, equals(0.2));
+          }
+        }
+      });
+    }
+
     test('negative pace and negative total gain are preserved with sign', () {
       final w1 = _createWeightSummary(
         weekStartIso: '2026-10-05',

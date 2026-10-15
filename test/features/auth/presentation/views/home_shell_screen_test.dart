@@ -10,6 +10,8 @@ import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dar
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/home_shell_screen.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/views/dashboard_view.dart';
+import 'package:bulk_tempo/features/gain_target/domain/models/gain_target_entity.dart';
+import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
 import 'package:bulk_tempo/features/gain_target/data/repositories/gain_target_repository_impl.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/views/gain_target_view.dart';
 import 'package:bulk_tempo/features/weight/data/repositories/weight_repository_impl.dart';
@@ -225,7 +227,7 @@ void main() {
   });
 
   testWidgets(
-    'Home tab renders seeded LineChart and BarChart with target band',
+    'Home tab marks cached target band outdated after a failed target refresh',
     (tester) async {
       fakeWeightRepository.seedEntries(testUser.id, [
         createEntry('2026-10-06', 80.0),
@@ -233,6 +235,10 @@ void main() {
       ]);
       fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
       fakeWorkoutRepository.seedWorkouts(testUser.id, [createSampleWorkout()]);
+      fakeGainTargetRepository.seedTarget(
+        testUser.id,
+        const GainTargetEntity(minWeeklyGainKg: 0.1, maxWeeklyGainKg: 0.3),
+      );
       await tester.pumpApp(
         const HomeShellScreen(),
         overrides: buildOverrides(),
@@ -244,6 +250,36 @@ void main() {
 
       await tester.scrollUntilVisible(find.byType(BarChart), 100);
       expect(find.byType(BarChart), findsAtLeastNWidgets(1));
+      final targetSubtitle = find.byKey(
+        const Key('dashboard_pace_target_subtitle'),
+      );
+      expect(targetSubtitle, findsOneWidget);
+      final subtitleBeforeRefresh = tester.widget<Text>(targetSubtitle).data;
+      expect(find.byKey(const Key('weekly_pace_outdated_badge')), findsNothing);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DashboardView)),
+      );
+      fakeGainTargetRepository.getFailure = const NetworkFailure('Offline');
+      await container
+          .read(gainTargetViewModelProvider.notifier)
+          .loadTarget(showLoading: false, isRefresh: true);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('weekly_pace_outdated_badge')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('weight_trend_outdated_badge')),
+        findsNothing,
+      );
+      expect(tester.widget<Text>(targetSubtitle).data, subtitleBeforeRefresh);
+      final paceChart = tester.widget<BarChart>(find.byType(BarChart).first);
+      final targetBand =
+          paceChart.data.rangeAnnotations.horizontalRangeAnnotations.single;
+      expect(targetBand.y1, 0.1);
+      expect(targetBand.y2, 0.3);
     },
   );
 
