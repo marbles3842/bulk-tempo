@@ -105,3 +105,6 @@ key.properties
 # AI Agents
 .agents/
 skills-lock.json
+
+# Local research and scratch outputs
+exa-results/

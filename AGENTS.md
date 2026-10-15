@@ -14,6 +14,7 @@ Comprehensive architectural guidelines and specifications are located in `contex
 - @context/documentation/04_data_and_domain.md: Functional `Result<T, AppFailure>` error handling, domain entities, repository contracts, DTOs, and data sources.
 - @context/documentation/05_navigation.md: Declarative routing and deep linking using GoRouter, route constants, and navigation patterns.
 - @context/documentation/06_testing_strategy.md: Testing structure mirroring, test helpers (`mocktail`, pump helpers), ViewModel unit tests, repository unit tests, and widget tests.
+- @context/documentation/07_design_system.md: Design system contract covering semantic tokens, Material 3 (Android) and Liquid Glass / Cupertino (iOS) adaptation (`adaptive_platform_ui`), core widget wrappers, accessibility, and Widgetbook cataloging.
 
 ## Build, Test, and Development Commands
 
