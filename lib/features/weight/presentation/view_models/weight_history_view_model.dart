@@ -22,6 +22,7 @@ class WeightHistoryViewModel extends AutoDisposeNotifier<WeightHistoryState> {
 
   @override
   WeightHistoryState build() {
+    ref.keepAlive();
     _disposed = false;
     ref.onDispose(() {
       _disposed = true;
@@ -35,6 +36,14 @@ class WeightHistoryViewModel extends AutoDisposeNotifier<WeightHistoryState> {
     _lastAcceptedRequestId = 0;
 
     return const WeightHistoryInitial();
+  }
+
+  /// Triggers [loadEntries] only when the ViewModel is still in
+  /// [WeightHistoryInitial], preserving session-cached state across tab switches.
+  Future<void> ensureInitialized() async {
+    if (state is WeightHistoryInitial) {
+      await loadEntries();
+    }
   }
 
   /// Derives sorted entries, weekly summaries, and chronological chart slice

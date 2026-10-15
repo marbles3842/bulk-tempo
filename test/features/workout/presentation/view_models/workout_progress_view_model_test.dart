@@ -330,5 +330,25 @@ void main() {
         expect(state, isA<WorkoutProgressInitial>());
       },
     );
+
+    test(
+      'forwards custom now timestamp to repository in loadWorkouts and ensureInitialized',
+      () async {
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        final customNow = DateTime.utc(2026, 9, 1, 10, 0);
+
+        final notifier = container.read(
+          workoutProgressViewModelProvider.notifier,
+        );
+        await notifier.ensureInitialized(now: customNow);
+
+        expect(fakeWorkoutRepository.lastGetWorkoutsNow, equals(customNow));
+
+        final anotherNow = DateTime.utc(2026, 9, 15, 14, 30);
+        await notifier.loadWorkouts(now: anotherNow);
+
+        expect(fakeWorkoutRepository.lastGetWorkoutsNow, equals(anotherNow));
+      },
+    );
   });
 }

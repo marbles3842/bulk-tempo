@@ -643,5 +643,145 @@
   "monthDec": "Dec",
   "@monthDec": {
     "description": "Abbreviated December"
+  },
+  "dashboardOutdatedBadge": "Outdated · last refresh failed",
+  "@dashboardOutdatedBadge": {
+    "description": "Badge indicating that dashboard card data is outdated due to refresh failure"
+  },
+  "dashboardKpiPaceTitle": "Current Pace",
+  "@dashboardKpiPaceTitle": {
+    "description": "Title for Current Pace KPI card"
+  },
+  "dashboardKpiPaceSubtitleEmpty": "Log 2+ weeks",
+  "@dashboardKpiPaceSubtitleEmpty": {
+    "description": "Subtitle when not enough weeks are logged to compute pace"
+  },
+  "dashboardKpiAverageTitle": "Latest Average",
+  "@dashboardKpiAverageTitle": {
+    "description": "Title for Latest Average weight KPI card"
+  },
+  "dashboardKpiAverageSubtitleIncomplete": "This week · {loggedDays}/7 days logged",
+  "@dashboardKpiAverageSubtitleIncomplete": {
+    "description": "Subtitle for partial latest week average weight",
+    "placeholders": {
+      "loggedDays": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "dashboardKpiAverageSubtitleComplete": "This week · 7/7 days logged",
+  "@dashboardKpiAverageSubtitleComplete": {
+    "description": "Subtitle for complete current week average weight"
+  },
+  "dashboardKpiTotalGainTitle": "Total Gain",
+  "@dashboardKpiTotalGainTitle": {
+    "description": "Title for Total Gain KPI card"
+  },
+  "dashboardKpiWorkoutsTitle": "Workouts This Week",
+  "@dashboardKpiWorkoutsTitle": {
+    "description": "Title for Workouts This Week KPI card"
+  },
+  "dashboardKpiWorkoutsThisWeek": "This week",
+  "@dashboardKpiWorkoutsThisWeek": {
+    "description": "Subtitle for workouts count in the current week"
+  },
+  "dashboardKpiWorkoutsNotConnected": "Not connected",
+  "@dashboardKpiWorkoutsNotConnected": {
+    "description": "Subtitle when workouts integration is not configured"
+  },
+  "dashboardKpiWorkoutsSyncError": "Sync error",
+  "@dashboardKpiWorkoutsSyncError": {
+    "description": "Subtitle when workouts integration encountered a sync error"
+  },
+  "dashboardWeightTrendTitle": "Weekly Weight Trend",
+  "@dashboardWeightTrendTitle": {
+    "description": "Title for Weekly Weight Trend chart card"
+  },
+  "dashboardWeightEmpty": "No weights logged yet — add one on the Weights tab",
+  "@dashboardWeightEmpty": {
+    "description": "Empty state text for Weekly Weight Trend chart card"
+  },
+  "dashboardPaceTitle": "Weekly Pace",
+  "@dashboardPaceTitle": {
+    "description": "Title for Weekly Pace chart card"
+  },
+  "dashboardPaceEmpty": "No weights logged yet — add one on the Weights tab",
+  "@dashboardPaceEmpty": {
+    "description": "Empty state text for Weekly Pace chart card when no weights exist"
+  },
+  "dashboardPaceNeedTwoWeeks": "Log weights in at least 2 weeks to see weekly pace",
+  "@dashboardPaceNeedTwoWeeks": {
+    "description": "Empty state text for Weekly Pace chart card when less than 2 weeks are logged"
+  },
+  "dashboardPaceTargetSubtitle": "Target: {target}",
+  "@dashboardPaceTargetSubtitle": {
+    "description": "Subtitle for weekly pace card showing target range",
+    "placeholders": {
+      "target": {
+        "type": "String",
+        "example": "0.20–0.40 kg/week"
+      }
+    }
+  },
+  "dashboardWorkoutsTitle": "Workouts per Week",
+  "@dashboardWorkoutsTitle": {
+    "description": "Title for Workouts per Week chart card"
+  },
+  "dashboardWorkoutsUnconfigured": "Hevy not connected — connect in Profile",
+  "@dashboardWorkoutsUnconfigured": {
+    "description": "Unconfigured state text for Workouts per Week chart card"
+  },
+  "dashboardWorkoutsTooltip": "{count, plural, one{1 workout} other{{count} workouts}}",
+  "@dashboardWorkoutsTooltip": {
+    "description": "Tooltip text for workout bar chart showing count of workouts",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "dashboardPaceMetric": "{sign}{value} {unit}",
+  "@dashboardPaceMetric": {
+    "description": "Formatted pace metric value with sign and unit",
+    "placeholders": {
+      "sign": {
+        "type": "String",
+        "example": "+"
+      },
+      "value": {
+        "type": "String",
+        "example": "0.20"
+      },
+      "unit": {
+        "type": "String",
+        "example": "kg/week"
+      }
+    }
+  },
+  "dashboardWeightMetric": "{value} kg",
+  "@dashboardWeightMetric": {
+    "description": "Formatted weight metric value in kg",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "80.60"
+      }
+    }
+  },
+  "dashboardGainMetric": "{sign}{value} kg",
+  "@dashboardGainMetric": {
+    "description": "Formatted gain metric value in kg with sign",
+    "placeholders": {
+      "sign": {
+        "type": "String",
+        "example": "+"
+      },
+      "value": {
+        "type": "String",
+        "example": "1.40"
+      }
+    }
   }
 }

@@ -21,6 +21,9 @@ class FakeWorkoutRepository implements WorkoutRepository {
   /// [getWorkoutsForLastWeeks].
   DateTime? defaultNow;
 
+  /// The `now` argument passed to the most recent [getWorkoutsForLastWeeks] call.
+  DateTime? lastGetWorkoutsNow;
+
   AppFailure? nextFailure;
   AppFailure? getKeyFailure;
   AppFailure? saveKeyFailure;
@@ -123,6 +126,7 @@ class FakeWorkoutRepository implements WorkoutRepository {
     int weeks = HevyApiConstants.lookbackWeeks,
     DateTime? now,
   }) async {
+    lastGetWorkoutsNow = now;
     if (onGetWorkoutsForLastWeeks != null) {
       await onGetWorkoutsForLastWeeks!();
     }
@@ -209,6 +213,7 @@ class FakeWorkoutRepository implements WorkoutRepository {
     _userApiKeys.clear();
     _userWorkouts.clear();
     defaultNow = null;
+    lastGetWorkoutsNow = null;
     nextFailure = null;
     getKeyFailure = null;
     saveKeyFailure = null;

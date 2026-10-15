@@ -497,4 +497,97 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get monthDec => 'gru';
+
+  @override
+  String get dashboardOutdatedBadge => 'Nieaktualne · błąd odświeżania';
+
+  @override
+  String get dashboardKpiPaceTitle => 'Bieżące tempo';
+
+  @override
+  String get dashboardKpiPaceSubtitleEmpty => 'Zapisz min. 2 tyg.';
+
+  @override
+  String get dashboardKpiAverageTitle => 'Ostatnia średnia';
+
+  @override
+  String dashboardKpiAverageSubtitleIncomplete(int loggedDays) {
+    return 'Ten tydzień · $loggedDays/7 dni';
+  }
+
+  @override
+  String get dashboardKpiAverageSubtitleComplete => 'Ten tydzień · 7/7 dni';
+
+  @override
+  String get dashboardKpiTotalGainTitle => 'Łączny przyrost';
+
+  @override
+  String get dashboardKpiWorkoutsTitle => 'Treningi w tym tygodniu';
+
+  @override
+  String get dashboardKpiWorkoutsThisWeek => 'W tym tygodniu';
+
+  @override
+  String get dashboardKpiWorkoutsNotConnected => 'Nie połączono';
+
+  @override
+  String get dashboardKpiWorkoutsSyncError => 'Błąd synchronizacji';
+
+  @override
+  String get dashboardWeightTrendTitle => 'Tygodniowy trend wagi';
+
+  @override
+  String get dashboardWeightEmpty =>
+      'Brak zapisanych wag — dodaj wagę w zakładce Wagi';
+
+  @override
+  String get dashboardPaceTitle => 'Tygodniowe tempo';
+
+  @override
+  String get dashboardPaceEmpty =>
+      'Brak zapisanych wag — dodaj wagę w zakładce Wagi';
+
+  @override
+  String get dashboardPaceNeedTwoWeeks =>
+      'Zapisz wagę w co najmniej 2 tygodniach, aby zobaczyć tempo';
+
+  @override
+  String dashboardPaceTargetSubtitle(String target) {
+    return 'Cel: $target';
+  }
+
+  @override
+  String get dashboardWorkoutsTitle => 'Liczba treningów na tydzień';
+
+  @override
+  String get dashboardWorkoutsUnconfigured =>
+      'Hevy niepołączone — połącz w Profilu';
+
+  @override
+  String dashboardWorkoutsTooltip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count treningu',
+      many: '$count treningów',
+      few: '$count treningi',
+      one: '1 trening',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dashboardPaceMetric(String sign, String value, String unit) {
+    return '$sign$value $unit';
+  }
+
+  @override
+  String dashboardWeightMetric(String value) {
+    return '$value kg';
+  }
+
+  @override
+  String dashboardGainMetric(String sign, String value) {
+    return '$sign$value kg';
+  }
 }

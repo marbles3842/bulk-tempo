@@ -919,6 +919,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dec'**
   String get monthDec;
+
+  /// Badge indicating that dashboard card data is outdated due to refresh failure
+  ///
+  /// In en, this message translates to:
+  /// **'Outdated · last refresh failed'**
+  String get dashboardOutdatedBadge;
+
+  /// Title for Current Pace KPI card
+  ///
+  /// In en, this message translates to:
+  /// **'Current Pace'**
+  String get dashboardKpiPaceTitle;
+
+  /// Subtitle when not enough weeks are logged to compute pace
+  ///
+  /// In en, this message translates to:
+  /// **'Log 2+ weeks'**
+  String get dashboardKpiPaceSubtitleEmpty;
+
+  /// Title for Latest Average weight KPI card
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Average'**
+  String get dashboardKpiAverageTitle;
+
+  /// Subtitle for partial latest week average weight
+  ///
+  /// In en, this message translates to:
+  /// **'This week · {loggedDays}/7 days logged'**
+  String dashboardKpiAverageSubtitleIncomplete(int loggedDays);
+
+  /// Subtitle for complete current week average weight
+  ///
+  /// In en, this message translates to:
+  /// **'This week · 7/7 days logged'**
+  String get dashboardKpiAverageSubtitleComplete;
+
+  /// Title for Total Gain KPI card
+  ///
+  /// In en, this message translates to:
+  /// **'Total Gain'**
+  String get dashboardKpiTotalGainTitle;
+
+  /// Title for Workouts This Week KPI card
+  ///
+  /// In en, this message translates to:
+  /// **'Workouts This Week'**
+  String get dashboardKpiWorkoutsTitle;
+
+  /// Subtitle for workouts count in the current week
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get dashboardKpiWorkoutsThisWeek;
+
+  /// Subtitle when workouts integration is not configured
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get dashboardKpiWorkoutsNotConnected;
+
+  /// Subtitle when workouts integration encountered a sync error
+  ///
+  /// In en, this message translates to:
+  /// **'Sync error'**
+  String get dashboardKpiWorkoutsSyncError;
+
+  /// Title for Weekly Weight Trend chart card
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Weight Trend'**
+  String get dashboardWeightTrendTitle;
+
+  /// Empty state text for Weekly Weight Trend chart card
+  ///
+  /// In en, this message translates to:
+  /// **'No weights logged yet — add one on the Weights tab'**
+  String get dashboardWeightEmpty;
+
+  /// Title for Weekly Pace chart card
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Pace'**
+  String get dashboardPaceTitle;
+
+  /// Empty state text for Weekly Pace chart card when no weights exist
+  ///
+  /// In en, this message translates to:
+  /// **'No weights logged yet — add one on the Weights tab'**
+  String get dashboardPaceEmpty;
+
+  /// Empty state text for Weekly Pace chart card when less than 2 weeks are logged
+  ///
+  /// In en, this message translates to:
+  /// **'Log weights in at least 2 weeks to see weekly pace'**
+  String get dashboardPaceNeedTwoWeeks;
+
+  /// Subtitle for weekly pace card showing target range
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {target}'**
+  String dashboardPaceTargetSubtitle(String target);
+
+  /// Title for Workouts per Week chart card
+  ///
+  /// In en, this message translates to:
+  /// **'Workouts per Week'**
+  String get dashboardWorkoutsTitle;
+
+  /// Unconfigured state text for Workouts per Week chart card
+  ///
+  /// In en, this message translates to:
+  /// **'Hevy not connected — connect in Profile'**
+  String get dashboardWorkoutsUnconfigured;
+
+  /// Tooltip text for workout bar chart showing count of workouts
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 workout} other{{count} workouts}}'**
+  String dashboardWorkoutsTooltip(int count);
+
+  /// Formatted pace metric value with sign and unit
+  ///
+  /// In en, this message translates to:
+  /// **'{sign}{value} {unit}'**
+  String dashboardPaceMetric(String sign, String value, String unit);
+
+  /// Formatted weight metric value in kg
+  ///
+  /// In en, this message translates to:
+  /// **'{value} kg'**
+  String dashboardWeightMetric(String value);
+
+  /// Formatted gain metric value in kg with sign
+  ///
+  /// In en, this message translates to:
+  /// **'{sign}{value} kg'**
+  String dashboardGainMetric(String sign, String value);
 }
 
 class _AppLocalizationsDelegate
