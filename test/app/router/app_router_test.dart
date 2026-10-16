@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bulk_tempo/app/router/app_router.dart';
 import 'package:bulk_tempo/core/router/route_paths.dart';
+import 'package:bulk_tempo/core/theme/app_theme.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
@@ -67,7 +68,10 @@ void main() {
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
-                return MaterialApp.router(routerConfig: router);
+                return MaterialApp.router(
+                  theme: AppTheme.light(),
+                  routerConfig: router,
+                );
               },
             ),
           ),
@@ -95,7 +99,10 @@ void main() {
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
-                return MaterialApp.router(routerConfig: router);
+                return MaterialApp.router(
+                  theme: AppTheme.light(),
+                  routerConfig: router,
+                );
               },
             ),
           ),
@@ -125,7 +132,10 @@ void main() {
           child: Consumer(
             builder: (context, ref, _) {
               router = ref.watch(appRouterProvider);
-              return MaterialApp.router(routerConfig: router);
+              return MaterialApp.router(
+                theme: AppTheme.light(),
+                routerConfig: router,
+              );
             },
           ),
         ),
@@ -159,7 +169,10 @@ void main() {
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
-                return MaterialApp.router(routerConfig: router);
+                return MaterialApp.router(
+                  theme: AppTheme.light(),
+                  routerConfig: router,
+                );
               },
             ),
           ),
@@ -204,7 +217,10 @@ void main() {
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
-                return MaterialApp.router(routerConfig: router);
+                return MaterialApp.router(
+                  theme: AppTheme.light(),
+                  routerConfig: router,
+                );
               },
             ),
           ),
@@ -258,7 +274,10 @@ void main() {
             child: Consumer(
               builder: (context, ref, _) {
                 router = ref.watch(appRouterProvider);
-                return MaterialApp.router(routerConfig: router);
+                return MaterialApp.router(
+                  theme: AppTheme.light(),
+                  routerConfig: router,
+                );
               },
             ),
           ),
