@@ -500,26 +500,26 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 
 #### Automated
 
-- [x] 1.1 Dependencies resolve cleanly and analyzer passes: `flutter pub get && flutter analyze`
-- [x] 1.2 Formatting check passes on modified files: `dart format --output=none --set-exit-if-changed lib test`
-- [x] 1.3 Token contrast, theme extension lerp/copyWith, and platform capability unit tests pass: `flutter test test/core/theme/ test/core/platform/`
-- [x] 1.4 Existing full test suite passes with updated pumpApp and router test themes: `flutter test`
+- [x] 1.1 Dependencies resolve cleanly and analyzer passes: `flutter pub get && flutter analyze` — c548b71
+- [x] 1.2 Formatting check passes on modified files: `dart format --output=none --set-exit-if-changed lib test` — c548b71
+- [x] 1.3 Token contrast, theme extension lerp/copyWith, and platform capability unit tests pass: `flutter test test/core/theme/ test/core/platform/` — c548b71
+- [x] 1.4 Existing full test suite passes with updated pumpApp and router test themes: `flutter test` — c548b71
 
 #### Manual
 
-- [x] 1.5 Launch the app in light and dark system appearance and confirm BulkTempoApp applies the seeded #673AB7 tonalSpot Material 3 and Cupertino themes without visual regressions on existing screens
+- [x] 1.5 Launch the app in light and dark system appearance and confirm BulkTempoApp applies the seeded #673AB7 tonalSpot Material 3 and Cupertino themes without visual regressions on existing screens — c548b71
 
 ### Phase 2: Shared Adaptive Form & Surface Primitives (AppButton, AppTextField, AppCard, AppFeedback)
 
 #### Automated
 
-- [ ] 2.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [ ] 2.2 Form, surface, and feedback widget tests pass across Android Material, iOS 15–25 Cupertino, and iOS 26+ capability branches: `flutter test test/core/widgets/app_button_test.dart test/core/widgets/app_text_field_test.dart test/core/widgets/app_card_test.dart test/core/widgets/app_feedback_test.dart`
-- [ ] 2.3 Accessibility guideline and 2.0x TextScaler reflow tests pass for Phase 2 primitives: `flutter test test/core/widgets/primitives_accessibility_test.dart`
+- [x] 2.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- [x] 2.2 Form, surface, and feedback widget tests pass across Android Material, iOS 15–25 Cupertino, and iOS 26+ capability branches: `flutter test test/core/widgets/app_button_test.dart test/core/widgets/app_text_field_test.dart test/core/widgets/app_card_test.dart test/core/widgets/app_feedback_test.dart`
+- [x] 2.3 Accessibility guideline and 2.0x TextScaler reflow tests pass for Phase 2 primitives: `flutter test test/core/widgets/primitives_accessibility_test.dart`
 
 #### Manual
 
-- [ ] 2.4 Verify that AppButton busy spinners, AppTextField validation error chrome, AppCard tonal surfaces, and AppFeedback banners/snackbars render with legible paired foreground/background colors in light and dark modes
+- [x] 2.4 Verify that AppButton busy spinners, AppTextField validation error chrome, AppCard tonal surfaces, and AppFeedback banners/snackbars render with legible paired foreground/background colors in light and dark modes
 
 ### Phase 3: Shared Adaptive Overlay & Shell Primitives (AppDialog, AppSheetFrame, AppNavigationShell)
 
