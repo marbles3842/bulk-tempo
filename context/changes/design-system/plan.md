@@ -513,25 +513,25 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 
 #### Automated
 
-- [x] 2.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [x] 2.2 Form, surface, and feedback widget tests pass across Android Material, iOS 15–25 Cupertino, and iOS 26+ capability branches: `flutter test test/core/widgets/app_button_test.dart test/core/widgets/app_text_field_test.dart test/core/widgets/app_card_test.dart test/core/widgets/app_feedback_test.dart`
-- [x] 2.3 Accessibility guideline and 2.0x TextScaler reflow tests pass for Phase 2 primitives: `flutter test test/core/widgets/primitives_accessibility_test.dart`
+- [x] 2.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze` — 143783f
+- [x] 2.2 Form, surface, and feedback widget tests pass across Android Material, iOS 15–25 Cupertino, and iOS 26+ capability branches: `flutter test test/core/widgets/app_button_test.dart test/core/widgets/app_text_field_test.dart test/core/widgets/app_card_test.dart test/core/widgets/app_feedback_test.dart` — 143783f
+- [x] 2.3 Accessibility guideline and 2.0x TextScaler reflow tests pass for Phase 2 primitives: `flutter test test/core/widgets/primitives_accessibility_test.dart` — 143783f
 
 #### Manual
 
-- [x] 2.4 Verify that AppButton busy spinners, AppTextField validation error chrome, AppCard tonal surfaces, and AppFeedback banners/snackbars render with legible paired foreground/background colors in light and dark modes
+- [x] 2.4 Verify that AppButton busy spinners, AppTextField validation error chrome, AppCard tonal surfaces, and AppFeedback banners/snackbars render with legible paired foreground/background colors in light and dark modes — 143783f
 
 ### Phase 3: Shared Adaptive Overlay & Shell Primitives (AppDialog, AppSheetFrame, AppNavigationShell)
 
 #### Automated
 
-- [ ] 3.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [ ] 3.2 Overlay and navigation shell widget tests pass across Android Material, iOS 15–25 Cupertino, iOS 26+ capability branches, and >=840px NavigationRail breakpoint: `flutter test test/core/widgets/app_dialog_test.dart test/core/widgets/app_sheet_frame_test.dart test/core/widgets/app_navigation_shell_test.dart`
-- [ ] 3.3 Full repository test suite passes without regressions: `flutter test`
+- [x] 3.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- [x] 3.2 Overlay and navigation shell widget tests pass across Android Material, iOS 15–25 Cupertino, iOS 26+ capability branches, and >=840px NavigationRail breakpoint: `flutter test test/core/widgets/app_dialog_test.dart test/core/widgets/app_sheet_frame_test.dart test/core/widgets/app_navigation_shell_test.dart`
+- [x] 3.3 Full repository test suite passes without regressions: `flutter test`
 
 #### Manual
 
-- [ ] 3.4 Verify AppDialog confirmation/destructive actions, AppSheetFrame PopScope/swipe-down dismissal guards and keyboard clearance, and AppNavigationShell <600px bottom bar vs >=840px rail adaptation
+- [x] 3.4 Verify AppDialog confirmation/destructive actions, AppSheetFrame PopScope/swipe-down dismissal guards and keyboard clearance, and AppNavigationShell <600px bottom bar vs >=840px rail adaptation
 
 ### Phase 4: Widgetbook Component Catalog & Verification Gate
 
