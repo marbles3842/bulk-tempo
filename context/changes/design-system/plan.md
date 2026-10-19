@@ -525,22 +525,22 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 
 #### Automated
 
-- [x] 3.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [x] 3.2 Overlay and navigation shell widget tests pass across Android Material, iOS 15–25 Cupertino, iOS 26+ capability branches, and >=840px NavigationRail breakpoint: `flutter test test/core/widgets/app_dialog_test.dart test/core/widgets/app_sheet_frame_test.dart test/core/widgets/app_navigation_shell_test.dart`
-- [x] 3.3 Full repository test suite passes without regressions: `flutter test`
+- [x] 3.1 Static analysis and formatting pass with zero warnings: `dart format --output=none --set-exit-if-changed lib test && flutter analyze` — 6aea435
+- [x] 3.2 Overlay and navigation shell widget tests pass across Android Material, iOS 15–25 Cupertino, iOS 26+ capability branches, and >=840px NavigationRail breakpoint: `flutter test test/core/widgets/app_dialog_test.dart test/core/widgets/app_sheet_frame_test.dart test/core/widgets/app_navigation_shell_test.dart` — 6aea435
+- [x] 3.3 Full repository test suite passes without regressions: `flutter test` — 6aea435
 
 #### Manual
 
-- [x] 3.4 Verify AppDialog confirmation/destructive actions, AppSheetFrame PopScope/swipe-down dismissal guards and keyboard clearance, and AppNavigationShell <600px bottom bar vs >=840px rail adaptation
+- [x] 3.4 Verify AppDialog confirmation/destructive actions, AppSheetFrame PopScope/swipe-down dismissal guards and keyboard clearance, and AppNavigationShell <600px bottom bar vs >=840px rail adaptation — 6aea435
 
 ### Phase 4: Widgetbook Component Catalog & Verification Gate
 
 #### Automated
 
-- [ ] 4.1 Static analysis and formatting pass across lib and test (including lib/widgetbook/): `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [ ] 4.2 Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
-- [ ] 4.3 Complete repository test suite passes: `flutter test`
+- [x] 4.1 Static analysis and formatting pass across lib and test (including lib/widgetbook/): `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- [x] 4.2 Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
+- [x] 4.3 Complete repository test suite passes: `flutter test`
 
 #### Manual
 
-- [ ] 4.4 Run flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
+- [x] 4.4 Run flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
