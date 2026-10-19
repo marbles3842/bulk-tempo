@@ -230,6 +230,30 @@ void main() {
       expect(find.text('Item 0'), findsOneWidget);
     });
 
+    testWidgets('renders scrollableBuilder directly in non-draggable mode', (
+      tester,
+    ) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: AppSheetFrame(
+            title: 'Static Scrollable Sheet',
+            isDraggable: false,
+            scrollableBuilder: (context, controller) {
+              return ListView.builder(
+                controller: controller,
+                itemCount: 10,
+                itemBuilder: (context, index) => Text('Row $index'),
+              );
+            },
+          ),
+        ),
+      );
+
+      expect(find.text('Static Scrollable Sheet'), findsOneWidget);
+      expect(find.text('Row 0'), findsOneWidget);
+      expect(find.byType(SingleChildScrollView), findsNothing);
+    });
+
     testWidgets('AppSheetFrame.show presents modal bottom sheet', (
       tester,
     ) async {

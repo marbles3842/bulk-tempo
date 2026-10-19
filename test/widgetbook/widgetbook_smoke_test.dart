@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'package:bulk_tempo/core/theme/app_theme.dart';
-import 'package:bulk_tempo/widgetbook/widgetbook_app.dart';
+import '../../widgetbook/widgetbook_app.dart';
 import '../test_helpers/pump_app.dart';
 
 List<WidgetbookUseCase> _extractUseCases(List<WidgetbookNode> nodes) {

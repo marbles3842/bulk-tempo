@@ -1,7 +1,7 @@
 ---
 change_id: design-system
 title: Define a shared Flutter design system with platform-adaptive controls
-status: implemented
+status: impl_reviewed
 created: 2026-10-15
 updated: 2026-10-19
 archived_at: null

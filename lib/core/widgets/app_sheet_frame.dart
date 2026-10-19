@@ -262,10 +262,22 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
         },
       );
     } else {
-      sheetContent = _buildSheetContainer(
-        context: context,
-        theme: theme,
-        child: SingleChildScrollView(
+      final Widget bodyContent;
+      if (widget.scrollableBuilder != null) {
+        bodyContent = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildHeader(context, theme),
+            const SizedBox(height: AppSpacing.space4),
+            if (widget.child != null) widget.child!,
+            Flexible(
+              child: widget.scrollableBuilder!(context, _scrollController),
+            ),
+          ],
+        );
+      } else {
+        bodyContent = SingleChildScrollView(
           controller: _scrollController,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -274,11 +286,15 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
               _buildHeader(context, theme),
               const SizedBox(height: AppSpacing.space4),
               if (widget.child != null) widget.child!,
-              if (widget.scrollableBuilder != null)
-                widget.scrollableBuilder!(context, _scrollController),
             ],
           ),
-        ),
+        );
+      }
+
+      sheetContent = _buildSheetContainer(
+        context: context,
+        theme: theme,
+        child: bodyContent,
       );
     }
 

@@ -7,9 +7,9 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/l10n/app_localizations.dart';
-import 'package:bulk_tempo/widgetbook/use_cases/overlays_and_shell_use_cases.dart';
-import 'package:bulk_tempo/widgetbook/use_cases/primitives_use_cases.dart';
-import 'package:bulk_tempo/widgetbook/use_cases/tokens_use_cases.dart';
+import 'use_cases/overlays_and_shell_use_cases.dart';
+import 'use_cases/primitives_use_cases.dart';
+import 'use_cases/tokens_use_cases.dart';
 
 /// Top-level list of all Widgetbook navigation nodes exported for the catalog
 /// and programmatic smoke tests.
