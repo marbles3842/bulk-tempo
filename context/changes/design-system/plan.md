@@ -537,10 +537,10 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 
 #### Automated
 
-- [x] 4.1 Static analysis and formatting pass across lib and test (including lib/widgetbook/): `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
-- [x] 4.2 Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
-- [x] 4.3 Complete repository test suite passes: `flutter test`
+- [x] 4.1 Static analysis and formatting pass across lib and test (including lib/widgetbook/): `dart format --output=none --set-exit-if-changed lib test && flutter analyze` — 00e4d3c
+- [x] 4.2 Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart` — 00e4d3c
+- [x] 4.3 Complete repository test suite passes: `flutter test` — 00e4d3c
 
 #### Manual
 
-- [x] 4.4 Run flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
+- [x] 4.4 Run flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs — 00e4d3c
