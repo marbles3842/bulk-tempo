@@ -258,20 +258,22 @@ class AppNavigationShell extends ConsumerWidget {
       appBar: AdaptiveAppBar(
         title: title,
         useNativeToolbar: true,
-        actions: toolbarActions.map((action) {
-          return AdaptiveAppBarAction(
-            iosSymbol: AppIcons.sfSymbol(action.icon),
-            icon: AppIcons.cupertino(action.icon),
-            iconWidget: action.key != null
-                ? KeyedSubtree(
-                    key: action.key,
-                    child: Icon(AppIcons.cupertino(action.icon)),
-                  )
-                : null,
-            label: action.tooltip,
-            onPressed: action.onPressed ?? () {},
-          );
-        }).toList(),
+        actions: toolbarActions.where((action) => action.onPressed != null).map(
+          (action) {
+            return AdaptiveAppBarAction(
+              iosSymbol: AppIcons.sfSymbol(action.icon),
+              icon: AppIcons.cupertino(action.icon),
+              iconWidget: action.key != null
+                  ? KeyedSubtree(
+                      key: action.key,
+                      child: Icon(AppIcons.cupertino(action.icon)),
+                    )
+                  : null,
+              label: action.tooltip,
+              onPressed: action.onPressed!,
+            );
+          },
+        ).toList(),
       ),
       bottomNavigationBar: AdaptiveBottomNavigationBar(
         selectedIndex: selectedIndex,

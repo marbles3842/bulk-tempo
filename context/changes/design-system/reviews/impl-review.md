@@ -31,13 +31,13 @@
 - **Fix**: When `isDraggable == false` and `scrollableBuilder != null`, render `widget.scrollableBuilder!(context, _scrollController)` directly without the outer `SingleChildScrollView`.
 - **Decision**: FIXED (rendered scrollableBuilder directly without outer SingleChildScrollView)
 
-### F2 — widgetbook in dev_dependencies while catalog resides in lib/widgetbook/
+### F2 — widgetbook in dev_dependencies while catalog resides in widgetbook/
 
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Pattern Consistency
-- **Location**: `pubspec.yaml:36`, `lib/widgetbook/main_widgetbook.dart:1`
-- **Detail**: `widgetbook: ^3.25.0` is declared under `dev_dependencies` while `lib/widgetbook/` is under `lib/`. This is safely excluded by tree-shaking from production entrypoints and suppressed with file-level ignores, but conventional Dart packages prefer placing standalone catalog apps outside `lib/` (e.g. `widgetbook/`) or promoting `widgetbook` to standard dependencies.
+- **Location**: `pubspec.yaml:36`, `widgetbook/main_widgetbook.dart:1`
+- **Detail**: `widgetbook: ^3.25.0` is declared under `dev_dependencies` while the standalone catalog lives at root-level `widgetbook/` outside `lib/`.
 - **Fix**: Retain the current suppressed setup as planned, or relocate `lib/widgetbook/` to root-level `widgetbook/` in a future chore.
 - **Decision**: FIXED + ACCEPTED-AS-RULE: Separate Dev Tooling and Component Catalogs from Production lib/
 

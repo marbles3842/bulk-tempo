@@ -1,6 +1,6 @@
-# 07. Design System — Proposal
+# 07. Design System — Contract & Architecture
 
-Status: proposed, documentation only. Researched on 2026-10-15 and updated on 2026-10-16. This is the recommended contract for a later implementation, not a description of components already shipped. Supporting observations, source versions, and package evaluations are in [design-system research](../changes/design-system/research.md) and [adaptive tooling recommendation](../../exa-results/flutter-design-system-2026-10-16/recommendation.md).
+Status: implemented (core tokens, adaptive primitives, and Widgetbook catalog). Researched on 2026-10-15 and updated on 2026-10-16. This document defines the design-system contract implemented in `lib/core/` and `widgetbook/`. Supporting observations, source versions, and package evaluations are in [design-system research](../changes/design-system/research.md) and [adaptive tooling recommendation](../../exa-results/flutter-design-system-2026-10-16/recommendation.md).
 
 ## 1. Direction
 
@@ -233,4 +233,4 @@ Recommended incremental adoption order:
 3. **Focused adaptive trial:** Trial `adaptive_platform_ui` on `HomeShellScreen` and `WeightEntryBottomSheet` across Android, iOS 26+ (Liquid Glass), and older iOS 15+ (Cupertino fallback), retaining `MaterialApp.router` at the root initially (with `AdaptiveToolbarHost` if required) and preserving Riverpod/GoRouter behavior.
 4. **Catalog & feature rollout:** Add Widgetbook use cases and migrate remaining views (`auth`, `dashboard`, `weight`, `workout`, `gain_target`) through the shared interfaces using the repository's `/10x-ui` workflow.
 
-The proposed defaults are sufficient for planning. Remaining choices are visual acceptance of purple and content density, and passing the physical-device trial for `adaptive_platform_ui`. Product assessment thresholds remain outside this design-system decision. No runtime code, dependency, or platform setting is changed by this document.
+The core tokens, theme factories, adaptive primitives (`lib/core/`), and Widgetbook catalog (`widgetbook/main_widgetbook.dart`) implement this contract. Remaining choices are visual acceptance of purple and content density during feature rollout, and passing the physical-device trial for `adaptive_platform_ui`. Product assessment thresholds remain outside this design-system decision.

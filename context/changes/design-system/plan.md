@@ -2,11 +2,11 @@
 
 ## Overview
 
-Implement Bulk Tempo's foundational design system as specified in `context/documentation/07_design_system.md`: semantic color, chart, spacing, shape, motion, and icon tokens (`lib/core/theme/`), a deterministic platform and accessibility capability boundary (`lib/core/platform/presentation_capabilities.dart`), seven app-owned adaptive component wrappers encapsulating `adaptive_platform_ui` (`lib/core/widgets/`), root Material 3 and Cupertino theme wiring (`lib/app/app.dart` and `test/test_helpers/pump_app.dart`), and a manual Widgetbook 3.25.x catalog (`lib/widgetbook/main_widgetbook.dart`) with automated verification—without modifying existing feature screens under `lib/features/**`.
+Implement Bulk Tempo's foundational design system as specified in `context/documentation/07_design_system.md`: semantic color, chart, spacing, shape, motion, and icon tokens (`lib/core/theme/`), a deterministic platform and accessibility capability boundary (`lib/core/platform/presentation_capabilities.dart`), seven app-owned adaptive component wrappers encapsulating `adaptive_platform_ui` (`lib/core/widgets/`), root Material 3 and Cupertino theme wiring (`lib/app/app.dart` and `test/test_helpers/pump_app.dart`), and a manual Widgetbook 3.25.x catalog (`widgetbook/main_widgetbook.dart`) with automated verification—without modifying existing feature screens under `lib/features/**`.
 
 ## Current State Analysis
 
-The application currently uses an inline `ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true)` in `lib/app/app.dart:21-24` with no dark theme, high-contrast theme, `CupertinoThemeData` projection, or `ThemeExtension` registrations. Neither `lib/core/theme/`, `lib/core/platform/`, `lib/core/widgets/`, nor `lib/widgetbook/` exists yet, and `pubspec.yaml:9-34` does not include `adaptive_platform_ui`, `cupertino_icons`, or `widgetbook`.
+The application currently uses an inline `ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true)` in `lib/app/app.dart:21-24` with no dark theme, high-contrast theme, `CupertinoThemeData` projection, or `ThemeExtension` registrations. Neither `lib/core/theme/`, `lib/core/platform/`, `lib/core/widgets/`, nor `widgetbook/` exists yet, and `pubspec.yaml:9-34` does not include `adaptive_platform_ui`, `cupertino_icons`, or `widgetbook`.
 
 ### Key Discoveries:
 
@@ -17,11 +17,11 @@ The application currently uses an inline `ThemeData(colorScheme: ColorScheme.fro
 
 ## Desired End State
 
-A complete, tested design system foundation in `lib/core/` and `lib/widgetbook/` where:
+A complete, tested design system foundation in `lib/core/` and `widgetbook/` where:
 1. `BulkTempoApp` (`lib/app/app.dart`) and `pumpApp` (`test/test_helpers/pump_app.dart`) wire `AppTheme.light()`, `AppTheme.dark()`, `AppTheme.highContrastLight()`, and `AppTheme.highContrastDark()` with `ThemeMode.system` (defaulting to `ThemeMode.light` in `pumpApp` for existing test stability) and inject a coordinated `CupertinoTheme` via `MaterialApp.builder`.
 2. `lib/core/platform/presentation_capabilities.dart` provides an immutable `PresentationCapabilities` model and Riverpod `presentationCapabilitiesProvider` resolving 3 platform rendering modes (`material`, `cupertinoClassic` for iOS 15–25 or web/headless test previews, and `cupertinoLiquidGlass` for iOS 26+ native views) alongside normalized `reduceMotion`, `highContrast`, and `reduceTransparency` flags.
 3. All seven shared primitives (`AppButton`, `AppTextField`, `AppCard`, `AppFeedback`, `AppDialog`, `AppSheetFrame`, `AppNavigationShell`) encapsulate `adaptive_platform_ui` behind app-owned APIs, enforce opaque data surfaces, paired foreground/background colors, and accessible tap targets (`48×48` on Android/web, `44×44` on iOS).
-4. `lib/widgetbook/main_widgetbook.dart` catalogs all tokens and primitives across the 7-state matrix (`default`, `pressed`, `focused`, `hovered`, `disabled`, `busy`, `error`, plus async content states for cards/feedback), English and Polish locales, light/dark/high-contrast themes, `2.0x` text scale, and platform capability overrides.
+4. `widgetbook/main_widgetbook.dart` catalogs all tokens and primitives across the 7-state matrix (`default`, `pressed`, `focused`, `hovered`, `disabled`, `busy`, `error`, plus async content states for cards/feedback), English and Polish locales, light/dark/high-contrast themes, `2.0x` text scale, and platform capability overrides.
 5. `dart format --output=none --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test` pass with zero warnings or errors.
 
 ## What We're NOT Doing
@@ -35,15 +35,15 @@ A complete, tested design system foundation in `lib/core/` and `lib/widgetbook/`
 
 ## Implementation Approach
 
-Build bottom-up inside `lib/core/` and `lib/widgetbook/` across four incremental phases:
+Build bottom-up inside `lib/core/` and `widgetbook/` across four incremental phases:
 1. Establish the dependency baseline, pure-Dart `PresentationCapabilities` adapter, token classes, `ThemeExtension` types (`AppSemanticColors`, `AppChartTheme`), and Material/Cupertino `AppTheme` factories, wiring them into `lib/app/app.dart`, `test/test_helpers/pump_app.dart`, and `test/app/router/app_router_test.dart`.
 2. Build the leaf form, surface, and feedback primitives (`AppButton`, `AppTextField`, `AppCard`, `AppFeedback`) using 3-tier dispatch (`material`, `cupertinoClassic`, `cupertinoLiquidGlass`).
 3. Build the composite overlay and navigation shell primitives (`AppDialog`, `AppSheetFrame`, `AppNavigationShell`) with full dismissal-guard, draggable-sheet, FAB clearance, and responsive `NavigationRail` support so future feature migrations are drop-in replacements.
-4. Assemble the manual Widgetbook 3.25.x catalog in `lib/widgetbook/` and lock in automated smoke and accessibility verification.
+4. Assemble the manual Widgetbook 3.25.x catalog in `widgetbook/` and lock in automated smoke and accessibility verification.
 
 ## Critical Implementation Details
 
-- **Linter compatibility for `lib/widgetbook/` (`depend_on_referenced_packages`)**: Because `widgetbook: ^3.25.0` is added under `dev_dependencies` in `pubspec.yaml` while the catalog entrypoint lives at `lib/widgetbook/main_widgetbook.dart`, `package:flutter_lints/flutter.yaml` will flag `depend_on_referenced_packages` on imports of `package:widgetbook/widgetbook.dart` inside `lib/widgetbook/` unless suppressed. Configure `analysis_options.yaml` (or file-level `// ignore_for_file: depend_on_referenced_packages` in `lib/widgetbook/`) so `flutter analyze` passes cleanly without promoting `widgetbook` to production `dependencies`.
+- **Root-level `widgetbook/` catalog separation**: Because `widgetbook: ^3.25.0` is added under `dev_dependencies` in `pubspec.yaml`, placing the standalone catalog entrypoint at `widgetbook/main_widgetbook.dart` outside `lib/` keeps production code separated from dev-only cataloging packages without requiring `depend_on_referenced_packages` lint suppressions.
 - **Headless test & web fallback for `adaptive_platform_ui` native views**: On iOS 26+, `adaptive_platform_ui` renders native UIKit platform views (`UiKitView`) for glass toolbars, tab bars, and buttons. Neither Flutter's headless widget test runner nor Chrome (`flutter run -d chrome`) can instantiate native iOS `UiKitView`s. `PresentationCapabilities` must therefore gate `cupertinoLiquidGlass` on ` isIos26OrNewer && supportsNativeIosPlatformViews` (true on real iOS runtime when `!kIsWeb` and not in headless widget test environment unless `forceNativeIosViews: true` is explicitly passed in a capability override), falling back to `cupertinoClassic` in web Widgetbook and standard widget tests so iOS previews and assertions remain interactive and deterministic.
 - **Safe `ThemeExtension` resolution in tests**: Even after updating `pump_app.dart` and `app_router_test.dart` to supply `AppTheme.light()`, provide convenience accessors `AppSemanticColors.of(BuildContext)` and `AppChartTheme.of(BuildContext)` that fall back to the light/dark default extension instance (matched to `Theme.of(context).brightness`) if `Theme.of(context).extension<T>()` is ever null in an isolated test harness.
 
@@ -66,7 +66,7 @@ Add the required packages (`adaptive_platform_ui`, `cupertino_icons`, `widgetboo
 **Contract**:
 - `pubspec.yaml` `dependencies`: add `adaptive_platform_ui: ^1.0.2` (or latest compatible `1.x` resolved by `flutter pub get`) and `cupertino_icons: ^1.0.8`.
 - `pubspec.yaml` `dev_dependencies`: add `widgetbook: ^3.25.0`.
-- `analysis_options.yaml`: keep existing strict language rules (`strict-casts`, `strict-inference`, `strict-raw-types`); allow `lib/widgetbook/**` to import `package:widgetbook/widgetbook.dart` without triggering `depend_on_referenced_packages`.
+- `analysis_options.yaml`: keep existing strict language rules (`strict-casts`, `strict-inference`, `strict-raw-types`).
 
 #### 2. Platform & Accessibility Capability Boundary
 
@@ -392,27 +392,27 @@ Implement `AppDialog`, `AppSheetFrame`, and `AppNavigationShell` in `lib/core/wi
 
 ### Overview
 
-Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_widgetbook.dart` with interactive use cases for all design tokens and shared primitives across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, text scaling, and platform capability overrides, and add a `test/widgetbook/widgetbook_smoke_test.dart` suite that pumps every use case in `flutter test`.
+Build the manual Widgetbook 3.25.x component catalog at `widgetbook/main_widgetbook.dart` with interactive use cases for all design tokens and shared primitives across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, text scaling, and platform capability overrides, and add a `test/widgetbook/widgetbook_smoke_test.dart` suite that pumps every use case in `flutter test`.
 
 ### Changes Required:
 
 #### 1. Widgetbook Catalog Entrypoint & Addon Configuration
 
 **Files**:
-- `lib/widgetbook/main_widgetbook.dart`
-- `lib/widgetbook/widgetbook_app.dart`
+- `widgetbook/main_widgetbook.dart`
+- `widgetbook/widgetbook_app.dart`
 
-**Intent**: Configure a runnable Widgetbook 3.25.x application (`flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome`) with `MaterialThemeAddon` (Light, Dark, High Contrast Light, High Contrast Dark + coordinated `CupertinoTheme`), `LocalizationAddon` (`en` and `pl` using `AppLocalizations`), `TextScaleAddon` (`1.0`, `1.3`, `1.6`, `2.0`), and a custom wrapper/knob builder allowing live switching between `AdaptivePlatformMode.material`, `cupertinoClassic` (iOS 15–25), and `cupertinoLiquidGlass` (iOS 26+).
+**Intent**: Configure a runnable Widgetbook 3.25.x application (`flutter run -t widgetbook/main_widgetbook.dart -d chrome`) with `MaterialThemeAddon` (Light, Dark, High Contrast Light, High Contrast Dark + coordinated `CupertinoTheme`), `LocalizationAddon` (`en` and `pl` using `AppLocalizations`), `TextScaleAddon` (`1.0`, `1.3`, `1.6`, `2.0`), and a custom wrapper/knob builder allowing live switching between `AdaptivePlatformMode.material`, `cupertinoClassic` (iOS 15–25), and `cupertinoLiquidGlass` (iOS 26+).
 
 **Contract**:
-- `BulkTempoWidgetbookApp` wraps `Widgetbook.material` in a `ProviderScope` and configures `directories` from modular use-case files under `lib/widgetbook/use_cases/`.
+- `BulkTempoWidgetbookApp` wraps `Widgetbook.material` in a `ProviderScope` and configures `directories` from modular use-case files under `widgetbook/use_cases/`.
 
 #### 2. Token & Component Use Cases (7-State Matrix)
 
 **Files**:
-- `lib/widgetbook/use_cases/tokens_use_cases.dart`
-- `lib/widgetbook/use_cases/primitives_use_cases.dart`
-- `lib/widgetbook/use_cases/overlays_and_shell_use_cases.dart`
+- `widgetbook/use_cases/tokens_use_cases.dart`
+- `widgetbook/use_cases/primitives_use_cases.dart`
+- `widgetbook/use_cases/overlays_and_shell_use_cases.dart`
 
 **Intent**: Provide structured `WidgetbookCategory` / `WidgetbookComponent` / `WidgetbookUseCase` entries documenting every token family and all 7 shared widgets across interactive and asynchronous states, with explicit notes where a state is non-applicable.
 
@@ -435,19 +435,19 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 **Intent**: Programmatically mount `BulkTempoWidgetbookApp` and pump every registered `WidgetbookUseCase` builder in English and Polish, light and dark themes, and `2.0x` text scale to ensure no catalog entry throws a runtime or layout overflow error.
 
 **Contract**:
-- Traverses the `directories` tree exported by `lib/widgetbook/widgetbook_app.dart`, extracts every `WidgetbookUseCase`, and pumps each builder inside `tester.pumpApp` under `(Locale('en'), AppTheme.light())`, `(Locale('pl'), AppTheme.dark())`, and `TextScaler.linear(2.0)`, asserting `tester.takeException()` is `null`.
+- Traverses the `directories` tree exported by `widgetbook/widgetbook_app.dart`, extracts every `WidgetbookUseCase`, and pumps each builder inside `tester.pumpApp` under `(Locale('en'), AppTheme.light())`, `(Locale('pl'), AppTheme.dark())`, and `TextScaler.linear(2.0)`, asserting `tester.takeException()` is `null`.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
-- Static analysis and formatting pass across lib and test (including lib/widgetbook/): `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- Static analysis and formatting pass across lib, test, and widgetbook: `dart format --output=none --set-exit-if-changed lib test widgetbook && flutter analyze`
 - Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
 - Complete repository test suite passes: `flutter test`
 
 #### Manual Verification:
 
-- Run flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
+- Run flutter run -t widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
 
@@ -468,7 +468,7 @@ Build the manual Widgetbook 3.25.x component catalog at `lib/widgetbook/main_wid
 
 ### Manual Testing Steps:
 
-1. Run `flutter run -t lib/widgetbook/main_widgetbook.dart -d chrome` and switch between Light, Dark, High Contrast Light, and High Contrast Dark themes, English (`en`) and Polish (`pl`) locales, and `1.0x`–`2.0x` text scales across all token and component use cases.
+1. Run `flutter run -t widgetbook/main_widgetbook.dart -d chrome` and switch between Light, Dark, High Contrast Light, and High Contrast Dark themes, English (`en`) and Polish (`pl`) locales, and `1.0x`–`2.0x` text scales across all token and component use cases.
 2. Toggle the platform capability knob in Widgetbook between Android (`material`), iOS 15–25 (`cupertinoClassic`), and iOS 26+ (`cupertinoLiquidGlass`) to inspect component adaptation.
 3. Run the main app (`flutter run`) on simulator/device or web in light and dark system appearance to confirm `BulkTempoApp` applies the new theme foundation cleanly with no regressions on existing screens.
 

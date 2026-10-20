@@ -1,9 +1,8 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:bulk_tempo/core/platform/os_version_probe.dart';
 
 part 'presentation_capabilities.freezed.dart';
 
@@ -86,15 +85,13 @@ abstract class PresentationCapabilities with _$PresentationCapabilities {
     PresentationCapabilities? override,
   }) {
     var effectiveOverride = override;
-    if (effectiveOverride == null) {
-      try {
-        final container = ProviderScope.containerOf(context, listen: false);
-        effectiveOverride = container.read(
-          presentationCapabilitiesOverrideProvider,
-        );
-      } catch (_) {
-        // No ProviderScope ancestor in widget tree; fall back to ambient values.
-      }
+    if (effectiveOverride == null &&
+        context.getInheritedWidgetOfExactType<UncontrolledProviderScope>() !=
+            null) {
+      final container = ProviderScope.containerOf(context, listen: false);
+      effectiveOverride = container.read(
+        presentationCapabilitiesOverrideProvider,
+      );
     }
 
     final dispatcherFeatures =
@@ -114,16 +111,10 @@ abstract class PresentationCapabilities with _$PresentationCapabilities {
     }
 
     final themePlatform = Theme.of(context).platform;
-    final isRealIosRuntime =
-        !kIsWeb &&
-        Platform.isIOS &&
-        !Platform.environment.containsKey('FLUTTER_TEST') &&
-        !WidgetsBinding.instance.runtimeType.toString().contains(
-          'TestWidgetsFlutterBinding',
-        );
+    final isRealIosRuntime = !kIsWeb && isNativeIosRuntime();
 
     final iosVersion = (!kIsWeb && themePlatform == TargetPlatform.iOS)
-        ? parseIosMajorVersion(Platform.operatingSystemVersion)
+        ? parseIosMajorVersion(currentOperatingSystemVersion())
         : null;
 
     return PresentationCapabilities(

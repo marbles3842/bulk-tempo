@@ -144,14 +144,20 @@ void main() {
     testWidgets('renders CupertinoTextField with label and placeholder', (
       tester,
     ) async {
-      await tester.pumpApp(
-        const AppTextField(label: 'Rate of Gain', hint: 'e.g. 0.25'),
-        capabilities: cupertinoClassicCaps,
-      );
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpApp(
+          const AppTextField(label: 'Rate of Gain', hint: 'e.g. 0.25'),
+          capabilities: cupertinoClassicCaps,
+        );
 
-      expect(find.byType(CupertinoTextField), findsOneWidget);
-      expect(find.text('Rate of Gain'), findsOneWidget);
-      expect(find.text('e.g. 0.25'), findsOneWidget);
+        expect(find.byType(CupertinoTextField), findsOneWidget);
+        expect(find.text('Rate of Gain'), findsOneWidget);
+        expect(find.text('e.g. 0.25'), findsOneWidget);
+        expect(find.bySemanticsLabel('Rate of Gain'), findsOneWidget);
+      } finally {
+        handle.dispose();
+      }
     });
 
     testWidgets('displays suffixText and helperText', (tester) async {

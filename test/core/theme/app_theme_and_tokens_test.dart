@@ -250,6 +250,20 @@ void main() {
   });
 
   group('AppTheme & CupertinoTheme projection', () {
+    test(
+      'highContrastLight and highContrastDark produce distinct primary colors from standard themes',
+      () {
+        expect(
+          AppTheme.highContrastLight().colorScheme.primary,
+          isNot(equals(AppTheme.light().colorScheme.primary)),
+        );
+        expect(
+          AppTheme.highContrastDark().colorScheme.primary,
+          isNot(equals(AppTheme.dark().colorScheme.primary)),
+        );
+      },
+    );
+
     test('headlineMedium configures tabular figures for Metric role', () {
       for (final theme in [
         AppTheme.light(),

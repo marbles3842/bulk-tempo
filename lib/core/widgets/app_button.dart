@@ -105,6 +105,8 @@ class AppButton extends ConsumerWidget {
       enabled: isEnabled && !isBusy,
       label: semanticLabel ?? label,
       container: true,
+      excludeSemantics: true,
+      onTap: effectiveOnPressed,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: expand ? double.infinity : minTapTarget,

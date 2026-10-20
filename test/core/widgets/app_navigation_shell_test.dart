@@ -197,25 +197,42 @@ void main() {
   });
 
   group('AppNavigationShell - Cupertino Liquid Glass dispatch', () {
-    testWidgets('renders AdaptiveScaffold with blur enabled', (tester) async {
-      await tester.pumpApp(
-        AppNavigationShell(
-          title: 'Liquid Glass Shell',
-          destinations: testDestinations,
-          selectedIndex: 0,
-          onDestinationSelected: (_) {},
-          body: const Text('Liquid Content'),
-        ),
-        capabilities: cupertinoLiquidGlassCaps,
-      );
+    testWidgets(
+      'renders AdaptiveScaffold with blur enabled and omits disabled toolbar actions',
+      (tester) async {
+        await tester.pumpApp(
+          AppNavigationShell(
+            title: 'Liquid Glass Shell',
+            destinations: testDestinations,
+            selectedIndex: 0,
+            onDestinationSelected: (_) {},
+            toolbarActions: [
+              AppToolbarAction(
+                tooltip: 'Enabled Action',
+                icon: AppIcon.addMeasurement,
+                onPressed: () {},
+              ),
+              const AppToolbarAction(
+                tooltip: 'Disabled Action',
+                icon: AppIcon.delete,
+                onPressed: null,
+              ),
+            ],
+            body: const Text('Liquid Content'),
+          ),
+          capabilities: cupertinoLiquidGlassCaps,
+        );
 
-      expect(find.byType(AdaptiveScaffold), findsOneWidget);
-      final scaffold = tester.widget<AdaptiveScaffold>(
-        find.byType(AdaptiveScaffold),
-      );
-      expect(scaffold.enableBlur, isTrue);
-      expect(scaffold.appBar?.useNativeToolbar, isTrue);
-      expect(scaffold.bottomNavigationBar?.items?.length, 4);
-    });
+        expect(find.byType(AdaptiveScaffold), findsOneWidget);
+        final scaffold = tester.widget<AdaptiveScaffold>(
+          find.byType(AdaptiveScaffold),
+        );
+        expect(scaffold.enableBlur, isTrue);
+        expect(scaffold.appBar?.useNativeToolbar, isTrue);
+        expect(scaffold.appBar?.actions?.length, 1);
+        expect(scaffold.appBar?.actions?.first.label, 'Enabled Action');
+        expect(scaffold.bottomNavigationBar?.items?.length, 4);
+      },
+    );
   });
 }

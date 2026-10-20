@@ -268,7 +268,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('announces accessible semantics when busy', (tester) async {
+    testWidgets('announces accessible semantics when busy and enabled', (
+      tester,
+    ) async {
       await tester.pumpApp(
         const AppButton(
           label: 'Submit',
@@ -278,10 +280,32 @@ void main() {
         capabilities: materialCaps,
       );
 
-      final semantics = tester.getSemantics(find.byType(AppButton));
-      expect(semantics.label, 'Submit Weight Entry');
-      expect(semantics.flagsCollection.isButton, isTrue);
-      expect(semantics.flagsCollection.isEnabled, Tristate.isFalse);
+      final busySemantics = tester.getSemantics(find.byType(AppButton));
+      expect(busySemantics.label, 'Submit Weight Entry');
+      expect(busySemantics.flagsCollection.isButton, isTrue);
+      expect(busySemantics.flagsCollection.isEnabled, Tristate.isFalse);
+      expect(
+        busySemantics.getSemanticsData().hasAction(SemanticsAction.tap),
+        isFalse,
+      );
+
+      await tester.pumpApp(
+        AppButton(
+          label: 'Submit',
+          semanticLabel: 'Submit Weight Entry',
+          onPressed: () {},
+        ),
+        capabilities: materialCaps,
+      );
+
+      final enabledSemantics = tester.getSemantics(find.byType(AppButton));
+      expect(enabledSemantics.label, 'Submit Weight Entry');
+      expect(enabledSemantics.flagsCollection.isButton, isTrue);
+      expect(enabledSemantics.flagsCollection.isEnabled, Tristate.isTrue);
+      expect(
+        enabledSemantics.getSemanticsData().hasAction(SemanticsAction.tap),
+        isTrue,
+      );
     });
   });
 }

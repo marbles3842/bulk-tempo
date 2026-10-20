@@ -15,6 +15,27 @@ import 'package:bulk_tempo/core/theme/app_spacing.dart';
 /// - Caller-controlled dismissal guards ([canPop] + [onDismissRequested])
 ///   intercepting system back, overscroll at top, and swipe-down gestures.
 class AppSheetFrame extends ConsumerStatefulWidget {
+  /// Default initial fractional height for draggable sheets.
+  static const double defaultInitialChildSize = 0.75;
+
+  /// Default minimum fractional height for draggable sheets.
+  static const double defaultMinChildSize = 0.45;
+
+  /// Default maximum fractional height for draggable sheets.
+  static const double defaultMaxChildSize = 0.92;
+
+  /// Single-frame upward overscroll / scroll-delta threshold (in logical pixels)
+  /// at the top edge of the sheet's vertical scroll view that requests dismissal.
+  static const double dismissOverscrollThreshold = -20.0;
+
+  /// Cumulative downward vertical drag distance (in logical pixels) that
+  /// requests sheet dismissal on drag end.
+  static const double dismissDragDistanceThreshold = 100.0;
+
+  /// Downward fling velocity (in logical pixels per second) that requests
+  /// sheet dismissal on drag end.
+  static const double dismissFlingVelocityThreshold = 250.0;
+
   const AppSheetFrame({
     super.key,
     this.sheetKey,
@@ -27,9 +48,9 @@ class AppSheetFrame extends ConsumerStatefulWidget {
     this.isBusy = false,
     this.onDismissRequested,
     this.isDraggable = false,
-    this.initialChildSize = 0.75,
-    this.minChildSize = 0.45,
-    this.maxChildSize = 0.92,
+    this.initialChildSize = defaultInitialChildSize,
+    this.minChildSize = defaultMinChildSize,
+    this.maxChildSize = defaultMaxChildSize,
     this.maxWidth = AppSpacing.formMaxWidth,
     this.child,
     this.scrollableBuilder,
@@ -118,6 +139,7 @@ class AppSheetFrame extends ConsumerStatefulWidget {
 class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
   late final ScrollController _scrollController = ScrollController();
   double _dragDistance = 0.0;
+  bool _dismissInFlight = false;
 
   @override
   void dispose() {
@@ -126,18 +148,17 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
   }
 
   Future<void> _handleDismissRequest() async {
-    if (widget.isBusy) return;
-
-    if (!widget.canPop) {
-      await widget.onDismissRequested?.call();
-      return;
-    }
-
-    if (widget.onDismissRequested != null) {
-      await widget.onDismissRequested!();
-    } else {
+    if (widget.isBusy || _dismissInFlight) return;
+    _dismissInFlight = true;
+    try {
+      if (!widget.canPop || widget.onDismissRequested != null) {
+        await widget.onDismissRequested?.call();
+      } else if (mounted) {
+        await Navigator.of(context).maybePop();
+      }
+    } finally {
       if (mounted) {
-        Navigator.of(context).maybePop();
+        _dismissInFlight = false;
       }
     }
   }
@@ -308,14 +329,20 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
         color: Colors.transparent,
         child: NotificationListener<ScrollNotification>(
           onNotification: (notification) {
+            if (notification.depth != 0 ||
+                notification.metrics.axis != Axis.vertical) {
+              return false;
+            }
             if (notification is OverscrollNotification &&
-                notification.overscroll < -20) {
+                notification.overscroll <
+                    AppSheetFrame.dismissOverscrollThreshold) {
               _handleDismissRequest();
               return true;
             }
             if (notification is ScrollUpdateNotification &&
                 notification.metrics.pixels <= 0 &&
-                (notification.scrollDelta ?? 0) < -20) {
+                (notification.scrollDelta ?? 0) <
+                    AppSheetFrame.dismissOverscrollThreshold) {
               _handleDismissRequest();
               return true;
             }
@@ -332,7 +359,9 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
               }
             },
             onVerticalDragEnd: (details) {
-              if (_dragDistance > 100 || (details.primaryVelocity ?? 0) > 250) {
+              if (_dragDistance > AppSheetFrame.dismissDragDistanceThreshold ||
+                  (details.primaryVelocity ?? 0) >
+                      AppSheetFrame.dismissFlingVelocityThreshold) {
                 _handleDismissRequest();
               }
               _dragDistance = 0.0;

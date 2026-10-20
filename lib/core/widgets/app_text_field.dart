@@ -197,44 +197,52 @@ class AppTextField extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          label,
-          style: textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
+        ExcludeSemantics(
+          child: Text(
+            label,
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.space1),
-        ConstrainedBox(
-          constraints: BoxConstraints(minHeight: minTapTarget),
-          child: CupertinoTextField(
-            key: fieldKey,
-            controller: controller,
-            placeholder: hint,
-            placeholderStyle: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-            ),
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            obscureText: obscureText,
-            enabled: enabled,
-            autocorrect: autocorrect,
-            enableSuggestions: enableSuggestions,
-            keyboardType: keyboardType,
-            textInputAction: textInputAction,
-            onChanged: onChanged,
-            onSubmitted: onSubmitted,
-            prefix: prefixWidget,
-            suffix: suffixWidget,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space3,
-            ),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: AppShape.smallRadius,
-              border: Border.all(
-                color: borderColor,
-                width: hasError ? 1.5 : 1.0,
+        Semantics(
+          label: label,
+          textField: true,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minTapTarget),
+            child: CupertinoTextField(
+              key: fieldKey,
+              controller: controller,
+              placeholder: hint,
+              placeholderStyle: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              obscureText: obscureText,
+              enabled: enabled,
+              autocorrect: autocorrect,
+              enableSuggestions: enableSuggestions,
+              keyboardType: keyboardType,
+              textInputAction: textInputAction,
+              onChanged: onChanged,
+              onSubmitted: onSubmitted,
+              prefix: prefixWidget,
+              suffix: suffixWidget,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space3,
+              ),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: AppShape.smallRadius,
+                border: Border.all(
+                  color: borderColor,
+                  width: hasError ? 1.5 : 1.0,
+                ),
               ),
             ),
           ),

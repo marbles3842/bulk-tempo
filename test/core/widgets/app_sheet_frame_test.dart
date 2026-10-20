@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bulk_tempo/core/theme/app_spacing.dart';
@@ -163,6 +165,80 @@ void main() {
 
         // Attempt system back
         await tester.binding.handlePopRoute();
+        await tester.pump();
+
+        expect(dismissRequestedCount, 0);
+      },
+    );
+
+    testWidgets(
+      'guards against duplicate dismissal requests while async onDismissRequested is in flight',
+      (tester) async {
+        var dismissRequestedCount = 0;
+        final completer = Completer<void>();
+
+        await tester.pumpApp(
+          Scaffold(
+            body: AppSheetFrame(
+              title: 'Async Guard Sheet',
+              canPop: false,
+              onDismissRequested: () {
+                dismissRequestedCount++;
+                return completer.future;
+              },
+              scrollableBuilder: (context, controller) {
+                return ListView.builder(
+                  controller: controller,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: 5,
+                  itemBuilder: (_, index) =>
+                      SizedBox(height: 60, child: Text('Row $index')),
+                );
+              },
+            ),
+          ),
+        );
+
+        // Drag down at the top of the vertical scroll view to emit multiple overscroll frames
+        await tester.drag(find.text('Row 0'), const Offset(0, 180));
+        await tester.pump();
+
+        expect(dismissRequestedCount, 1);
+
+        // Complete the in-flight dismissal request and verify subsequent gesture works
+        completer.complete();
+        await tester.pump();
+      },
+    );
+
+    testWidgets(
+      'ignores horizontal scroll overscroll notifications inside sheet body',
+      (tester) async {
+        var dismissRequestedCount = 0;
+
+        await tester.pumpApp(
+          Scaffold(
+            body: AppSheetFrame(
+              title: 'Horizontal Scroll Sheet',
+              canPop: false,
+              onDismissRequested: () => dismissRequestedCount++,
+              child: SizedBox(
+                height: 80,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(width: 120, child: Text('Chip A')),
+                    SizedBox(width: 120, child: Text('Chip B')),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Swipe right at the start of the horizontal list to produce negative horizontal overscroll
+        await tester.drag(find.text('Chip A'), const Offset(150, 0));
         await tester.pump();
 
         expect(dismissRequestedCount, 0);
