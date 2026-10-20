@@ -61,5 +61,5 @@ We are implementing Bulk Tempo's foundational design system (`lib/core/theme/`, 
 
 ## Success Criteria (Summary)
 
-- `dart format --output=none --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test` pass with all existing tests and new token, 3-mode widget, accessibility guideline (`48×48` / `44×44` tap targets, contrast, `2.0x` `TextScaler`), and Widgetbook smoke tests green.
+- `dart format --output=none --set-exit-if-changed lib test widgetbook`, `flutter analyze`, and `flutter test` pass with all existing tests and new token, 3-mode widget, accessibility guideline (`48×48` / `44×44` tap targets, contrast, `2.0x` `TextScaler`), and Widgetbook smoke tests green.
 - Running `flutter run -t widgetbook/main_widgetbook.dart -d chrome` renders all token and component use cases interactively across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, and platform capability modes.

@@ -44,7 +44,7 @@ Build bottom-up inside `lib/core/` and `widgetbook/` across four incremental pha
 ## Critical Implementation Details
 
 - **Root-level `widgetbook/` catalog separation**: Because `widgetbook: ^3.25.0` is added under `dev_dependencies` in `pubspec.yaml`, placing the standalone catalog entrypoint at `widgetbook/main_widgetbook.dart` outside `lib/` keeps production code separated from dev-only cataloging packages without requiring `depend_on_referenced_packages` lint suppressions.
-- **Headless test & web fallback for `adaptive_platform_ui` native views**: On iOS 26+, `adaptive_platform_ui` renders native UIKit platform views (`UiKitView`) for glass toolbars, tab bars, and buttons. Neither Flutter's headless widget test runner nor Chrome (`flutter run -d chrome`) can instantiate native iOS `UiKitView`s. `PresentationCapabilities` must therefore gate `cupertinoLiquidGlass` on ` isIos26OrNewer && supportsNativeIosPlatformViews` (true on real iOS runtime when `!kIsWeb` and not in headless widget test environment unless `forceNativeIosViews: true` is explicitly passed in a capability override), falling back to `cupertinoClassic` in web Widgetbook and standard widget tests so iOS previews and assertions remain interactive and deterministic.
+- **Headless test & web fallback for `adaptive_platform_ui` native views**: On iOS 26+, `adaptive_platform_ui` renders native UIKit platform views (`UiKitView`) for glass toolbars, tab bars, and buttons. Neither Flutter's headless widget test runner nor Chrome (`flutter run -d chrome`) can instantiate native iOS `UiKitView`s. `PresentationCapabilities` must therefore gate `cupertinoLiquidGlass` on `isIos26OrNewer && supportsNativeIosViews` (true on real iOS runtime when `!kIsWeb` and not in headless widget test environment unless `supportsNativeIosViews: true` is explicitly passed in a capability override), falling back to `cupertinoClassic` in web Widgetbook and standard widget tests so iOS previews and assertions remain interactive and deterministic.
 - **Safe `ThemeExtension` resolution in tests**: Even after updating `pump_app.dart` and `app_router_test.dart` to supply `AppTheme.light()`, provide convenience accessors `AppSemanticColors.of(BuildContext)` and `AppChartTheme.of(BuildContext)` that fall back to the light/dark default extension instance (matched to `Theme.of(context).brightness`) if `Theme.of(context).extension<T>()` is ever null in an isolated test harness.
 
 ---
@@ -432,7 +432,7 @@ Build the manual Widgetbook 3.25.x component catalog at `widgetbook/main_widgetb
 
 **File**: `test/widgetbook/widgetbook_smoke_test.dart`
 
-**Intent**: Programmatically mount `BulkTempoWidgetbookApp` and pump every registered `WidgetbookUseCase` builder in English and Polish, light and dark themes, and `2.0x` text scale to ensure no catalog entry throws a runtime or layout overflow error.
+**Intent**: Programmatically mount `BulkTempoWidgetbookApp` and pump every registered `WidgetbookUseCase` builder across the representative `(Locale('en'), AppTheme.light())` and `(Locale('pl'), AppTheme.dark())` configurations and `2.0x` text scale to ensure no catalog entry throws a runtime or layout overflow error.
 
 **Contract**:
 - Traverses the `directories` tree exported by `widgetbook/widgetbook_app.dart`, extracts every `WidgetbookUseCase`, and pumps each builder inside `tester.pumpApp` under `(Locale('en'), AppTheme.light())`, `(Locale('pl'), AppTheme.dark())`, and `TextScaler.linear(2.0)`, asserting `tester.takeException()` is `null`.
@@ -442,12 +442,12 @@ Build the manual Widgetbook 3.25.x component catalog at `widgetbook/main_widgetb
 #### Automated Verification:
 
 - Static analysis and formatting pass across lib, test, and widgetbook: `dart format --output=none --set-exit-if-changed lib test widgetbook && flutter analyze`
-- Localization parity test and Widgetbook smoke tests pass across EN/PL, light/dark, and 2.0x text scaling: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
+- Localization parity test and Widgetbook smoke tests pass across the representative EN/light, PL/dark, and 2.0x text scaling checks: `flutter test test/core/localization/l10n_parity_test.dart test/widgetbook/widgetbook_smoke_test.dart`
 - Complete repository test suite passes: `flutter test`
 
 #### Manual Verification:
 
-- Run flutter run -t widgetbook/main_widgetbook.dart -d chrome and inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and Android / iOS 15–25 / iOS 26+ capability knobs
+- Run `flutter run -t widgetbook/main_widgetbook.dart -d chrome` to inspect all token and component use cases across the 7-state matrix, English and Polish locales, light/dark/high-contrast themes, 2.0x text scale, and capability-only platform mode toggles (`material`, `cupertinoClassic`, `cupertinoLiquidGlass`). Validate native `UiKitView` / Liquid Glass rendering on a real iOS 26+ simulator or device.
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
 

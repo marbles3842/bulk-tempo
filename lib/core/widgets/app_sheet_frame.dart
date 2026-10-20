@@ -149,6 +149,8 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
 
   Future<void> _handleDismissRequest() async {
     if (widget.isBusy || _dismissInFlight) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
     _dismissInFlight = true;
     try {
       if (!widget.canPop || widget.onDismissRequested != null) {
@@ -334,12 +336,14 @@ class _AppSheetFrameState extends ConsumerState<AppSheetFrame> {
               return false;
             }
             if (notification is OverscrollNotification &&
+                notification.dragDetails != null &&
                 notification.overscroll <
                     AppSheetFrame.dismissOverscrollThreshold) {
               _handleDismissRequest();
               return true;
             }
             if (notification is ScrollUpdateNotification &&
+                notification.dragDetails != null &&
                 notification.metrics.pixels <= 0 &&
                 (notification.scrollDelta ?? 0) <
                     AppSheetFrame.dismissOverscrollThreshold) {
