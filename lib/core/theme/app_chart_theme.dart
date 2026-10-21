@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'app_shape.dart';
+
 part 'app_chart_theme.freezed.dart';
 
 /// Immutable [ThemeExtension] defining semantic chart roles, stroke widths,
@@ -11,6 +13,13 @@ part 'app_chart_theme.freezed.dart';
 abstract class AppChartTheme extends ThemeExtension<AppChartTheme>
     with _$AppChartTheme {
   const AppChartTheme._();
+
+  static const double defaultChartHeight = 220.0;
+  static const double defaultBarRadius = AppShape.subtle;
+  static const double defaultBottomAxisReservedSize = 32.0;
+  static const double defaultWorkoutsLeftAxisReservedSize = 28.0;
+  static const double defaultWeightLeftAxisReservedSize = 48.0;
+  static const double defaultPaceLeftAxisReservedSize = 58.0;
 
   const factory AppChartTheme({
     required Color seriesWeight,
@@ -24,6 +33,16 @@ abstract class AppChartTheme extends ThemeExtension<AppChartTheme>
     required Color onTooltipSurface,
     @Default(3.0) double lineStrokeWidth,
     @Default(12.0) double barWidth,
+    @Default(AppChartTheme.defaultBarRadius) double barRadius,
+    @Default(AppChartTheme.defaultChartHeight) double chartHeight,
+    @Default(AppChartTheme.defaultBottomAxisReservedSize)
+    double bottomAxisReservedSize,
+    @Default(AppChartTheme.defaultWorkoutsLeftAxisReservedSize)
+    double workoutsLeftAxisReservedSize,
+    @Default(AppChartTheme.defaultWeightLeftAxisReservedSize)
+    double weightLeftAxisReservedSize,
+    @Default(AppChartTheme.defaultPaceLeftAxisReservedSize)
+    double paceLeftAxisReservedSize,
     @Default(<int>[6, 4]) List<int> targetDashPattern,
   }) = _AppChartTheme;
 
@@ -64,6 +83,12 @@ abstract class AppChartTheme extends ThemeExtension<AppChartTheme>
     Color? onTooltipSurface,
     double? lineStrokeWidth,
     double? barWidth,
+    double? barRadius,
+    double? chartHeight,
+    double? bottomAxisReservedSize,
+    double? workoutsLeftAxisReservedSize,
+    double? weightLeftAxisReservedSize,
+    double? paceLeftAxisReservedSize,
     List<int>? targetDashPattern,
   }) {
     return AppChartTheme(
@@ -78,6 +103,16 @@ abstract class AppChartTheme extends ThemeExtension<AppChartTheme>
       onTooltipSurface: onTooltipSurface ?? this.onTooltipSurface,
       lineStrokeWidth: lineStrokeWidth ?? this.lineStrokeWidth,
       barWidth: barWidth ?? this.barWidth,
+      barRadius: barRadius ?? this.barRadius,
+      chartHeight: chartHeight ?? this.chartHeight,
+      bottomAxisReservedSize:
+          bottomAxisReservedSize ?? this.bottomAxisReservedSize,
+      workoutsLeftAxisReservedSize:
+          workoutsLeftAxisReservedSize ?? this.workoutsLeftAxisReservedSize,
+      weightLeftAxisReservedSize:
+          weightLeftAxisReservedSize ?? this.weightLeftAxisReservedSize,
+      paceLeftAxisReservedSize:
+          paceLeftAxisReservedSize ?? this.paceLeftAxisReservedSize,
       targetDashPattern: targetDashPattern ?? this.targetDashPattern,
     );
   }
@@ -105,6 +140,37 @@ abstract class AppChartTheme extends ThemeExtension<AppChartTheme>
           ui.lerpDouble(lineStrokeWidth, other.lineStrokeWidth, t) ??
           lineStrokeWidth,
       barWidth: ui.lerpDouble(barWidth, other.barWidth, t) ?? barWidth,
+      barRadius: ui.lerpDouble(barRadius, other.barRadius, t) ?? barRadius,
+      chartHeight:
+          ui.lerpDouble(chartHeight, other.chartHeight, t) ?? chartHeight,
+      bottomAxisReservedSize:
+          ui.lerpDouble(
+            bottomAxisReservedSize,
+            other.bottomAxisReservedSize,
+            t,
+          ) ??
+          bottomAxisReservedSize,
+      workoutsLeftAxisReservedSize:
+          ui.lerpDouble(
+            workoutsLeftAxisReservedSize,
+            other.workoutsLeftAxisReservedSize,
+            t,
+          ) ??
+          workoutsLeftAxisReservedSize,
+      weightLeftAxisReservedSize:
+          ui.lerpDouble(
+            weightLeftAxisReservedSize,
+            other.weightLeftAxisReservedSize,
+            t,
+          ) ??
+          weightLeftAxisReservedSize,
+      paceLeftAxisReservedSize:
+          ui.lerpDouble(
+            paceLeftAxisReservedSize,
+            other.paceLeftAxisReservedSize,
+            t,
+          ) ??
+          paceLeftAxisReservedSize,
       targetDashPattern: t < 0.5 ? targetDashPattern : other.targetDashPattern,
     );
   }

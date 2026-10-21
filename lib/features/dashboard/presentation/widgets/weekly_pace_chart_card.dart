@@ -109,7 +109,7 @@ class WeeklyPaceChartCard extends StatelessWidget {
         excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
-          height: 220,
+          height: chartTheme.chartHeight,
           child: BarChart(
             BarChartData(
               minY: low - padding,
@@ -166,7 +166,7 @@ class WeeklyPaceChartCard extends StatelessWidget {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 32.0 * math.min(textScale, 1.8),
+                    reservedSize: chartTheme.bottomAxisReservedSize,
                     interval: 1,
                     getTitlesWidget: (value, meta) {
                       final index = value.toInt();
@@ -195,7 +195,7 @@ class WeeklyPaceChartCard extends StatelessWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 58.0 * math.min(textScale, 1.6),
+                    reservedSize: chartTheme.paceLeftAxisReservedSize,
                     getTitlesWidget: (value, meta) => SideTitleWidget(
                       meta: meta,
                       child: Text(
@@ -233,9 +233,9 @@ class WeeklyPaceChartCard extends StatelessWidget {
                             ? 0
                             : chartTheme.barWidth,
                         color: chartTheme.seriesPace,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(4),
-                          bottom: Radius.circular(4),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(chartTheme.barRadius),
+                          bottom: Radius.circular(chartTheme.barRadius),
                         ),
                       ),
                     ],

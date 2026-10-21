@@ -192,21 +192,45 @@ void main() {
       expect(lightChart.onTooltipSurface, lightScheme.onInverseSurface);
       expect(lightChart.lineStrokeWidth, 3.0);
       expect(lightChart.barWidth, 12.0);
+      expect(lightChart.barRadius, AppShape.subtle);
+      expect(lightChart.chartHeight, 220.0);
+      expect(lightChart.bottomAxisReservedSize, 32.0);
+      expect(lightChart.workoutsLeftAxisReservedSize, 28.0);
+      expect(lightChart.weightLeftAxisReservedSize, 48.0);
+      expect(lightChart.paceLeftAxisReservedSize, 58.0);
       expect(lightChart.targetDashPattern, const [6, 4]);
 
       final updated = lightChart.copyWith(
         lineStrokeWidth: 4.0,
         barWidth: 16.0,
+        barRadius: 6.0,
+        chartHeight: 240.0,
+        bottomAxisReservedSize: 36.0,
+        workoutsLeftAxisReservedSize: 32.0,
+        weightLeftAxisReservedSize: 52.0,
+        paceLeftAxisReservedSize: 62.0,
         targetDashPattern: const [8, 4],
       );
       expect(updated.lineStrokeWidth, 4.0);
       expect(updated.barWidth, 16.0);
+      expect(updated.barRadius, 6.0);
+      expect(updated.chartHeight, 240.0);
+      expect(updated.bottomAxisReservedSize, 36.0);
+      expect(updated.workoutsLeftAxisReservedSize, 32.0);
+      expect(updated.weightLeftAxisReservedSize, 52.0);
+      expect(updated.paceLeftAxisReservedSize, 62.0);
       expect(updated.targetDashPattern, const [8, 4]);
 
       expect(lightChart.lerp(null, 0.5), equals(lightChart));
       final lerped = lightChart.lerp(updated, 0.5);
       expect(lerped.lineStrokeWidth, 3.5);
       expect(lerped.barWidth, 14.0);
+      expect(lerped.barRadius, 5.0);
+      expect(lerped.chartHeight, 230.0);
+      expect(lerped.bottomAxisReservedSize, 34.0);
+      expect(lerped.workoutsLeftAxisReservedSize, 30.0);
+      expect(lerped.weightLeftAxisReservedSize, 50.0);
+      expect(lerped.paceLeftAxisReservedSize, 60.0);
       expect(lerped.targetDashPattern, const [8, 4]);
       expect(lightChart.lerp(darkChart, 0.0), equals(lightChart));
     });
@@ -327,6 +351,7 @@ void main() {
         expect(AppSpacing.androidMinTapTarget, 48.0);
         expect(AppSpacing.iosMinTapTarget, 44.0);
 
+        expect(AppShape.subtle, 4.0);
         expect(AppShape.small, 8.0);
         expect(AppShape.card, 16.0);
         expect(AppShape.sheet, 24.0);

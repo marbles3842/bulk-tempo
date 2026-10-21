@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 /// Shared border-radius tokens and prebuilt shape helpers.
 abstract final class AppShape {
+  /// Subtle radius (`4px`) for chart bars and micro indicators.
+  static const double subtle = 4.0;
+
   /// Compact radius (`8px`) for status badges, inline banners, and inputs.
   static const double small = 8.0;
 
@@ -10,6 +13,10 @@ abstract final class AppShape {
 
   /// Modal bottom sheet and dialog corner radius (`24px`).
   static const double sheet = 24.0;
+
+  static const BorderRadius subtleRadius = BorderRadius.all(
+    Radius.circular(subtle),
+  );
 
   static const BorderRadius smallRadius = BorderRadius.all(
     Radius.circular(small),

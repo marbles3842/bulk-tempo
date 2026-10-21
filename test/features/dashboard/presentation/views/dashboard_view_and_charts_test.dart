@@ -188,6 +188,24 @@ void main() {
         final data = lineChart.data;
         final barData = data.lineBarsData.single;
 
+        final chartSizedBox = tester.widget<SizedBox>(
+          find
+              .ancestor(
+                of: find.byType(LineChart),
+                matching: find.byType(SizedBox),
+              )
+              .first,
+        );
+        expect(chartSizedBox.height, equals(chartTheme.chartHeight));
+        expect(
+          data.titlesData.bottomTitles.sideTitles.reservedSize,
+          equals(chartTheme.bottomAxisReservedSize),
+        );
+        expect(
+          data.titlesData.leftTitles.sideTitles.reservedSize,
+          equals(chartTheme.weightLeftAxisReservedSize),
+        );
+
         expect(barData.color, equals(chartTheme.seriesWeight));
         expect(barData.barWidth, equals(chartTheme.lineStrokeWidth));
         expect(
@@ -247,6 +265,24 @@ void main() {
         final barChart = tester.widget<BarChart>(find.byType(BarChart));
         final data = barChart.data;
 
+        final chartSizedBox = tester.widget<SizedBox>(
+          find.descendant(
+            of: find.byType(WeeklyPaceChartCard),
+            matching: find.byWidgetPredicate(
+              (w) => w is SizedBox && w.child is BarChart,
+            ),
+          ),
+        );
+        expect(chartSizedBox.height, equals(chartTheme.chartHeight));
+        expect(
+          data.titlesData.bottomTitles.sideTitles.reservedSize,
+          equals(chartTheme.bottomAxisReservedSize),
+        );
+        expect(
+          data.titlesData.leftTitles.sideTitles.reservedSize,
+          equals(chartTheme.paceLeftAxisReservedSize),
+        );
+
         // First week has null pace (width 0), subsequent weeks have pace (width chartTheme.barWidth)
         final populatedRods = data.barGroups
             .skip(1)
@@ -256,6 +292,15 @@ void main() {
         for (final rod in populatedRods) {
           expect(rod.color, equals(chartTheme.seriesPace));
           expect(rod.width, equals(chartTheme.barWidth));
+          expect(
+            rod.borderRadius,
+            equals(
+              BorderRadius.vertical(
+                top: Radius.circular(chartTheme.barRadius),
+                bottom: Radius.circular(chartTheme.barRadius),
+              ),
+            ),
+          );
         }
 
         // Target band annotation
@@ -331,10 +376,34 @@ void main() {
         final data = barChart.data;
         expect(data.barGroups, hasLength(12));
 
+        final chartSizedBox = tester.widget<SizedBox>(
+          find.descendant(
+            of: find.byType(WeeklyWorkoutsChartCard),
+            matching: find.byWidgetPredicate(
+              (w) => w is SizedBox && w.child is BarChart,
+            ),
+          ),
+        );
+        expect(chartSizedBox.height, equals(chartTheme.chartHeight));
+        expect(
+          data.titlesData.bottomTitles.sideTitles.reservedSize,
+          equals(chartTheme.bottomAxisReservedSize),
+        );
+        expect(
+          data.titlesData.leftTitles.sideTitles.reservedSize,
+          equals(chartTheme.workoutsLeftAxisReservedSize),
+        );
+
         for (final group in data.barGroups) {
           final rod = group.barRods.single;
           expect(rod.color, equals(chartTheme.seriesWorkouts));
           expect(rod.width, equals(chartTheme.barWidth));
+          expect(
+            rod.borderRadius,
+            equals(
+              BorderRadius.vertical(top: Radius.circular(chartTheme.barRadius)),
+            ),
+          );
         }
 
         final semanticsFinder = find.descendant(

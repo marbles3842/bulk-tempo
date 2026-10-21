@@ -65,7 +65,7 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
         excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
-          height: 220,
+          height: chartTheme.chartHeight,
           child: BarChart(
             BarChartData(
               minY: 0,
@@ -88,7 +88,7 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 32.0 * math.min(textScale, 1.8),
+                    reservedSize: chartTheme.bottomAxisReservedSize,
                     interval: 1,
                     getTitlesWidget: (value, meta) {
                       final index = value.toInt();
@@ -117,7 +117,7 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 28.0 * math.min(textScale, 1.6),
+                    reservedSize: chartTheme.workoutsLeftAxisReservedSize,
                     interval: 1,
                     getTitlesWidget: (value, meta) {
                       if (value != value.roundToDouble()) {
@@ -156,8 +156,8 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
                         toY: weeks[i].workoutCount.toDouble(),
                         width: chartTheme.barWidth,
                         color: chartTheme.seriesWorkouts,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(4),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(chartTheme.barRadius),
                         ),
                       ),
                     ],

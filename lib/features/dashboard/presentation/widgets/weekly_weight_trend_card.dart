@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +68,7 @@ class WeeklyWeightTrendCard extends StatelessWidget {
         excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
-          height: 220,
+          height: chartTheme.chartHeight,
           child: LineChart(
             LineChartData(
               minX: 0,
@@ -100,7 +98,7 @@ class WeeklyWeightTrendCard extends StatelessWidget {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 32.0 * math.min(textScale, 1.8),
+                    reservedSize: chartTheme.bottomAxisReservedSize,
                     interval: 1,
                     getTitlesWidget: (value, meta) {
                       final index = value.toInt();
@@ -129,7 +127,7 @@ class WeeklyWeightTrendCard extends StatelessWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 48.0 * math.min(textScale, 1.6),
+                    reservedSize: chartTheme.weightLeftAxisReservedSize,
                     getTitlesWidget: (value, meta) => SideTitleWidget(
                       meta: meta,
                       child: Text(

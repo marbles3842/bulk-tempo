@@ -46,7 +46,7 @@ class DashboardCardShell extends StatelessWidget {
     this.unconfiguredMessage,
     this.unconfiguredMessageKey,
     required this.child,
-    this.contentHeight = 160,
+    this.contentHeight = AppChartTheme.defaultChartHeight,
   });
 
   @override
