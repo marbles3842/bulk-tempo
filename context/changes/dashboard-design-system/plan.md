@@ -303,26 +303,26 @@ Populate `test/features/dashboard/presentation/` with widget and accessibility t
 
 #### Automated
 
-- [x] 1.1 Branch is based on `feature/design-system` (`git merge-base --is-ancestor feature/design-system HEAD`)
-- [x] 1.2 Static analysis passes with zero warnings: `flutter analyze`
-- [x] 1.3 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook`
-- [x] 1.4 Existing Home shell and dashboard tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/features/dashboard/`
+- [x] 1.1 Branch is based on `feature/design-system` (`git merge-base --is-ancestor feature/design-system HEAD`) — 760a380
+- [x] 1.2 Static analysis passes with zero warnings: `flutter analyze` — 760a380
+- [x] 1.3 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook` — 760a380
+- [x] 1.4 Existing Home shell and dashboard tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart test/features/dashboard/` — 760a380
 
 #### Manual
 
-- [x] 1.5 Inspect Home tab on compact (`<600px`) and wide (`>=840px`) viewports: KPI tiles switch cleanly between `2×2` and `4×1` equal-height rows, and stack into `1×4` when text scale is `>=1.4x` with zero `FittedBox` shrinking or subtitle clipping.
+- [x] 1.5 Inspect Home tab on compact (`<600px`) and wide (`>=840px`) viewports: KPI tiles switch cleanly between `2×2` and `4×1` equal-height rows, and stack into `1×4` when text scale is `>=1.4x` with zero `FittedBox` shrinking or subtitle clipping. — 760a380
 
 ### Phase 2: Dashboard `fl_chart` Cards Tokenization, Target Band & Accessibility
 
 #### Automated
 
-- [ ] 2.1 Static analysis passes: `flutter analyze`
-- [ ] 2.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook`
-- [ ] 2.3 Home shell and dashboard tests pass (including `rangeAnnotations` assertion at `home_shell_screen_test.dart:279-282`): `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
+- [x] 2.1 Static analysis passes: `flutter analyze`
+- [x] 2.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook`
+- [x] 2.3 Home shell and dashboard tests pass (including `rangeAnnotations` assertion at `home_shell_screen_test.dart:279-282`): `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
 
 #### Manual
 
-- [ ] 2.4 Inspect the 3 dashboard charts in Light, Dark, and High-Contrast themes: Weight Trend and Weekly Pace use `seriesWeight`/`seriesPace` (`primary`), Workouts per Week uses `seriesWorkouts` (`tertiary`), Weekly Pace shows the `targetFill` band with dashed `targetBoundary` lines, tooltips use `tooltipSurface`/`onTooltipSurface`, and `2.0x` text scale steps bottom ticks to every 4th week without label collision.
+- [x] 2.4 Inspect the 3 dashboard charts in Light, Dark, and High-Contrast themes: Weight Trend and Weekly Pace use `seriesWeight`/`seriesPace` (`primary`), Workouts per Week uses `seriesWorkouts` (`tertiary`), Weekly Pace shows the `targetFill` band with dashed `targetBoundary` lines, tooltips use `tooltipSurface`/`onTooltipSurface`, and `2.0x` text scale steps bottom ticks to every 4th week without label collision.
 
 ### Phase 3: Dashboard Widget/Accessibility Test Suite & Widgetbook Catalog
 

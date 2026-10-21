@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
@@ -25,11 +26,32 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
       0,
       (max, week) => math.max(max, week.workoutCount),
     );
-    final color = Theme.of(context).colorScheme.primary;
+    final chartTheme = AppChartTheme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    final axisLabelStyle = textTheme.labelSmall?.copyWith(
+      color: chartTheme.axisLabel,
+    );
+    final tooltipTextStyle =
+        textTheme.labelSmall?.copyWith(
+          color: chartTheme.onTooltipSurface,
+          fontWeight: FontWeight.w600,
+        ) ??
+        TextStyle(
+          color: chartTheme.onTooltipSurface,
+          fontWeight: FontWeight.w600,
+        );
+
+    final semanticsParts = <String>[
+      context.l10n.dashboardWorkoutsTitle,
+      for (final week in weeks)
+        '${WeekDateUtils.formatWeekRange(week.weekStartMonday, week.weekEndSunday, locale)}: ${context.l10n.dashboardWorkoutsTooltip(week.workoutCount)}',
+    ];
 
     return DashboardCardShell(
       cardKey: const Key('dashboard_weekly_workouts_card'),
       title: context.l10n.dashboardWorkoutsTitle,
+      leadingIcon: AppIcon.workout,
       status: state.workoutStatus,
       isOutdated: state.isWorkoutOutdated,
       outdatedBadgeKey: const Key('weekly_workouts_outdated_badge'),
@@ -38,96 +60,109 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
       retryButtonKey: const Key('dashboard_workouts_retry_button'),
       unconfiguredMessage: context.l10n.dashboardWorkoutsUnconfigured,
       unconfiguredMessageKey: const Key('dashboard_workouts_unconfigured_text'),
-      child: SizedBox(
-        height: 220,
-        child: BarChart(
-          BarChartData(
-            minY: 0,
-            maxY: math.max(1, maxCount + 1).toDouble(),
-            alignment: BarChartAlignment.spaceAround,
-            gridData: const FlGridData(show: true, drawVerticalLine: false),
-            borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
+      child: Semantics(
+        container: true,
+        label: semanticsParts.join('. '),
+        child: SizedBox(
+          height: 220,
+          child: BarChart(
+            BarChartData(
+              minY: 0,
+              maxY: math.max(1, maxCount + 1).toDouble(),
+              alignment: BarChartAlignment.spaceAround,
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                getDrawingHorizontalLine: (_) =>
+                    FlLine(color: chartTheme.gridLine, strokeWidth: 1),
               ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 32,
-                  interval: 1,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (value != index.toDouble() ||
-                        index < 0 ||
-                        index >= weeks.length ||
-                        index.isOdd) {
-                      return const SizedBox.shrink();
-                    }
-                    return SideTitleWidget(
-                      meta: meta,
-                      child: Text(
-                        WeekDateUtils.formatShortWeekLabel(
-                          weeks[index].weekStartMonday,
-                          locale,
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 32.0 * math.min(textScale, 1.8),
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      final showTick = textScale >= 1.3
+                          ? index % 4 == 0
+                          : index.isEven;
+                      if (value != index.toDouble() ||
+                          index < 0 ||
+                          index >= weeks.length ||
+                          !showTick) {
+                        return const SizedBox.shrink();
+                      }
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Text(
+                          WeekDateUtils.formatShortWeekLabel(
+                            weeks[index].weekStartMonday,
+                            locale,
+                          ),
+                          style: axisLabelStyle,
                         ),
-                        style: const TextStyle(fontSize: 10),
-                      ),
+                      );
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 28.0 * math.min(textScale, 1.6),
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      if (value != value.roundToDouble()) {
+                        return const SizedBox.shrink();
+                      }
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Text(
+                          value.toInt().toString(),
+                          style: axisLabelStyle,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              barTouchData: BarTouchData(
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipColor: (_) => chartTheme.tooltipSurface,
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    final week = weeks[group.x];
+                    return BarTooltipItem(
+                      '${WeekDateUtils.formatWeekRange(week.weekStartMonday, week.weekEndSunday, locale)}\n'
+                      '${context.l10n.dashboardWorkoutsTooltip(week.workoutCount)}',
+                      tooltipTextStyle,
                     );
                   },
                 ),
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 28,
-                  interval: 1,
-                  getTitlesWidget: (value, meta) {
-                    if (value != value.roundToDouble()) {
-                      return const SizedBox.shrink();
-                    }
-                    return SideTitleWidget(
-                      meta: meta,
-                      child: Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(fontSize: 10),
+              barGroups: [
+                for (var i = 0; i < weeks.length; i++)
+                  BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: weeks[i].workoutCount.toDouble(),
+                        width: chartTheme.barWidth,
+                        color: chartTheme.seriesWorkouts,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(4),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ],
+                  ),
+              ],
             ),
-            barTouchData: BarTouchData(
-              touchTooltipData: BarTouchTooltipData(
-                getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                  final week = weeks[group.x];
-                  return BarTooltipItem(
-                    '${WeekDateUtils.formatWeekRange(week.weekStartMonday, week.weekEndSunday, locale)}\n'
-                    '${context.l10n.dashboardWorkoutsTooltip(week.workoutCount)}',
-                    const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                },
-              ),
-            ),
-            barGroups: [
-              for (var i = 0; i < weeks.length; i++)
-                BarChartGroupData(
-                  x: i,
-                  barRods: [
-                    BarChartRodData(
-                      toY: weeks[i].workoutCount.toDouble(),
-                      width: 12,
-                      color: color,
-                    ),
-                  ],
-                ),
-            ],
           ),
         ),
       ),
