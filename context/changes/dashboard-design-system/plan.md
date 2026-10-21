@@ -328,12 +328,12 @@ Populate `test/features/dashboard/presentation/` with widget and accessibility t
 
 #### Automated
 
-- [x] 3.1 Static analysis passes: `flutter analyze`
-- [x] 3.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook`
-- [x] 3.3 Dashboard presentation widget and accessibility tests pass: `flutter test test/features/dashboard/`
-- [x] 3.4 Widgetbook smoke tests pass across EN/PL, Light/Dark, and `2.0x` text scale: `flutter test test/widgetbook/widgetbook_smoke_test.dart`
-- [x] 3.5 Full repository test suite passes: `flutter test`
+- [x] 3.1 Static analysis passes: `flutter analyze` — e6c161d
+- [x] 3.2 Code formatting check passes: `dart format --output=none --set-exit-if-changed lib test widgetbook` — e6c161d
+- [x] 3.3 Dashboard presentation widget and accessibility tests pass: `flutter test test/features/dashboard/` — e6c161d
+- [x] 3.4 Widgetbook smoke tests pass across EN/PL, Light/Dark, and `2.0x` text scale: `flutter test test/widgetbook/widgetbook_smoke_test.dart` — e6c161d
+- [x] 3.5 Full repository test suite passes: `flutter test` — e6c161d
 
 #### Manual
 
-- [x] 3.6 Run `flutter run -t widgetbook/main_widgetbook.dart -d chrome` and verify the new `Dashboard` category renders `DashboardKpiRow`, `DashboardCardShell`, the 3 chart cards, and `DashboardView` across Light/Dark/High-Contrast themes, English/Polish locales, `1.0x`–`2.0x` text scales, and the 3 platform capability modes.
+- [x] 3.6 Run `flutter run -t widgetbook/main_widgetbook.dart -d chrome` and verify the new `Dashboard` category renders `DashboardKpiRow`, `DashboardCardShell`, the 3 chart cards, and `DashboardView` across Light/Dark/High-Contrast themes, English/Polish locales, `1.0x`–`2.0x` text scales, and the 3 platform capability modes. — e6c161d
