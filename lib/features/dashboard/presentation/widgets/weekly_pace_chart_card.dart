@@ -106,6 +106,7 @@ class WeeklyPaceChartCard extends StatelessWidget {
           : context.l10n.dashboardPaceNeedTwoWeeks,
       child: Semantics(
         container: true,
+        excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
           height: 220,

@@ -62,6 +62,7 @@ class WeeklyWorkoutsChartCard extends StatelessWidget {
       unconfiguredMessageKey: const Key('dashboard_workouts_unconfigured_text'),
       child: Semantics(
         container: true,
+        excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
           height: 220,

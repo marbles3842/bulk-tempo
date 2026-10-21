@@ -67,6 +67,7 @@ class WeeklyWeightTrendCard extends StatelessWidget {
       emptyMessage: context.l10n.dashboardWeightEmpty,
       child: Semantics(
         container: true,
+        excludeSemantics: true,
         label: semanticsParts.join('. '),
         child: SizedBox(
           height: 220,
