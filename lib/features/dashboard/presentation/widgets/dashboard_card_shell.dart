@@ -1,17 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
 
 /// Reusable card shell for dashboard metric and chart cards.
 ///
-/// Provides a consistent [Card] header with title, optional subtitle, optional
-/// outdated badge, and handles loading, error, empty, and unconfigured presentation
-/// states cleanly.
+/// Provides a consistent [AppCard] header with title, optional subtitle,
+/// optional leading icon, optional outdated badge, and handles loading, error,
+/// empty, and unconfigured presentation states cleanly.
 class DashboardCardShell extends StatelessWidget {
   final Key? cardKey;
   final String title;
   final String? subtitle;
   final Key? subtitleKey;
+  final AppIcon? leadingIcon;
   final bool isOutdated;
   final Key? outdatedBadgeKey;
   final DashboardCardStatus status;
@@ -31,6 +34,7 @@ class DashboardCardShell extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.subtitleKey,
+    this.leadingIcon,
     this.isOutdated = false,
     this.outdatedBadgeKey,
     required this.status,
@@ -42,110 +46,75 @@ class DashboardCardShell extends StatelessWidget {
     this.unconfiguredMessage,
     this.unconfiguredMessageKey,
     required this.child,
-    this.contentHeight = 220,
+    this.contentHeight = AppChartTheme.defaultChartHeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      key: cardKey,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle!,
-                          key: subtitleKey,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (isOutdated) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    key: outdatedBadgeKey,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      context.l10n.dashboardOutdatedBadge,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onErrorContainer,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildBody(context),
-          ],
-        ),
-      ),
+    return AppCard(
+      cardKey: cardKey,
+      title: title,
+      subtitle: subtitle,
+      subtitleKey: subtitleKey,
+      leadingIcon: leadingIcon,
+      headerTrailing: isOutdated
+          ? AppStatusBadge(
+              badgeKey: outdatedBadgeKey,
+              label: context.l10n.dashboardOutdatedBadge,
+              tone: AppFeedbackTone.warning,
+              icon: AppIcon.warning,
+            )
+          : null,
+      variant: AppCardVariant.grouped,
+      margin: EdgeInsets.zero,
+      child: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     final theme = Theme.of(context);
+    final capabilities = PresentationCapabilities.resolve(context);
 
     switch (status) {
       case DashboardCardStatus.loading:
-        return SizedBox(
-          height: contentHeight,
-          child: const Center(child: CircularProgressIndicator()),
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: contentHeight),
+          child: Center(
+            child: capabilities.platformMode != AdaptivePlatformMode.material
+                ? const CupertinoActivityIndicator()
+                : const CircularProgressIndicator(),
+          ),
         );
 
       case DashboardCardStatus.error:
-        return SizedBox(
-          height: contentHeight,
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: contentHeight),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(
+                  AppIcons.resolve(context, AppIcon.error),
+                  color: theme.colorScheme.error,
+                  size: AppIcons.normalSize,
+                ),
+                const SizedBox(height: AppSpacing.space2),
                 Text(
-                  errorMessage ?? 'Failed to load data',
+                  errorMessage ?? '',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.error,
                   ),
                 ),
                 if (onRetry != null) ...[
-                  const SizedBox(height: 12),
-                  FilledButton.tonal(
+                  const SizedBox(height: AppSpacing.relatedGap),
+                  AppButton(
                     key: retryButtonKey,
+                    label: context.l10n.retry,
+                    variant: AppButtonVariant.tonal,
+                    icon: AppIcon.retry,
                     onPressed: onRetry,
-                    child: Text(context.l10n.retry),
                   ),
                 ],
               ],
@@ -154,8 +123,8 @@ class DashboardCardShell extends StatelessWidget {
         );
 
       case DashboardCardStatus.empty:
-        return SizedBox(
-          height: contentHeight,
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: contentHeight),
           child: Center(
             child: Text(
               emptyMessage ?? '',
@@ -169,8 +138,8 @@ class DashboardCardShell extends StatelessWidget {
         );
 
       case DashboardCardStatus.unconfigured:
-        return SizedBox(
-          height: contentHeight,
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: contentHeight),
           child: Center(
             child: Text(
               unconfiguredMessage ?? '',

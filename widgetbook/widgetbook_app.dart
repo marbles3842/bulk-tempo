@@ -5,6 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/l10n/app_localizations.dart';
+import 'use_cases/dashboard_use_cases.dart';
 import 'use_cases/overlays_and_shell_use_cases.dart';
 import 'use_cases/primitives_use_cases.dart';
 import 'use_cases/tokens_use_cases.dart';
@@ -15,6 +16,7 @@ final List<WidgetbookNode> widgetbookDirectories = [
   tokensCategory,
   primitivesCategory,
   overlaysAndShellCategory,
+  dashboardCategory,
 ];
 
 /// Global addon providing live switching between the 3 adaptive platform modes.

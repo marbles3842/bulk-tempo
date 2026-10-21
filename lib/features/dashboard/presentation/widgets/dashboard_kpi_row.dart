@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/utils/week_date_utils.dart';
+import 'package:bulk_tempo/features/dashboard/domain/models/weekly_progress_overview_entity.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
 
-/// 2×2 grid row of headline KPI metric tiles:
+/// Responsive KPI metric tiles header:
 /// - Current Pace
 /// - Latest Average (with incomplete week indicator)
 /// - Total Gain
@@ -22,39 +24,82 @@ class DashboardKpiRow extends StatelessWidget {
       decimalDigits: 2,
     );
     final overview = state.overview;
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        children: [
-          Row(
+    final paceTile = _buildPaceTile(context, overview, formatter);
+    final averageTile = _buildAverageTile(context, overview, formatter);
+    final totalGainTile = _buildTotalGainTile(context, overview, formatter);
+    final workoutsTile = _buildWorkoutsTile(context, overview);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (textScale >= 1.4 || constraints.maxWidth < 360) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(child: _buildPaceTile(context, overview, formatter)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildAverageTile(context, overview, formatter)),
+              paceTile,
+              const SizedBox(height: AppSpacing.relatedGap),
+              averageTile,
+              const SizedBox(height: AppSpacing.relatedGap),
+              totalGainTile,
+              const SizedBox(height: AppSpacing.relatedGap),
+              workoutsTile,
             ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTotalGainTile(context, overview, formatter),
+          );
+        }
+
+        if (constraints.maxWidth >= AppSpacing.expandedBreakpoint) {
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: paceTile),
+                const SizedBox(width: AppSpacing.relatedGap),
+                Expanded(child: averageTile),
+                const SizedBox(width: AppSpacing.relatedGap),
+                Expanded(child: totalGainTile),
+                const SizedBox(width: AppSpacing.relatedGap),
+                Expanded(child: workoutsTile),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: paceTile),
+                  const SizedBox(width: AppSpacing.relatedGap),
+                  Expanded(child: averageTile),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(child: _buildWorkoutsTile(context, overview)),
-            ],
-          ),
-        ],
-      ),
+            ),
+            const SizedBox(height: AppSpacing.relatedGap),
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: totalGainTile),
+                  const SizedBox(width: AppSpacing.relatedGap),
+                  Expanded(child: workoutsTile),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildPaceTile(
     BuildContext context,
-    dynamic overview,
+    WeeklyProgressOverviewEntity overview,
     NumberFormat formatter,
   ) {
-    final pace = overview.currentPaceKgPerWeek as double?;
+    final pace = overview.currentPaceKgPerWeek;
     final String valueText;
     final String? subtitleText;
 
@@ -72,7 +117,7 @@ class DashboardKpiRow extends StatelessWidget {
     }
 
     return _StatTile(
-      key: const Key('dashboard_kpi_pace_tile'),
+      cardKey: const Key('dashboard_kpi_pace_tile'),
       title: context.l10n.dashboardKpiPaceTitle,
       value: valueText,
       subtitle: subtitleText != null ? Text(subtitleText) : null,
@@ -81,33 +126,29 @@ class DashboardKpiRow extends StatelessWidget {
 
   Widget _buildAverageTile(
     BuildContext context,
-    dynamic overview,
+    WeeklyProgressOverviewEntity overview,
     NumberFormat formatter,
   ) {
     final theme = Theme.of(context);
-    final avg = overview.latestAverageWeightKg as double?;
+    final avg = overview.latestAverageWeightKg;
     final String valueText;
     Widget? subtitleWidget;
 
     if (avg != null) {
       valueText = context.l10n.dashboardWeightMetric(formatter.format(avg));
 
-      if (overview.isLatestWeekIncomplete as bool) {
-        subtitleWidget = Container(
-          key: const Key('dashboard_incomplete_week_badge'),
-          child: Text(
-            context.l10n.dashboardKpiAverageSubtitleIncomplete(
-              overview.latestWeekLoggedDays as int,
-            ),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+      if (overview.isLatestWeekIncomplete) {
+        subtitleWidget = AppStatusBadge(
+          badgeKey: const Key('dashboard_incomplete_week_badge'),
+          label: context.l10n.dashboardKpiAverageSubtitleIncomplete(
+            overview.latestWeekLoggedDays,
           ),
+          tone: AppFeedbackTone.info,
         );
-      } else if (overview.isLatestWeekCurrentWeek as bool) {
+      } else if (overview.isLatestWeekCurrentWeek) {
         subtitleWidget = Text(
           context.l10n.dashboardKpiAverageSubtitleComplete,
-          style: theme.textTheme.bodySmall?.copyWith(
+          style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         );
@@ -115,11 +156,11 @@ class DashboardKpiRow extends StatelessWidget {
           overview.latestWeekEndSunday != null) {
         subtitleWidget = Text(
           WeekDateUtils.formatWeekRange(
-            overview.latestWeekStartMonday as DateTime,
-            overview.latestWeekEndSunday as DateTime,
+            overview.latestWeekStartMonday!,
+            overview.latestWeekEndSunday!,
             Localizations.localeOf(context).languageCode,
           ),
-          style: theme.textTheme.bodySmall?.copyWith(
+          style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         );
@@ -130,7 +171,7 @@ class DashboardKpiRow extends StatelessWidget {
     }
 
     return _StatTile(
-      key: const Key('dashboard_kpi_average_tile'),
+      cardKey: const Key('dashboard_kpi_average_tile'),
       title: context.l10n.dashboardKpiAverageTitle,
       value: valueText,
       subtitle: subtitleWidget,
@@ -139,10 +180,10 @@ class DashboardKpiRow extends StatelessWidget {
 
   Widget _buildTotalGainTile(
     BuildContext context,
-    dynamic overview,
+    WeeklyProgressOverviewEntity overview,
     NumberFormat formatter,
   ) {
-    final gain = overview.totalGainKg as double?;
+    final gain = overview.totalGainKg;
     final String valueText;
     final String? subtitleText;
 
@@ -159,49 +200,67 @@ class DashboardKpiRow extends StatelessWidget {
     }
 
     return _StatTile(
-      key: const Key('dashboard_kpi_total_gain_tile'),
+      cardKey: const Key('dashboard_kpi_total_gain_tile'),
       title: context.l10n.dashboardKpiTotalGainTitle,
       value: valueText,
       subtitle: subtitleText != null ? Text(subtitleText) : null,
     );
   }
 
-  Widget _buildWorkoutsTile(BuildContext context, dynamic overview) {
+  Widget _buildWorkoutsTile(
+    BuildContext context,
+    WeeklyProgressOverviewEntity overview,
+  ) {
+    final theme = Theme.of(context);
     final String valueText;
-    final String subtitleText;
+    Widget? subtitleWidget;
 
     switch (state.workoutStatus) {
       case DashboardCardStatus.loaded:
         valueText = '${overview.currentWeekWorkoutCount}';
-        subtitleText = context.l10n.dashboardKpiWorkoutsThisWeek;
+        subtitleWidget = Text(
+          context.l10n.dashboardKpiWorkoutsThisWeek,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        );
       case DashboardCardStatus.unconfigured:
         valueText = '—';
-        subtitleText = context.l10n.dashboardKpiWorkoutsNotConnected;
+        subtitleWidget = Text(
+          context.l10n.dashboardKpiWorkoutsNotConnected,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        );
       case DashboardCardStatus.error:
         valueText = '—';
-        subtitleText = context.l10n.dashboardKpiWorkoutsSyncError;
+        subtitleWidget = AppStatusBadge(
+          label: context.l10n.dashboardKpiWorkoutsSyncError,
+          tone: AppFeedbackTone.error,
+        );
       case DashboardCardStatus.loading:
       case DashboardCardStatus.empty:
         valueText = '...';
-        subtitleText = '';
+        subtitleWidget = null;
     }
 
     return _StatTile(
-      key: const Key('dashboard_kpi_workouts_tile'),
+      cardKey: const Key('dashboard_kpi_workouts_tile'),
       title: context.l10n.dashboardKpiWorkoutsTitle,
       value: valueText,
-      subtitle: subtitleText.isNotEmpty ? Text(subtitleText) : null,
+      subtitle: subtitleWidget,
     );
   }
 }
 
 class _StatTile extends StatelessWidget {
+  final Key? cardKey;
   final String title;
   final String value;
   final Widget? subtitle;
 
   const _StatTile({
-    super.key,
+    this.cardKey,
     required this.title,
     required this.value,
     this.subtitle,
@@ -211,50 +270,40 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium?.copyWith(
+    return AppCard(
+      cardKey: cardKey,
+      variant: AppCardVariant.grouped,
+      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            value,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppSpacing.space1),
+            DefaultTextStyle.merge(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
-            const SizedBox(height: 4),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                value,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            SizedBox(
-              height: 18,
-              child: subtitle != null
-                  ? DefaultTextStyle(
-                      style: theme.textTheme.bodySmall!.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      child: subtitle!,
-                    )
-                  : const SizedBox.shrink(),
+              child: subtitle!,
             ),
           ],
-        ),
+        ],
       ),
     );
   }
