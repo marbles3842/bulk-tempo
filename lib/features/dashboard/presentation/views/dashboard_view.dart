@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/widgets/dashboard_kpi_row.dart';
@@ -40,31 +41,56 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     final state = ref.watch(dashboardViewModelProvider);
 
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () =>
           ref.read(dashboardViewModelProvider.notifier).refreshAll(),
-      child: ListView(
-        key: const Key('dashboard_scroll_view'),
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        children: [
-          DashboardKpiRow(state: state),
-          WeeklyWeightTrendCard(
-            state: state,
-            onRetry: () =>
-                ref.read(dashboardViewModelProvider.notifier).retryWeights(),
-          ),
-          WeeklyPaceChartCard(
-            state: state,
-            onRetry: () =>
-                ref.read(dashboardViewModelProvider.notifier).retryPace(),
-          ),
-          WeeklyWorkoutsChartCard(
-            state: state,
-            onRetry: () =>
-                ref.read(dashboardViewModelProvider.notifier).retryWorkouts(),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalInset =
+              constraints.maxWidth >= AppSpacing.compactBreakpoint
+              ? AppSpacing.pageInsetWide
+              : AppSpacing.pageInsetCompact;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppSpacing.dashboardMaxWidth,
+              ),
+              child: ListView(
+                key: const Key('dashboard_scroll_view'),
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalInset,
+                  vertical: AppSpacing.space4,
+                ),
+                children: [
+                  DashboardKpiRow(state: state),
+                  const SizedBox(height: AppSpacing.relatedGap),
+                  WeeklyWeightTrendCard(
+                    state: state,
+                    onRetry: () => ref
+                        .read(dashboardViewModelProvider.notifier)
+                        .retryWeights(),
+                  ),
+                  const SizedBox(height: AppSpacing.relatedGap),
+                  WeeklyPaceChartCard(
+                    state: state,
+                    onRetry: () => ref
+                        .read(dashboardViewModelProvider.notifier)
+                        .retryPace(),
+                  ),
+                  const SizedBox(height: AppSpacing.relatedGap),
+                  WeeklyWorkoutsChartCard(
+                    state: state,
+                    onRetry: () => ref
+                        .read(dashboardViewModelProvider.notifier)
+                        .retryWorkouts(),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
