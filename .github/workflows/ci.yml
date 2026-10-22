@@ -41,6 +41,13 @@ jobs:
       - name: Verify code formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
+      - name: Reject raw colors in gain-target view
+        run: |
+          if grep -nE 'Color([.]from[A-Za-z]+)?[[:space:]]*\(|Colors\.[[:alpha:]]+|0[xX][0-9A-Fa-f]{6,8}' lib/features/gain_target/presentation/views/gain_target_view.dart; then
+            echo 'Use semantic theme roles from lib/core/theme/ in GainTargetView.'
+            exit 1
+          fi
+
       - name: Configure environment and Firebase
         env:
           ENV_JSON: ${{ secrets.ENV_JSON }}

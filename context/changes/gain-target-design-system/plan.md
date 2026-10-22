@@ -229,22 +229,22 @@ There is no persisted-data or API migration. The design-system change affects on
 
 #### Automated
 
-- [x] 2.1 Replace direct styling with shared components and semantic tokens while preserving state behavior.
-- [x] 2.2 Update gain-target widget tests to assert the app-owned component contract and existing behavior.
-- [x] 2.3 Pass focused gain-target view tests in Material presentation mode.
+- [x] 2.1 Replace direct styling with shared components and semantic tokens while preserving state behavior. — 7ccf1ed
+- [x] 2.2 Update gain-target widget tests to assert the app-owned component contract and existing behavior. — 7ccf1ed
+- [x] 2.3 Pass focused gain-target view tests in Material presentation mode. — 7ccf1ed
 
 #### Manual
 
-- [x] 2.4 Confirm Profile embedding, content order, and scroll layout remain intact.
+- [x] 2.4 Confirm Profile embedding, content order, and scroll layout remain intact. — 7ccf1ed
 
 ### Phase 3: Cover States and Verify the Visual Result
 
 #### Automated
 
-- [ ] 3.1 Add deterministic gain-target Widgetbook examples and catalog registration.
-- [ ] 3.2 Cover the applicable state matrix and adaptive fallback behavior in tests/catalog.
-- [ ] 3.3 Add the local design-system rule and scoped raw-color CI guard.
-- [ ] 3.4 Pass format, analysis, and full Flutter test checks.
+- [x] 3.1 Add deterministic gain-target Widgetbook examples and catalog registration.
+- [x] 3.2 Cover the applicable state matrix and adaptive fallback behavior in tests/catalog.
+- [x] 3.3 Add the local design-system rule and scoped raw-color CI guard.
+- [x] 3.4 Pass format, analysis, and full Flutter test checks.
 
 #### Manual
 

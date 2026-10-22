@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -369,5 +370,77 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0.30–0.45 kg/week'), findsOneWidget);
+  });
+
+  testWidgets(
+    'classic Cupertino capability renders adaptive fields and actions',
+    (tester) async {
+      await tester.pumpApp(
+        buildTestSubject(),
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+          gainTargetRepositoryProvider.overrideWithValue(
+            fakeGainTargetRepository,
+          ),
+        ],
+        capabilities: const PresentationCapabilities(
+          targetPlatform: TargetPlatform.iOS,
+          iosMajorVersion: 18,
+          supportsNativeIosViews: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CupertinoTextField), findsNWidgets(2));
+      expect(find.byType(CupertinoButton), findsOneWidget);
+      expect(find.bySemanticsLabel('Minimum weekly gain'), findsOneWidget);
+      expect(find.bySemanticsLabel('Maximum weekly gain'), findsOneWidget);
+      expect(
+        tester
+            .getSize(find.byKey(const Key('gain_target_refresh_button')))
+            .height,
+        greaterThanOrEqualTo(AppSpacing.iosMinTapTarget),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('wraps Polish Material field labels at enlarged text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    fakeGainTargetRepository.seedTarget(
+      testUser.id,
+      const GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+    );
+
+    await tester.pumpApp(
+      MediaQuery(
+        data: const MediaQueryData(
+          size: Size(390, 844),
+          textScaler: TextScaler.linear(2.0),
+        ),
+        child: buildTestSubject(),
+      ),
+      locale: const Locale('pl'),
+      theme: AppTheme.dark(),
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+        gainTargetRepositoryProvider.overrideWithValue(
+          fakeGainTargetRepository,
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    final minLabel = find.text('Minimalny tygodniowy przyrost');
+    final labelWidget = tester.widget<Text>(minLabel);
+    expect(labelWidget.maxLines, 2);
+    expect(labelWidget.overflow, TextOverflow.clip);
+    expect(tester.getSize(minLabel).height, greaterThan(40));
+    expect(tester.takeException(), isNull);
   });
 }

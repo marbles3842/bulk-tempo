@@ -191,33 +191,64 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
             color: Theme.of(context).colorScheme.surfaceContainerLow,
             borderRadius: AppShape.smallRadius,
           ),
-          child: Row(
-            children: [
-              Icon(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final theme = Theme.of(context);
+              final colorScheme = theme.colorScheme;
+              final label = Text(
+                context.l10n.gainTargetCurrentLabel,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              );
+              final summary = Text(
+                summaryText,
+                key: const Key('gain_target_summary'),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: state.savedTarget != null
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              );
+              final icon = Icon(
                 AppIcons.resolve(context, AppIcon.target),
                 size: AppIcons.compactSize,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: AppSpacing.inlineGap),
-              Text(
-                context.l10n.gainTargetCurrentLabel,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              Expanded(
-                child: Text(
-                  summaryText,
-                  key: const Key('gain_target_summary'),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: state.savedTarget != null
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
+                color: colorScheme.primary,
+              );
+              final useStackedText =
+                  MediaQuery.textScalerOf(context).scale(1.0) >= 1.4 ||
+                  constraints.maxWidth < 420;
+
+              if (useStackedText) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    icon,
+                    const SizedBox(width: AppSpacing.inlineGap),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          label,
+                          const SizedBox(height: AppSpacing.space1),
+                          summary,
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  icon,
+                  const SizedBox(width: AppSpacing.inlineGap),
+                  label,
+                  Expanded(child: summary),
+                ],
+              );
+            },
           ),
         ),
         const SizedBox(height: AppSpacing.sectionGap),
@@ -225,6 +256,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           fieldKey: const Key('gain_target_min_field'),
           controller: _minController,
           label: context.l10n.minWeeklyGainLabel,
+          labelMaxLines: 2,
           hint: '0.15',
           suffixText: context.l10n.kgPerWeekUnit,
           errorText: state.minError,
@@ -239,6 +271,7 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           fieldKey: const Key('gain_target_max_field'),
           controller: _maxController,
           label: context.l10n.maxWeeklyGainLabel,
+          labelMaxLines: 2,
           hint: '0.25',
           suffixText: context.l10n.kgPerWeekUnit,
           errorText: state.effectiveMaxError,
@@ -268,7 +301,12 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               const SizedBox(width: AppSpacing.inlineGap),
-              Text(context.l10n.gainTargetWaitingConfirmation),
+              Flexible(
+                child: Text(
+                  context.l10n.gainTargetWaitingConfirmation,
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
         ],

@@ -16,6 +16,8 @@ Comprehensive architectural guidelines and specifications are located in `contex
 - @context/documentation/06_testing_strategy.md: Testing structure mirroring, test helpers (`mocktail`, pump helpers), ViewModel unit tests, repository unit tests, and widget tests.
 - @context/documentation/07_design_system.md: Design system contract covering semantic tokens, Material 3 (Android) and Liquid Glass / Cupertino (iOS) adaptation (`adaptive_platform_ui`), core widget wrappers, accessibility, and Widgetbook cataloging.
 
+For UI work, inspect and reuse the semantic tokens in `lib/core/theme/` and shared components in `lib/core/widgets/` before adding feature-local styling. Keep feature views on app-owned components and semantic theme roles; raw color literals and direct palette colors are forbidden in `lib/features/gain_target/presentation/views/gain_target_view.dart`.
+
 ## Build, Test, and Development Commands
 
 From the repository root: `flutter pub get`, `flutter run` (`-d chrome` for web), `flutter analyze`, `flutter build apk`, and `flutter build web`.
