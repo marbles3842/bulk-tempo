@@ -382,10 +382,10 @@ Add the `Auth` category to Widgetbook (`widgetbook/use_cases/auth_use_cases.dart
 
 #### Automated
 
-- [x] 3.1 Widgetbook smoke and auth state-matrix tests pass: `flutter test test/widgetbook/widgetbook_smoke_test.dart`
-- [x] 3.2 No raw Color, Colors.*, AppPalette.*, or adaptive_platform_ui imports exist in lib/features/auth/presentation/: `! grep -rnE "Colors\.|Color\(0x|AppPalette|adaptive_platform_ui" lib/features/auth/presentation/`
-- [x] 3.3 Full repository formatting, static analysis, and test suite pass: `dart format --output=none --set-exit-if-changed lib test widgetbook && flutter analyze && flutter test`
+- [x] 3.1 Widgetbook smoke and auth state-matrix tests pass: `flutter test test/widgetbook/widgetbook_smoke_test.dart` — 3f5bbba
+- [x] 3.2 No raw Color, Colors.*, AppPalette.*, or adaptive_platform_ui imports exist in lib/features/auth/presentation/: `! grep -rnE "Colors\.|Color\(0x|AppPalette|adaptive_platform_ui" lib/features/auth/presentation/` — 3f5bbba
+- [x] 3.3 Full repository formatting, static analysis, and test suite pass: `dart format --output=none --set-exit-if-changed lib test widgetbook && flutter analyze && flutter test` — 3f5bbba
 
 #### Manual
 
-- [x] 3.4 Inspect the Auth category in Widgetbook (Login 7-state matrix, Register 7-state matrix, SplashScreen, and HomeShellScreen/Profile) across light/dark themes, English/Polish locales, and 2.0x text scale
+- [x] 3.4 Inspect the Auth category in Widgetbook (Login 7-state matrix, Register 7-state matrix, SplashScreen, and HomeShellScreen/Profile) across light/dark themes, English/Polish locales, and 2.0x text scale — 3f5bbba
