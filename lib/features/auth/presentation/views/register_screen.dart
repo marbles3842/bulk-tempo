@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/register_form_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/register_view_model.dart';
@@ -57,37 +59,72 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     ref.listen<RegisterFormState>(registerViewModelProvider, (previous, next) {
       if (next.status == FormStatus.failure && next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppFeedback.showSnackBar(
+          context,
+          message: next.errorMessage!,
+          tone: AppFeedbackTone.error,
         );
       }
     });
 
     final formState = ref.watch(registerViewModelProvider);
     final notifier = ref.read(registerViewModelProvider.notifier);
+    final isSubmitting = formState.status == FormStatus.submitting;
+    final activeErrorMessage = formState.status == FormStatus.failure
+        ? formState.errorMessage
+        : null;
+
+    final capabilities = PresentationCapabilities.resolve(context);
+    final isMaterial =
+        capabilities.platformMode == AdaptivePlatformMode.material;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final PreferredSizeWidget appBar = isMaterial
+        ? AppBar(
+            leading: IconButton(
+              key: const Key('register_back_button'),
+              icon: const Icon(Icons.arrow_back),
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+              onPressed: isSubmitting ? null : _goToLogin,
+            ),
+          )
+        : CupertinoNavigationBar(
+            border: null,
+            backgroundColor: Colors.transparent,
+            leading: Tooltip(
+              message: MaterialLocalizations.of(context).backButtonTooltip,
+              child: CupertinoButton(
+                key: const Key('register_back_button'),
+                padding: EdgeInsets.zero,
+                onPressed: isSubmitting ? null : _goToLogin,
+                child: const Icon(CupertinoIcons.back),
+              ),
+            ),
+          );
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _goToLogin,
-        ),
-      ),
+      appBar: appBar,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.pageInsetWide,
+              vertical: AppSpacing.space6,
+            ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
+              constraints: const BoxConstraints(
+                maxWidth: AppSpacing.formMaxWidth,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.fitness_center, size: 56),
-                  const SizedBox(height: 16),
+                  Icon(
+                    AppIcons.resolve(context, AppIcon.workout, selected: true),
+                    size: 56,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
                   Text(
                     context.l10n.registerTitle,
                     textAlign: TextAlign.center,
@@ -95,26 +132,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.space2),
                   Text(
                     context.l10n.registerSubtitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppSpacing.space8),
                   AuthTextField(
                     fieldKey: const Key('register_email_field'),
                     controller: _emailController,
                     label: context.l10n.emailLabel,
                     hint: context.l10n.emailHint,
                     errorText: formState.emailError,
+                    enabled: !isSubmitting,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     onChanged: notifier.updateEmail,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.space4),
                   AuthTextField(
                     fieldKey: const Key('register_password_field'),
                     controller: _passwordController,
@@ -122,37 +160,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hint: context.l10n.passwordHintRegister,
                     errorText: formState.passwordError,
                     obscureText: _obscurePassword,
+                    enabled: !isSubmitting,
                     textInputAction: TextInputAction.done,
                     onChanged: notifier.updatePassword,
                     onSubmitted: (_) => _submit(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      tooltip: _obscurePassword
-                          ? context.l10n.showPasswordTooltip
-                          : context.l10n.hidePasswordTooltip,
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
+                    onToggleObscureText: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                    toggleObscureTooltip: _obscurePassword
+                        ? context.l10n.showPasswordTooltip
+                        : context.l10n.hidePasswordTooltip,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.space6),
+                  if (activeErrorMessage != null) ...[
+                    AppFeedbackBanner(
+                      bannerKey: const Key('register_error_banner'),
+                      message: activeErrorMessage,
+                      tone: AppFeedbackTone.error,
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
                   AuthButton(
                     key: const Key('register_submit_button'),
                     text: context.l10n.registerButton,
-                    isLoading: formState.status == FormStatus.submitting,
+                    isLoading: isSubmitting,
+                    isEnabled: !isSubmitting,
                     onPressed: _submit,
                   ),
-                  const SizedBox(height: 16),
-                  TextButton(
+                  const SizedBox(height: AppSpacing.space4),
+                  AppButton(
                     key: const Key('register_to_login_button'),
+                    label: context.l10n.alreadyHaveAccountButton,
+                    variant: AppButtonVariant.text,
+                    isEnabled: !isSubmitting,
                     onPressed: _goToLogin,
-                    child: Text(context.l10n.alreadyHaveAccountButton),
                   ),
                 ],
               ),

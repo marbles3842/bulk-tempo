@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_form_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/login_view_model.dart';
 import 'package:bulk_tempo/features/auth/presentation/views/login_screen.dart';
+import 'package:bulk_tempo/features/auth/presentation/widgets/auth_button.dart';
 
 import '../../../../test_helpers/fakes/fake_auth_repository.dart';
 import '../../../../test_helpers/pump_app.dart';
@@ -92,6 +95,7 @@ void main() {
     await tester.pumpApp(
       const LoginScreen(),
       overrides: [
+        authRepositoryProvider.overrideWithValue(fakeRepository),
         loginViewModelProvider.overrideWith(
           () => FakeLoginViewModel(
             const LoginFormState(status: FormStatus.submitting),
@@ -103,27 +107,81 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('displays error SnackBar on submission failure', (tester) async {
+  testWidgets(
+    'displays error SnackBar and inline banner on submission failure',
+    (tester) async {
+      await tester.pumpApp(
+        const LoginScreen(),
+        overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+      );
+
+      // Enter non-existent user credentials
+      await tester.enterText(
+        find.byKey(const Key('login_email_field')),
+        'nobody@example.com',
+      );
+      await tester.enterText(
+        find.byKey(const Key('login_password_field')),
+        'password123',
+      );
+
+      await tester.tap(find.byKey(const Key('login_submit_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.byKey(const Key('login_error_banner')), findsOneWidget);
+      expect(find.text('Invalid email or password'), findsNWidgets(2));
+    },
+  );
+
+  testWidgets('disables inputs and buttons during FormStatus.submitting', (
+    tester,
+  ) async {
+    await tester.pumpApp(
+      const LoginScreen(),
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeRepository),
+        loginViewModelProvider.overrideWith(
+          () => FakeLoginViewModel(
+            const LoginFormState(status: FormStatus.submitting),
+          ),
+        ),
+      ],
+    );
+
+    final emailField = tester.widget<TextField>(
+      find.byKey(const Key('login_email_field')),
+    );
+    final passwordField = tester.widget<TextField>(
+      find.byKey(const Key('login_password_field')),
+    );
+    final submitButton = tester.widget<AuthButton>(
+      find.byKey(const Key('login_submit_button')),
+    );
+    final registerButton = tester.widget<AppButton>(
+      find.byKey(const Key('login_to_register_button')),
+    );
+
+    expect(emailField.enabled, isFalse);
+    expect(passwordField.enabled, isFalse);
+    expect(submitButton.isEnabled, isFalse);
+    expect(submitButton.isLoading, isTrue);
+    expect(registerButton.isEnabled, isFalse);
+  });
+
+  testWidgets('renders cupertinoClassic controls when on iOS platform', (
+    tester,
+  ) async {
     await tester.pumpApp(
       const LoginScreen(),
       overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+      capabilities: const PresentationCapabilities(
+        targetPlatform: TargetPlatform.iOS,
+      ),
     );
 
-    // Enter non-existent user credentials
-    await tester.enterText(
-      find.byKey(const Key('login_email_field')),
-      'nobody@example.com',
-    );
-    await tester.enterText(
-      find.byKey(const Key('login_password_field')),
-      'password123',
-    );
-
-    await tester.tap(find.byKey(const Key('login_submit_button')));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.text('Invalid email or password'), findsOneWidget);
+    expect(find.byType(CupertinoTextField), findsNWidgets(2));
+    expect(find.byType(CupertinoButton), findsAtLeastNWidgets(2));
   });
 
   testWidgets('navigates to register when sign up link is tapped', (
