@@ -16,6 +16,13 @@ class GainTargetView extends ConsumerStatefulWidget {
 }
 
 class _GainTargetViewState extends ConsumerState<GainTargetView> {
+  static const double _refreshIndicatorSize = 18.0;
+  static const double _pendingIndicatorSize = 16.0;
+  static const double _indicatorStrokeWidth = 2.0;
+  static const int _fieldLabelMaxLines = 2;
+  static const String _minWeeklyGainHint = '0.15';
+  static const String _maxWeeklyGainHint = '0.25';
+
   late final TextEditingController _minController;
   late final TextEditingController _maxController;
   late final GainTargetViewModel _viewModel;
@@ -102,14 +109,16 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
     return AppCard(
       title: context.l10n.gainTargetTitle,
       variant: AppCardVariant.outlined,
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(AppSpacing.space1),
       headerTrailing: IconButton(
         key: const Key('gain_target_refresh_button'),
         icon: state.isRefreshing
             ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                width: _refreshIndicatorSize,
+                height: _refreshIndicatorSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: _indicatorStrokeWidth,
+                ),
               )
             : Icon(AppIcons.resolve(context, AppIcon.retry)),
         tooltip: context.l10n.gainTargetRefreshTooltip,
@@ -217,8 +226,9 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
                 color: colorScheme.primary,
               );
               final useStackedText =
-                  MediaQuery.textScalerOf(context).scale(1.0) >= 1.4 ||
-                  constraints.maxWidth < 420;
+                  MediaQuery.textScalerOf(context).scale(1.0) >=
+                      AppSpacing.enlargedTextScaleThreshold ||
+                  constraints.maxWidth < AppSpacing.stackedSummaryBreakpoint;
 
               if (useStackedText) {
                 return Row(
@@ -256,8 +266,8 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           fieldKey: const Key('gain_target_min_field'),
           controller: _minController,
           label: context.l10n.minWeeklyGainLabel,
-          labelMaxLines: 2,
-          hint: '0.15',
+          labelMaxLines: _fieldLabelMaxLines,
+          hint: _minWeeklyGainHint,
           suffixText: context.l10n.kgPerWeekUnit,
           errorText: state.minError,
           enabled: !state.isSubmitting,
@@ -271,8 +281,8 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
           fieldKey: const Key('gain_target_max_field'),
           controller: _maxController,
           label: context.l10n.maxWeeklyGainLabel,
-          labelMaxLines: 2,
-          hint: '0.25',
+          labelMaxLines: _fieldLabelMaxLines,
+          hint: _maxWeeklyGainHint,
           suffixText: context.l10n.kgPerWeekUnit,
           errorText: state.effectiveMaxError,
           enabled: !state.isSubmitting,
@@ -296,9 +306,11 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                width: _pendingIndicatorSize,
+                height: _pendingIndicatorSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: _indicatorStrokeWidth,
+                ),
               ),
               const SizedBox(width: AppSpacing.inlineGap),
               Flexible(

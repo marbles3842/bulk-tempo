@@ -34,6 +34,8 @@ abstract final class AppSpacing {
   static const double expandedBreakpoint = 840.0;
   static const double formMaxWidth = 480.0;
   static const double dashboardMaxWidth = 1120.0;
+  static const double stackedSummaryBreakpoint = 420.0;
+  static const double enlargedTextScaleThreshold = 1.4;
 
   // ---------------------------------------------------------------------------
   // Accessible minimum tap-target dimensions
