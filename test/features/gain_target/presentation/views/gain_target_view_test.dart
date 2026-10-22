@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/core/result/result.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
@@ -70,16 +72,38 @@ void main() {
       expect(minFieldFinder, findsOneWidget);
       expect(maxFieldFinder, findsOneWidget);
 
-      final minField = tester.widget<TextField>(minFieldFinder);
-      final maxField = tester.widget<TextField>(maxFieldFinder);
+      final minField = tester.widget<AppTextField>(
+        find.byType(AppTextField).at(0),
+      );
+      final maxField = tester.widget<AppTextField>(
+        find.byType(AppTextField).at(1),
+      );
+      expect(minField.fieldKey, const Key('gain_target_min_field'));
+      expect(minField.label, 'Minimum weekly gain');
       expect(minField.controller?.text, isEmpty);
-      expect(minField.decoration?.hintText, equals('0.15'));
-      expect(minField.decoration?.suffixText, equals('kg/week'));
+      expect(minField.hint, equals('0.15'));
+      expect(minField.suffixText, equals('kg/week'));
+      expect(
+        minField.keyboardType,
+        const TextInputType.numberWithOptions(decimal: true),
+      );
+      expect(minField.enabled, isTrue);
+      expect(maxField.fieldKey, const Key('gain_target_max_field'));
+      expect(maxField.label, 'Maximum weekly gain');
       expect(maxField.controller?.text, isEmpty);
-      expect(maxField.decoration?.hintText, equals('0.25'));
-      expect(maxField.decoration?.suffixText, equals('kg/week'));
+      expect(maxField.hint, equals('0.25'));
+      expect(maxField.suffixText, equals('kg/week'));
+      expect(maxField.enabled, isTrue);
 
       expect(find.byKey(const Key('gain_target_save_button')), findsOneWidget);
+      expect(find.byType(AppCard), findsOneWidget);
+      expect(find.byType(AppButton), findsOneWidget);
+      expect(
+        tester
+            .widget<AppButton>(find.byKey(const Key('gain_target_save_button')))
+            .isEnabled,
+        isTrue,
+      );
       expect(
         find.byKey(const Key('gain_target_refresh_button')),
         findsOneWidget,
@@ -118,8 +142,7 @@ void main() {
 
       // Expect confirmed summary
       expect(find.text('0.15–0.25 kg/week'), findsOneWidget);
-      // SnackBar feedback
-      expect(find.byType(SnackBar), findsOneWidget);
+      // User-facing feedback message remains stable across platform adapters.
       expect(
         find.text('Weekly gain target saved successfully'),
         findsOneWidget,
@@ -241,10 +264,26 @@ void main() {
     expect(find.text('Waiting for server confirmation'), findsOneWidget);
 
     // Save button disabled
-    final saveBtn = tester.widget<FilledButton>(
+    final saveBtn = tester.widget<AppButton>(
       find.byKey(const Key('gain_target_save_button')),
     );
-    expect(saveBtn.onPressed, isNull);
+    expect(saveBtn.isEnabled, isFalse);
+    expect(
+      tester.widget<AppTextField>(find.byType(AppTextField).at(0)).enabled,
+      isFalse,
+    );
+    expect(
+      tester.widget<AppTextField>(find.byType(AppTextField).at(1)).enabled,
+      isFalse,
+    );
+    expect(
+      tester
+          .widget<IconButton>(
+            find.byKey(const Key('gain_target_refresh_button')),
+          )
+          .onPressed,
+      isNull,
+    );
 
     // Complete save
     saveCompleter.complete(
@@ -279,6 +318,12 @@ void main() {
 
     expect(find.text('Database connection failed'), findsOneWidget);
     expect(find.byKey(const Key('gain_target_retry_button')), findsOneWidget);
+    expect(
+      tester
+          .widget<AppButton>(find.byKey(const Key('gain_target_retry_button')))
+          .label,
+      'Retry',
+    );
     expect(find.byKey(const Key('gain_target_summary')), findsNothing);
 
     // Resolve failure and tap retry
@@ -325,5 +370,77 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0.30–0.45 kg/week'), findsOneWidget);
+  });
+
+  testWidgets(
+    'classic Cupertino capability renders adaptive fields and actions',
+    (tester) async {
+      await tester.pumpApp(
+        buildTestSubject(),
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+          gainTargetRepositoryProvider.overrideWithValue(
+            fakeGainTargetRepository,
+          ),
+        ],
+        capabilities: const PresentationCapabilities(
+          targetPlatform: TargetPlatform.iOS,
+          iosMajorVersion: 18,
+          supportsNativeIosViews: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CupertinoTextField), findsNWidgets(2));
+      expect(find.byType(CupertinoButton), findsOneWidget);
+      expect(find.bySemanticsLabel('Minimum weekly gain'), findsOneWidget);
+      expect(find.bySemanticsLabel('Maximum weekly gain'), findsOneWidget);
+      expect(
+        tester
+            .getSize(find.byKey(const Key('gain_target_refresh_button')))
+            .height,
+        greaterThanOrEqualTo(AppSpacing.iosMinTapTarget),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('wraps Polish Material field labels at enlarged text scale', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    fakeGainTargetRepository.seedTarget(
+      testUser.id,
+      const GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+    );
+
+    await tester.pumpApp(
+      MediaQuery(
+        data: const MediaQueryData(
+          size: Size(390, 844),
+          textScaler: TextScaler.linear(2.0),
+        ),
+        child: buildTestSubject(),
+      ),
+      locale: const Locale('pl'),
+      theme: AppTheme.dark(),
+      overrides: [
+        authRepositoryProvider.overrideWithValue(fakeAuthRepository),
+        gainTargetRepositoryProvider.overrideWithValue(
+          fakeGainTargetRepository,
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    final minLabel = find.text('Minimalny tygodniowy przyrost');
+    final labelWidget = tester.widget<Text>(minLabel);
+    expect(labelWidget.maxLines, 2);
+    expect(labelWidget.overflow, TextOverflow.clip);
+    expect(tester.getSize(minLabel).height, greaterThan(40));
+    expect(tester.takeException(), isNull);
   });
 }

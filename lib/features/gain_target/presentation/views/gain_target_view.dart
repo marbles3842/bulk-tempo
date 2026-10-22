@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/formatters/gain_target_formatter.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_state.dart';
@@ -15,6 +16,13 @@ class GainTargetView extends ConsumerStatefulWidget {
 }
 
 class _GainTargetViewState extends ConsumerState<GainTargetView> {
+  static const double _refreshIndicatorSize = 18.0;
+  static const double _pendingIndicatorSize = 16.0;
+  static const double _indicatorStrokeWidth = 2.0;
+  static const int _fieldLabelMaxLines = 2;
+  static const String _minWeeklyGainHint = '0.15';
+  static const String _maxWeeklyGainHint = '0.25';
+
   late final TextEditingController _minController;
   late final TextEditingController _maxController;
   late final GainTargetViewModel _viewModel;
@@ -67,33 +75,30 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
             next.successMessage == 'Weekly gain target saved successfully'
             ? context.l10n.gainTargetSavedSuccess
             : next.successMessage!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.green.shade700,
-          ),
+        AppFeedback.showSnackBar(
+          context,
+          message: message,
+          tone: AppFeedbackTone.success,
         );
         ref.read(gainTargetViewModelProvider.notifier).clearMessages();
       }
 
       if (next.saveErrorMessage != null &&
           next.saveErrorMessage != previous?.saveErrorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.saveErrorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppFeedback.showSnackBar(
+          context,
+          message: next.saveErrorMessage!,
+          tone: AppFeedbackTone.error,
         );
         ref.read(gainTargetViewModelProvider.notifier).clearMessages();
       }
 
       if (next.refreshErrorMessage != null &&
           next.refreshErrorMessage != previous?.refreshErrorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.refreshErrorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppFeedback.showSnackBar(
+          context,
+          message: next.refreshErrorMessage!,
+          tone: AppFeedbackTone.error,
         );
         ref.read(gainTargetViewModelProvider.notifier).clearMessages();
       }
@@ -101,77 +106,61 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
 
     final state = ref.watch(gainTargetViewModelProvider);
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    context.l10n.gainTargetTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  key: const Key('gain_target_refresh_button'),
-                  icon: state.isRefreshing
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.refresh),
-                  tooltip: context.l10n.gainTargetRefreshTooltip,
-                  onPressed: state.isSubmitting
-                      ? null
-                      : () => ref
-                            .read(gainTargetViewModelProvider.notifier)
-                            .loadTarget(showLoading: false, isRefresh: true),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            if (state.isLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.0),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    key: Key('gain_target_loading_indicator'),
-                  ),
+    return AppCard(
+      title: context.l10n.gainTargetTitle,
+      variant: AppCardVariant.outlined,
+      margin: const EdgeInsets.all(AppSpacing.space1),
+      headerTrailing: IconButton(
+        key: const Key('gain_target_refresh_button'),
+        icon: state.isRefreshing
+            ? const SizedBox(
+                width: _refreshIndicatorSize,
+                height: _refreshIndicatorSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: _indicatorStrokeWidth,
                 ),
               )
-            else if (state.errorMessage != null)
-              _buildErrorView(context, state.errorMessage!)
-            else
-              _buildFormView(context, state),
-          ],
-        ),
+            : Icon(AppIcons.resolve(context, AppIcon.retry)),
+        tooltip: context.l10n.gainTargetRefreshTooltip,
+        onPressed: state.isSubmitting
+            ? null
+            : () => ref
+                  .read(gainTargetViewModelProvider.notifier)
+                  .loadTarget(showLoading: false, isRefresh: true),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (state.isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space6),
+              child: Center(
+                child: CircularProgressIndicator(
+                  key: Key('gain_target_loading_indicator'),
+                ),
+              ),
+            )
+          else if (state.errorMessage != null)
+            _buildErrorView(context, state.errorMessage!)
+          else
+            _buildFormView(context, state),
+        ],
       ),
     );
   }
 
   Widget _buildErrorView(BuildContext context, String message) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.cardPadding),
       child: Column(
         children: [
           Icon(
-            Icons.error_outline,
-            size: 40,
+            AppIcons.resolve(context, AppIcon.error),
+            size: AppIcons.normalSize,
             color: Theme.of(context).colorScheme.error,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.space2),
           Text(
             message,
             textAlign: TextAlign.center,
@@ -179,11 +168,12 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
               color: Theme.of(context).colorScheme.error,
             ),
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
+          const SizedBox(height: AppSpacing.sectionGap),
+          AppButton(
             key: const Key('gain_target_retry_button'),
-            icon: const Icon(Icons.refresh),
-            label: Text(context.l10n.retry),
+            label: context.l10n.retry,
+            variant: AppButtonVariant.primary,
+            icon: AppIcon.retry,
             onPressed: () => ref
                 .read(gainTargetViewModelProvider.notifier)
                 .loadTarget(showLoading: true),
@@ -202,98 +192,133 @@ class _GainTargetViewState extends ConsumerState<GainTargetView> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(8),
+          padding: const EdgeInsetsDirectional.symmetric(
+            horizontal: AppSpacing.space3,
+            vertical: AppSpacing.space2,
           ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.track_changes,
-                size: 20,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            borderRadius: AppShape.smallRadius,
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final theme = Theme.of(context);
+              final colorScheme = theme.colorScheme;
+              final label = Text(
                 context.l10n.gainTargetCurrentLabel,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              Expanded(
-                child: Text(
-                  summaryText,
-                  key: const Key('gain_target_summary'),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: state.savedTarget != null
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
                 ),
-              ),
-            ],
+              );
+              final summary = Text(
+                summaryText,
+                key: const Key('gain_target_summary'),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: state.savedTarget != null
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              );
+              final icon = Icon(
+                AppIcons.resolve(context, AppIcon.target),
+                size: AppIcons.compactSize,
+                color: colorScheme.primary,
+              );
+              final useStackedText =
+                  MediaQuery.textScalerOf(context).scale(1.0) >=
+                      AppSpacing.enlargedTextScaleThreshold ||
+                  constraints.maxWidth < AppSpacing.stackedSummaryBreakpoint;
+
+              if (useStackedText) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    icon,
+                    const SizedBox(width: AppSpacing.inlineGap),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          label,
+                          const SizedBox(height: AppSpacing.space1),
+                          summary,
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  icon,
+                  const SizedBox(width: AppSpacing.inlineGap),
+                  label,
+                  Expanded(child: summary),
+                ],
+              );
+            },
           ),
         ),
-        const SizedBox(height: 16),
-        TextField(
-          key: const Key('gain_target_min_field'),
+        const SizedBox(height: AppSpacing.sectionGap),
+        AppTextField(
+          fieldKey: const Key('gain_target_min_field'),
           controller: _minController,
+          label: context.l10n.minWeeklyGainLabel,
+          labelMaxLines: _fieldLabelMaxLines,
+          hint: _minWeeklyGainHint,
+          suffixText: context.l10n.kgPerWeekUnit,
+          errorText: state.minError,
           enabled: !state.isSubmitting,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: context.l10n.minWeeklyGainLabel,
-            hintText: '0.15',
-            suffixText: context.l10n.kgPerWeekUnit,
-            errorText: state.minError,
-            border: const OutlineInputBorder(),
-          ),
           onChanged: (value) => ref
               .read(gainTargetViewModelProvider.notifier)
               .updateMinInput(value),
         ),
-        const SizedBox(height: 16),
-        TextField(
-          key: const Key('gain_target_max_field'),
+        const SizedBox(height: AppSpacing.sectionGap),
+        AppTextField(
+          fieldKey: const Key('gain_target_max_field'),
           controller: _maxController,
+          label: context.l10n.maxWeeklyGainLabel,
+          labelMaxLines: _fieldLabelMaxLines,
+          hint: _maxWeeklyGainHint,
+          suffixText: context.l10n.kgPerWeekUnit,
+          errorText: state.effectiveMaxError,
           enabled: !state.isSubmitting,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: context.l10n.maxWeeklyGainLabel,
-            hintText: '0.25',
-            suffixText: context.l10n.kgPerWeekUnit,
-            errorText: state.effectiveMaxError,
-            border: const OutlineInputBorder(),
-          ),
           onChanged: (value) => ref
               .read(gainTargetViewModelProvider.notifier)
               .updateMaxInput(value),
         ),
-        const SizedBox(height: 16),
-        FilledButton(
+        const SizedBox(height: AppSpacing.sectionGap),
+        AppButton(
           key: const Key('gain_target_save_button'),
-          onPressed: state.isSubmitting
-              ? null
-              : () =>
-                    ref.read(gainTargetViewModelProvider.notifier).saveTarget(),
-          child: Text(context.l10n.saveTargetButton),
+          label: context.l10n.saveTargetButton,
+          isEnabled: !state.isSubmitting,
+          onPressed: () =>
+              ref.read(gainTargetViewModelProvider.notifier).saveTarget(),
         ),
         if (state.isSubmitting) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.space3),
           Row(
             key: const Key('gain_target_pending_indicator'),
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                width: _pendingIndicatorSize,
+                height: _pendingIndicatorSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: _indicatorStrokeWidth,
+                ),
               ),
-              const SizedBox(width: 8),
-              Text(context.l10n.gainTargetWaitingConfirmation),
+              const SizedBox(width: AppSpacing.inlineGap),
+              Flexible(
+                child: Text(
+                  context.l10n.gainTargetWaitingConfirmation,
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
         ],

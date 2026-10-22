@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import 'package:bulk_tempo/core/theme/app_theme.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import '../../widgetbook/widgetbook_app.dart';
 import '../test_helpers/pump_app.dart';
 
@@ -126,5 +126,55 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+
+    testWidgets(
+      'Gain Target kitchen sink covers Material and classic Cupertino fallbacks',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final useCase = allUseCases.singleWhere(
+          (item) => item.name == 'Kitchen Sink — State Matrix',
+        );
+        final state = WidgetbookState(
+          root: WidgetbookRoot(children: widgetbookDirectories),
+        );
+
+        for (final capabilities in [
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.android,
+          ),
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.iOS,
+            iosMajorVersion: 18,
+            supportsNativeIosViews: false,
+          ),
+        ]) {
+          final platform = capabilities.targetPlatform;
+          await tester.pumpApp(
+            WidgetbookScope(
+              state: state,
+              child: Builder(builder: (context) => useCase.build(context)),
+            ),
+            locale: const Locale('pl'),
+            theme: AppTheme.dark().copyWith(platform: platform),
+            capabilities: capabilities,
+          );
+          await tester.pump(const Duration(milliseconds: 50));
+
+          expect(find.text('Nie ustawiono celu'), findsOneWidget);
+          expect(find.text('Default / saved'), findsOneWidget);
+          expect(find.text('Empty / no target'), findsOneWidget);
+          expect(find.text('Loading'), findsOneWidget);
+          expect(find.text('Fetch error'), findsOneWidget);
+          expect(find.text('Validation error'), findsOneWidget);
+          expect(find.text('Disabled / busy'), findsOneWidget);
+          expect(find.text('Success feedback'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
   });
 }

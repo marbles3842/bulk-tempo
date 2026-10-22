@@ -348,6 +348,8 @@ void main() {
         expect(AppSpacing.expandedBreakpoint, 840.0);
         expect(AppSpacing.formMaxWidth, 480.0);
         expect(AppSpacing.dashboardMaxWidth, 1120.0);
+        expect(AppSpacing.stackedSummaryBreakpoint, 420.0);
+        expect(AppSpacing.enlargedTextScaleThreshold, 1.4);
         expect(AppSpacing.androidMinTapTarget, 48.0);
         expect(AppSpacing.iosMinTapTarget, 44.0);
 

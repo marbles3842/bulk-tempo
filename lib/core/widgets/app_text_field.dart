@@ -14,6 +14,7 @@ class AppTextField extends ConsumerWidget {
     this.fieldKey,
     this.controller,
     required this.label,
+    this.labelMaxLines,
     this.hint,
     this.helperText,
     this.errorText,
@@ -39,6 +40,9 @@ class AppTextField extends ConsumerWidget {
 
   /// Visible label displayed as floating label (Material) or header (Cupertino).
   final String label;
+
+  /// Maximum lines for long labels. Defaults to the platform control's behavior.
+  final int? labelMaxLines;
 
   /// Placeholder hint text.
   final String? hint;
@@ -116,7 +120,14 @@ class AppTextField extends ConsumerWidget {
         onChanged: onChanged,
         onSubmitted: onSubmitted,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: labelMaxLines == null ? label : null,
+          label: labelMaxLines == null
+              ? null
+              : Text(
+                  label,
+                  maxLines: labelMaxLines,
+                  overflow: TextOverflow.clip,
+                ),
           hintText: hint,
           helperText: helperText,
           errorText: errorText,
@@ -200,6 +211,8 @@ class AppTextField extends ConsumerWidget {
         ExcludeSemantics(
           child: Text(
             label,
+            maxLines: labelMaxLines,
+            overflow: labelMaxLines == null ? null : TextOverflow.clip,
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
