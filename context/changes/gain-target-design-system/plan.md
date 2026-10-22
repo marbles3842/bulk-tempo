@@ -241,10 +241,10 @@ There is no persisted-data or API migration. The design-system change affects on
 
 #### Automated
 
-- [x] 3.1 Add deterministic gain-target Widgetbook examples and catalog registration.
-- [x] 3.2 Cover the applicable state matrix and adaptive fallback behavior in tests/catalog.
-- [x] 3.3 Add the local design-system rule and scoped raw-color CI guard.
-- [x] 3.4 Pass format, analysis, and full Flutter test checks.
+- [x] 3.1 Add deterministic gain-target Widgetbook examples and catalog registration. — f38e3d3
+- [x] 3.2 Cover the applicable state matrix and adaptive fallback behavior in tests/catalog. — f38e3d3
+- [x] 3.3 Add the local design-system rule and scoped raw-color CI guard. — f38e3d3
+- [x] 3.4 Pass format, analysis, and full Flutter test checks. — f38e3d3
 
 #### Manual
 
