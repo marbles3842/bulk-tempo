@@ -235,7 +235,7 @@ There is no persisted-data or API migration. The design-system change affects on
 
 #### Manual
 
-- [ ] 2.4 Confirm Profile embedding, content order, and scroll layout remain intact.
+- [x] 2.4 Confirm Profile embedding, content order, and scroll layout remain intact.
 
 ### Phase 3: Cover States and Verify the Visual Result
 
