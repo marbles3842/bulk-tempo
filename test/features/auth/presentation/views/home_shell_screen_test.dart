@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
+import 'package:bulk_tempo/core/platform/presentation_capabilities.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
@@ -917,10 +919,110 @@ void main() {
 
         // Clear failure and tap retry
         fakeGainTargetRepository.getFailure = null;
-        await tester.tap(find.byKey(const Key('dashboard_pace_retry_button')));
+        await tester.tap(
+          find.byKey(const Key('dashboard_pace_retry_button')),
+          warnIfMissed: false,
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Failed to load target'), findsNothing);
+      },
+    );
+  });
+
+  group('Design System & Platform Adaptation', () {
+    testWidgets(
+      'renders CupertinoNavigationBar, CupertinoTabBar, CupertinoAlertDialog, and CupertinoSlidingSegmentedControl in cupertinoClassic mode',
+      (tester) async {
+        const cupertinoClassicCaps = PresentationCapabilities(
+          targetPlatform: TargetPlatform.iOS,
+          iosMajorVersion: 18,
+          supportsNativeIosViews: false,
+        );
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: buildOverrides(),
+          capabilities: cupertinoClassicCaps,
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CupertinoNavigationBar), findsOneWidget);
+        expect(find.byType(CupertinoTabBar), findsOneWidget);
+
+        // Tap logout in top navigation bar to verify CupertinoAlertDialog
+        await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CupertinoAlertDialog), findsOneWidget);
+        expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.byKey(const Key('confirm_logout_button')), findsOneWidget);
+
+        // Cancel logout dialog
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+        expect(find.byType(CupertinoAlertDialog), findsNothing);
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(
+          find.byKey(const Key('profile_language_card')),
+        );
+        expect(
+          find.byType(CupertinoSlidingSegmentedControl<String>),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('profile_language_selector')),
+          findsOneWidget,
+        );
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(HomeShellScreen)),
+        );
+        expect(container.read(localeProvider), const Locale('en'));
+
+        // Switch language via Cupertino control
+        await tester.tap(find.text('Polski'));
+        await tester.pumpAndSettle();
+
+        expect(container.read(localeProvider), const Locale('pl'));
+        final selectorPl = tester
+            .widget<CupertinoSlidingSegmentedControl<String>>(
+              find.byKey(const Key('profile_language_selector')),
+            );
+        expect(selectorPl.groupValue, 'pl');
+      },
+    );
+
+    testWidgets(
+      'switches to NavigationRail on wide (1024x768) Material viewport preserving all 4 tab keys',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          overrides: buildOverrides(),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(NavigationRail), findsOneWidget);
+        expect(find.byType(NavigationBar), findsNothing);
+        expect(find.byKey(const Key('nav_home_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_weights_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_workouts_tab')), findsOneWidget);
+        expect(find.byKey(const Key('nav_profile_tab')), findsOneWidget);
+
+        // Verify switching tabs via NavigationRail
+        await tester.tap(find.byKey(const Key('nav_weights_tab')));
+        await tester.pumpAndSettle();
+        expect(find.byType(WeightHistoryView), findsOneWidget);
       },
     );
   });

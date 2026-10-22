@@ -370,13 +370,13 @@ Add the `Auth` category to Widgetbook (`widgetbook/use_cases/auth_use_cases.dart
 
 #### Automated
 
-- [ ] 2.1 HomeShellScreen widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
-- [ ] 2.2 Full auth test suite passes: `flutter test test/features/auth/`
-- [ ] 2.3 Formatting and static analysis pass with zero issues: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- [x] 2.1 HomeShellScreen widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
+- [x] 2.2 Full auth test suite passes: `flutter test test/features/auth/`
+- [x] 2.3 Formatting and static analysis pass with zero issues: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
 
 #### Manual
 
-- [ ] 2.4 Verify HomeShellScreen navigation bar/rail switching (<840px vs >=840px), destructive logout confirmation dialog, and Profile tab cards and language selector in Material and Cupertino modes
+- [x] 2.4 Verify HomeShellScreen navigation bar/rail switching (<840px vs >=840px), destructive logout confirmation dialog, and Profile tab cards and language selector in Material and Cupertino modes
 
 ### Phase 3: Widgetbook Catalog, Accessibility Verification & Governance
 

@@ -151,12 +151,15 @@ class AppNavigationShell extends ConsumerWidget {
                             ? Badge(label: Text(dest.badgeText!), child: icon)
                             : icon,
                       ),
-                      selectedIcon: dest.badgeText != null
-                          ? Badge(
-                              label: Text(dest.badgeText!),
-                              child: selectedIcon,
-                            )
-                          : selectedIcon,
+                      selectedIcon: KeyedSubtree(
+                        key: dest.key,
+                        child: dest.badgeText != null
+                            ? Badge(
+                                label: Text(dest.badgeText!),
+                                child: selectedIcon,
+                              )
+                            : selectedIcon,
+                      ),
                       label: Text(dest.label),
                     );
                   }).toList(),
@@ -233,6 +236,7 @@ class AppNavigationShell extends ConsumerWidget {
           );
           Widget activeIconWidget = Icon(
             AppIcons.cupertino(dest.icon, selected: true),
+            key: dest.key,
           );
           if (dest.badgeText != null) {
             iconWidget = Badge(label: Text(dest.badgeText!), child: iconWidget);

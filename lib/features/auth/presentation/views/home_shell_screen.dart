@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
@@ -21,28 +23,185 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
   int _selectedIndex = 0;
 
   void _showLogoutDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(context.l10n.logoutDialogTitle),
-          content: Text(context.l10n.logoutDialogContent),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(context.l10n.cancel),
+    AppDialog.showConfirm<bool>(
+      context,
+      dialogKey: const Key('logout_confirm_dialog'),
+      title: context.l10n.logoutDialogTitle,
+      message: context.l10n.logoutDialogContent,
+      cancelLabel: context.l10n.cancel,
+      confirmLabel: context.l10n.logoutDialogConfirm,
+      confirmButtonKey: const Key('confirm_logout_button'),
+      isDestructive: true,
+      onConfirm: () => ref.read(authViewModelProvider.notifier).signOut(),
+    );
+  }
+
+  Widget _buildHevyCard(BuildContext context, String? maskedApiKey) {
+    return AppCard(
+      cardKey: const Key('profile_hevy_card'),
+      variant: AppCardVariant.outlined,
+      title: context.l10n.hevyIntegrationTitle,
+      leadingIcon: AppIcon.workout,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow =
+              constraints.maxWidth < AppSpacing.stackedSummaryBreakpoint;
+          final textScaler = MediaQuery.textScalerOf(context);
+          final isEnlarged =
+              textScaler.scale(1.0) >= AppSpacing.enlargedTextScaleThreshold;
+          final shouldStack = isNarrow || isEnlarged;
+
+          final connectOrUpdateButton = AppButton(
+            key: const Key('profile_connect_or_update_hevy_key_button'),
+            label: maskedApiKey != null
+                ? context.l10n.updateKeyButton
+                : context.l10n.connectHevyKeyButton,
+            variant: AppButtonVariant.tonal,
+            expand: true,
+            onPressed: () => HevyKeyBottomSheet.show(context),
+          );
+
+          final disconnectButton = maskedApiKey != null
+              ? AppButton(
+                  key: const Key('profile_disconnect_hevy_key_button'),
+                  label: context.l10n.disconnectButton,
+                  variant: AppButtonVariant.outlined,
+                  expand: shouldStack,
+                  onPressed: () {
+                    ref
+                        .read(workoutProgressViewModelProvider.notifier)
+                        .disconnectApiKey();
+                  },
+                )
+              : null;
+
+          final Widget buttons;
+          if (shouldStack) {
+            buttons = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                connectOrUpdateButton,
+                if (disconnectButton != null) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  disconnectButton,
+                ],
+              ],
+            );
+          } else {
+            buttons = Row(
+              children: [
+                Expanded(child: connectOrUpdateButton),
+                if (disconnectButton != null) ...[
+                  const SizedBox(width: AppSpacing.space2),
+                  disconnectButton,
+                ],
+              ],
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                context.l10n.connectionStatusLabel,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space1),
+              if (maskedApiKey != null)
+                Text(
+                  maskedApiKey,
+                  key: const Key('profile_hevy_masked_key'),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              else
+                Text(
+                  context.l10n.hevyNotConnected,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              const SizedBox(height: AppSpacing.space4),
+              buttons,
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLanguageCard(BuildContext context, Locale currentLocale) {
+    final capabilities = PresentationCapabilities.resolve(context);
+    final isMaterial =
+        capabilities.platformMode == AdaptivePlatformMode.material;
+
+    final Widget selector;
+    if (isMaterial) {
+      selector = SizedBox(
+        width: double.infinity,
+        child: SegmentedButton<String>(
+          key: const Key('profile_language_selector'),
+          segments: [
+            ButtonSegment<String>(
+              value: LocaleConstants.english,
+              label: Text(context.l10n.languageEnglish),
             ),
-            TextButton(
-              key: const Key('confirm_logout_button'),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                ref.read(authViewModelProvider.notifier).signOut();
-              },
-              child: Text(context.l10n.logoutDialogConfirm),
+            ButtonSegment<String>(
+              value: LocaleConstants.polish,
+              label: Text(context.l10n.languagePolish),
             ),
           ],
-        );
-      },
+          selected: {LocaleConstants.toSelectionCode(currentLocale)},
+          onSelectionChanged: (newSelection) {
+            final selectedLocale = LocaleConstants.fromSelectionCode(
+              newSelection.first,
+            );
+            ref.read(localeProvider.notifier).setLocale(selectedLocale);
+          },
+        ),
+      );
+    } else {
+      selector = SizedBox(
+        width: double.infinity,
+        child: CupertinoSlidingSegmentedControl<String>(
+          key: const Key('profile_language_selector'),
+          groupValue: LocaleConstants.toSelectionCode(currentLocale),
+          children: {
+            LocaleConstants.english: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              child: Text(context.l10n.languageEnglish),
+            ),
+            LocaleConstants.polish: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              child: Text(context.l10n.languagePolish),
+            ),
+          },
+          onValueChanged: (value) {
+            if (value != null) {
+              final selectedLocale = LocaleConstants.fromSelectionCode(value);
+              ref.read(localeProvider.notifier).setLocale(selectedLocale);
+            }
+          },
+        ),
+      );
+    }
+
+    return AppCard(
+      cardKey: const Key('profile_language_card'),
+      variant: AppCardVariant.outlined,
+      title: context.l10n.languageLabel,
+      leadingIcon: AppIcon.language,
+      child: selector,
     );
   }
 
@@ -53,188 +212,51 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            const Icon(Icons.person_outline, size: 72),
-            const SizedBox(height: 16),
-            Text(
-              context.l10n.profileTitle,
-              key: const Key('profile_heading'),
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.all(AppSpacing.pageInsetWide),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppSpacing.dashboardMaxWidth,
             ),
-            const SizedBox(height: 8),
-            Text(
-              email ?? context.l10n.noEmail,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const GainTargetView(),
-            const SizedBox(height: 24),
-            Card(
-              key: const Key('profile_hevy_card'),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.fitness_center,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          context.l10n.hevyIntegrationTitle,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      context.l10n.connectionStatusLabel,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    if (maskedApiKey != null)
-                      Text(
-                        maskedApiKey,
-                        key: const Key('profile_hevy_masked_key'),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    else
-                      Text(
-                        context.l10n.hevyNotConnected,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton.tonal(
-                            key: const Key(
-                              'profile_connect_or_update_hevy_key_button',
-                            ),
-                            onPressed: () => HevyKeyBottomSheet.show(context),
-                            child: Text(
-                              maskedApiKey != null
-                                  ? context.l10n.updateKeyButton
-                                  : context.l10n.connectHevyKeyButton,
-                            ),
-                          ),
-                        ),
-                        if (maskedApiKey != null) ...[
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            key: const Key(
-                              'profile_disconnect_hevy_key_button',
-                            ),
-                            onPressed: () {
-                              ref
-                                  .read(
-                                    workoutProgressViewModelProvider.notifier,
-                                  )
-                                  .disconnectApiKey();
-                            },
-                            child: Text(context.l10n.disconnectButton),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildLanguageCard(context, currentLocale),
-            const SizedBox(height: 32),
-            OutlinedButton.icon(
-              key: const Key('profile_logout_button'),
-              icon: const Icon(Icons.logout),
-              label: Text(context.l10n.logoutButton),
-              onPressed: () => _showLogoutDialog(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLanguageCard(BuildContext context, Locale currentLocale) {
-    return Card(
-      key: const Key('profile_language_card'),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
+            child: Column(
               children: [
                 Icon(
-                  Icons.language,
-                  size: 20,
+                  AppIcons.resolve(context, AppIcon.profile),
+                  size: 72,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(height: AppSpacing.space4),
                 Text(
-                  context.l10n.languageLabel,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  context.l10n.profileTitle,
+                  key: const Key('profile_heading'),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  email ?? context.l10n.noEmail,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
+                const GainTargetView(),
+                const SizedBox(height: AppSpacing.sectionGap),
+                _buildHevyCard(context, maskedApiKey),
+                const SizedBox(height: AppSpacing.sectionGap),
+                _buildLanguageCard(context, currentLocale),
+                const SizedBox(height: AppSpacing.space8),
+                AppButton(
+                  key: const Key('profile_logout_button'),
+                  label: context.l10n.logoutButton,
+                  icon: AppIcon.logout,
+                  variant: AppButtonVariant.outlined,
+                  onPressed: () => _showLogoutDialog(context),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<String>(
-                key: const Key('profile_language_selector'),
-                segments: [
-                  ButtonSegment<String>(
-                    value: LocaleConstants.english,
-                    label: Text(context.l10n.languageEnglish),
-                  ),
-                  ButtonSegment<String>(
-                    value: LocaleConstants.polish,
-                    label: Text(context.l10n.languagePolish),
-                  ),
-                ],
-                selected: {LocaleConstants.toSelectionCode(currentLocale)},
-                onSelectionChanged: (newSelection) {
-                  final selectedLocale = LocaleConstants.fromSelectionCode(
-                    newSelection.first,
-                  );
-                  ref.read(localeProvider.notifier).setLocale(selectedLocale);
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -245,11 +267,10 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.errorMessage != null &&
           next.errorMessage != previous?.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppFeedback.showSnackBar(
+          context,
+          message: next.errorMessage!,
+          tone: AppFeedbackTone.error,
         );
         ref.read(authViewModelProvider.notifier).clearError();
       }
@@ -272,58 +293,50 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
         body = const DashboardView();
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.appTitle),
-        actions: [
-          IconButton(
-            key: const Key('home_app_bar_logout_button'),
-            icon: const Icon(Icons.logout),
-            tooltip: context.l10n.logoutButton,
-            onPressed: () => _showLogoutDialog(context),
-          ),
-        ],
-      ),
+    return AppNavigationShell(
+      title: context.l10n.appTitle,
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+        if (index == 3) {
+          ref
+              .read(workoutProgressViewModelProvider.notifier)
+              .ensureInitialized();
+        }
+      },
+      toolbarActions: [
+        AppToolbarAction(
+          key: const Key('home_app_bar_logout_button'),
+          tooltip: context.l10n.logoutButton,
+          icon: AppIcon.logout,
+          onPressed: () => _showLogoutDialog(context),
+        ),
+      ],
+      destinations: [
+        AppNavigationDestinationItem(
+          key: const Key('nav_home_tab'),
+          label: context.l10n.navHome,
+          icon: AppIcon.home,
+        ),
+        AppNavigationDestinationItem(
+          key: const Key('nav_weights_tab'),
+          label: context.l10n.navWeights,
+          icon: AppIcon.weight,
+        ),
+        AppNavigationDestinationItem(
+          key: const Key('nav_workouts_tab'),
+          label: context.l10n.navWorkouts,
+          icon: AppIcon.workout,
+        ),
+        AppNavigationDestinationItem(
+          key: const Key('nav_profile_tab'),
+          label: context.l10n.navProfile,
+          icon: AppIcon.profile,
+        ),
+      ],
       body: body,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          if (index == 3) {
-            ref
-                .read(workoutProgressViewModelProvider.notifier)
-                .ensureInitialized();
-          }
-        },
-        destinations: [
-          NavigationDestination(
-            key: const Key('nav_home_tab'),
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home),
-            label: context.l10n.navHome,
-          ),
-          NavigationDestination(
-            key: const Key('nav_weights_tab'),
-            icon: const Icon(Icons.monitor_weight_outlined),
-            selectedIcon: const Icon(Icons.monitor_weight),
-            label: context.l10n.navWeights,
-          ),
-          NavigationDestination(
-            key: const Key('nav_workouts_tab'),
-            icon: const Icon(Icons.fitness_center_outlined),
-            selectedIcon: const Icon(Icons.fitness_center),
-            label: context.l10n.navWorkouts,
-          ),
-          NavigationDestination(
-            key: const Key('nav_profile_tab'),
-            icon: const Icon(Icons.person_outlined),
-            selectedIcon: const Icon(Icons.person),
-            label: context.l10n.navProfile,
-          ),
-        ],
-      ),
     );
   }
 }
