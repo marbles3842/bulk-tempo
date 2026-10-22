@@ -357,14 +357,14 @@ Add the `Auth` category to Widgetbook (`widgetbook/use_cases/auth_use_cases.dart
 
 #### Automated
 
-- [x] 1.1 AuthButton and AuthTextField unit/widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/widgets/`
-- [x] 1.2 Splash, Login, and Register widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/views/splash_screen_test.dart test/features/auth/presentation/views/login_screen_test.dart test/features/auth/presentation/views/register_screen_test.dart`
-- [x] 1.3 Router and localization tests pass with migrated auth screens: `flutter test test/app/router/app_router_test.dart test/features/localization/polish_rendering_test.dart test/widget_test.dart`
-- [x] 1.4 Formatting and static analysis pass with zero issues: `dart format --output=none --set-exit-if-changed lib test && flutter analyze`
+- [x] 1.1 AuthButton and AuthTextField unit/widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/widgets/` — f8227b6
+- [x] 1.2 Splash, Login, and Register widget tests pass across Material and Cupertino modes: `flutter test test/features/auth/presentation/views/splash_screen_test.dart test/features/auth/presentation/views/login_screen_test.dart test/features/auth/presentation/views/register_screen_test.dart` — f8227b6
+- [x] 1.3 Router and localization tests pass with migrated auth screens: `flutter test test/app/router/app_router_test.dart test/features/localization/polish_rendering_test.dart test/widget_test.dart` — f8227b6
+- [x] 1.4 Formatting and static analysis pass with zero issues: `dart format --output=none --set-exit-if-changed lib test && flutter analyze` — f8227b6
 
 #### Manual
 
-- [x] 1.5 Verify SplashScreen, LoginScreen, and RegisterScreen in English and Polish across light and dark themes, confirming password visibility toggle, inline error banner + snackbar feedback, and disabled inputs while submitting
+- [x] 1.5 Verify SplashScreen, LoginScreen, and RegisterScreen in English and Polish across light and dark themes, confirming password visibility toggle, inline error banner + snackbar feedback, and disabled inputs while submitting — f8227b6
 
 ### Phase 2: Migrate HomeShellScreen, Logout Dialog & Profile Tab
 
