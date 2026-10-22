@@ -26,8 +26,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+    final initialForm = ref.read(registerViewModelProvider);
+    _emailController = TextEditingController(text: initialForm.email);
+    _passwordController = TextEditingController(text: initialForm.password);
   }
 
   @override
@@ -90,7 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           )
         : CupertinoNavigationBar(
             border: null,
-            backgroundColor: Colors.transparent,
+            backgroundColor: colorScheme.surface.withValues(alpha: 0),
             leading: Tooltip(
               message: MaterialLocalizations.of(context).backButtonTooltip,
               child: CupertinoButton(

@@ -246,4 +246,94 @@ void main() {
 
     expect(fakeRepository.currentUser?.email, equals('brandnew@example.com'));
   });
+
+  group('RegisterScreen Accessibility & 2.0x Text-Scale Reflow', () {
+    testWidgets(
+      'renders without overflow at 2.0x text scale in Polish (390x844)',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpApp(
+          MediaQuery(
+            data: const MediaQueryData(
+              size: Size(390, 844),
+              textScaler: TextScaler.linear(2.0),
+            ),
+            child: const RegisterScreen(),
+          ),
+          locale: const Locale('pl'),
+          theme: AppTheme.dark(),
+          overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'interactive buttons satisfy 48x48 tap target on Android and 44x44 on iOS',
+      (tester) async {
+        // 1. Android
+        await tester.pumpApp(
+          const RegisterScreen(),
+          locale: const Locale('pl'),
+          overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+          capabilities: const PresentationCapabilities(
+            targetPlatform: TargetPlatform.android,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final submitBtnAndroid = tester.getSize(
+          find.byKey(const Key('register_submit_button')),
+        );
+        final loginBtnAndroid = tester.getSize(
+          find.byKey(const Key('register_to_login_button')),
+        );
+        final backBtnAndroid = tester.getSize(
+          find.byKey(const Key('register_back_button')),
+        );
+        expect(submitBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(submitBtnAndroid.height, greaterThanOrEqualTo(48));
+        expect(loginBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(loginBtnAndroid.height, greaterThanOrEqualTo(48));
+        expect(backBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(backBtnAndroid.height, greaterThanOrEqualTo(48));
+
+        // 2. iOS
+        await tester.pumpApp(
+          const RegisterScreen(),
+          locale: const Locale('pl'),
+          overrides: [authRepositoryProvider.overrideWithValue(fakeRepository)],
+          capabilities: const PresentationCapabilities(
+            targetPlatform: TargetPlatform.iOS,
+            iosMajorVersion: 18,
+            supportsNativeIosViews: false,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final submitBtnIos = tester.getSize(
+          find.byKey(const Key('register_submit_button')),
+        );
+        final loginBtnIos = tester.getSize(
+          find.byKey(const Key('register_to_login_button')),
+        );
+        final backBtnIos = tester.getSize(
+          find.byKey(const Key('register_back_button')),
+        );
+        expect(submitBtnIos.width, greaterThanOrEqualTo(44));
+        expect(submitBtnIos.height, greaterThanOrEqualTo(44));
+        expect(loginBtnIos.width, greaterThanOrEqualTo(44));
+        expect(loginBtnIos.height, greaterThanOrEqualTo(44));
+        expect(backBtnIos.width, greaterThanOrEqualTo(44));
+        expect(backBtnIos.height, greaterThanOrEqualTo(44));
+        expect(tester.takeException(), isNull);
+      },
+    );
+  });
 }

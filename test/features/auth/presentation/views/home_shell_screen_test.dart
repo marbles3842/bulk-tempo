@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:bulk_tempo/core/design_system.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
-import 'package:bulk_tempo/core/platform/presentation_capabilities.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
@@ -1023,6 +1023,132 @@ void main() {
         await tester.tap(find.byKey(const Key('nav_weights_tab')));
         await tester.pumpAndSettle();
         expect(find.byType(WeightHistoryView), findsOneWidget);
+      },
+    );
+  });
+
+  group('HomeShellScreen Accessibility & 2.0x Text-Scale Reflow', () {
+    testWidgets(
+      'Profile tab renders without overflow at 2.0x text scale in Polish (390x844)',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        fakeGainTargetRepository.seedTarget(
+          testUser.id,
+          const GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+        );
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+
+        await tester.pumpApp(
+          MediaQuery(
+            data: const MediaQueryData(
+              size: Size(390, 844),
+              textScaler: TextScaler.linear(2.0),
+            ),
+            child: const HomeShellScreen(),
+          ),
+          locale: const Locale('pl'),
+          theme: AppTheme.dark(),
+          overrides: buildOverrides(),
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to Profile tab
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('profile_heading')), findsOneWidget);
+        expect(find.byKey(const Key('profile_logout_button')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'Profile tab interactive buttons satisfy 48x48 tap target on Android and 44x44 on iOS',
+      (tester) async {
+        fakeGainTargetRepository.seedTarget(
+          testUser.id,
+          const GainTargetEntity(minWeeklyGainKg: 0.15, maxWeeklyGainKg: 0.25),
+        );
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+
+        // 1. Android
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          locale: const Locale('pl'),
+          overrides: buildOverrides(),
+          capabilities: const PresentationCapabilities(
+            targetPlatform: TargetPlatform.android,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        final connectBtnAndroid = tester.getSize(
+          find.byKey(const Key('profile_connect_or_update_hevy_key_button')),
+        );
+        final disconnectBtnAndroid = tester.getSize(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+        );
+        final logoutBtnAndroid = tester.getSize(
+          find.byKey(const Key('profile_logout_button')),
+        );
+        final navLogoutBtnAndroid = tester.getSize(
+          find.byKey(const Key('home_app_bar_logout_button')),
+        );
+
+        expect(connectBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(connectBtnAndroid.height, greaterThanOrEqualTo(48));
+        expect(disconnectBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(disconnectBtnAndroid.height, greaterThanOrEqualTo(48));
+        expect(logoutBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(logoutBtnAndroid.height, greaterThanOrEqualTo(48));
+        expect(navLogoutBtnAndroid.width, greaterThanOrEqualTo(48));
+        expect(navLogoutBtnAndroid.height, greaterThanOrEqualTo(48));
+
+        // 2. iOS
+        await tester.pumpApp(
+          const HomeShellScreen(),
+          locale: const Locale('pl'),
+          overrides: buildOverrides(),
+          capabilities: const PresentationCapabilities(
+            targetPlatform: TargetPlatform.iOS,
+            iosMajorVersion: 18,
+            supportsNativeIosViews: false,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('nav_profile_tab')));
+        await tester.pumpAndSettle();
+
+        final connectBtnIos = tester.getSize(
+          find.byKey(const Key('profile_connect_or_update_hevy_key_button')),
+        );
+        final disconnectBtnIos = tester.getSize(
+          find.byKey(const Key('profile_disconnect_hevy_key_button')),
+        );
+        final logoutBtnIos = tester.getSize(
+          find.byKey(const Key('profile_logout_button')),
+        );
+        final navLogoutBtnIos = tester.getSize(
+          find.byKey(const Key('home_app_bar_logout_button')),
+        );
+
+        expect(connectBtnIos.width, greaterThanOrEqualTo(44));
+        expect(connectBtnIos.height, greaterThanOrEqualTo(44));
+        expect(disconnectBtnIos.width, greaterThanOrEqualTo(44));
+        expect(disconnectBtnIos.height, greaterThanOrEqualTo(44));
+        expect(logoutBtnIos.width, greaterThanOrEqualTo(44));
+        expect(logoutBtnIos.height, greaterThanOrEqualTo(44));
+        expect(navLogoutBtnIos.width, greaterThanOrEqualTo(44));
+        expect(navLogoutBtnIos.height, greaterThanOrEqualTo(44));
+        expect(tester.takeException(), isNull);
       },
     );
   });

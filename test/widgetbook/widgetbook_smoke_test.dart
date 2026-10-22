@@ -176,5 +176,107 @@ void main() {
         }
       },
     );
+
+    testWidgets(
+      'Auth Login state matrix covers Material and classic Cupertino fallbacks',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final loginUseCase = allUseCases.singleWhere(
+          (item) => item.name == 'Login — State Matrix',
+        );
+        final state = WidgetbookState(
+          root: WidgetbookRoot(children: widgetbookDirectories),
+        );
+
+        for (final capabilities in [
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.android,
+          ),
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.iOS,
+            iosMajorVersion: 18,
+            supportsNativeIosViews: false,
+          ),
+        ]) {
+          final platform = capabilities.targetPlatform;
+
+          await tester.pumpApp(
+            WidgetbookScope(
+              state: state,
+              child: Builder(builder: (context) => loginUseCase.build(context)),
+            ),
+            locale: const Locale('pl'),
+            theme: AppTheme.dark().copyWith(platform: platform),
+            capabilities: capabilities,
+          );
+          await tester.pump(const Duration(milliseconds: 50));
+
+          expect(find.text('Default (empty)'), findsOneWidget);
+          expect(find.text('Populated (ready)'), findsOneWidget);
+          expect(find.text('Validation error'), findsOneWidget);
+          expect(find.text('Submission failure'), findsOneWidget);
+          expect(find.text('Submitting / busy'), findsOneWidget);
+          expect(find.text('Auth stream error'), findsOneWidget);
+          expect(find.text('Success feedback'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
+
+    testWidgets(
+      'Auth Register state matrix covers Material and classic Cupertino fallbacks',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final registerUseCase = allUseCases.singleWhere(
+          (item) => item.name == 'Register — State Matrix',
+        );
+        final state = WidgetbookState(
+          root: WidgetbookRoot(children: widgetbookDirectories),
+        );
+
+        for (final capabilities in [
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.android,
+          ),
+          const PresentationCapabilities(
+            targetPlatform: TargetPlatform.iOS,
+            iosMajorVersion: 18,
+            supportsNativeIosViews: false,
+          ),
+        ]) {
+          final platform = capabilities.targetPlatform;
+
+          await tester.pumpApp(
+            WidgetbookScope(
+              state: state,
+              child: Builder(
+                builder: (context) => registerUseCase.build(context),
+              ),
+            ),
+            locale: const Locale('pl'),
+            theme: AppTheme.dark().copyWith(platform: platform),
+            capabilities: capabilities,
+          );
+          await tester.pump(const Duration(milliseconds: 50));
+
+          expect(find.text('Default (empty)'), findsOneWidget);
+          expect(find.text('Populated (ready)'), findsOneWidget);
+          expect(find.text('Validation error'), findsOneWidget);
+          expect(find.text('Submission failure'), findsOneWidget);
+          expect(find.text('Submitting / busy'), findsOneWidget);
+          expect(find.text('Auth stream error'), findsOneWidget);
+          expect(find.text('Success feedback'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
   });
 }

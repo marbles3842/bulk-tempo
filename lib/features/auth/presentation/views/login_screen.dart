@@ -27,8 +27,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+    final initialForm = ref.read(loginViewModelProvider);
+    _emailController = TextEditingController(text: initialForm.email);
+    _passwordController = TextEditingController(text: initialForm.password);
   }
 
   @override
