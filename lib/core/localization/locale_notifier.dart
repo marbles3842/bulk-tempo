@@ -1,14 +1,13 @@
 import 'dart:ui';
 import 'package:bulk_tempo/core/constants/locale_constants.dart';
+import 'package:bulk_tempo/core/providers/secure_storage_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-/// Provider for [FlutterSecureStorage] used by locale persistence.
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
-});
+export 'package:bulk_tempo/core/providers/secure_storage_provider.dart'
+    show secureStorageProvider;
 
 /// Riverpod notifier managing the active [Locale].
 ///
