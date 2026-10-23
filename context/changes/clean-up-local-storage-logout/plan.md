@@ -271,11 +271,11 @@ Add and update unit tests for `AuthViewModel` covering successful storage wipe, 
 
 #### Automated
 
-- [x] 3.1 AuthViewModel tests pass: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
-- [x] 3.2 HomeShellScreen widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
-- [x] 3.3 Full project test suite passes: `flutter test`
-- [x] 3.4 Static analysis clean: `flutter analyze` reports 0 issues
-- [x] 3.5 Code formatted: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 AuthViewModel tests pass: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart` — 311e8de
+- [x] 3.2 HomeShellScreen widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart` — 311e8de
+- [x] 3.3 Full project test suite passes: `flutter test` — 311e8de
+- [x] 3.4 Static analysis clean: `flutter analyze` reports 0 issues — 311e8de
+- [x] 3.5 Code formatted: `dart format --output=none --set-exit-if-changed lib test` — 311e8de
 
 #### Manual
 
