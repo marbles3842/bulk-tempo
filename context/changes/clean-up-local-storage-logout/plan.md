@@ -236,9 +236,9 @@ Add and update unit tests for `AuthViewModel` covering successful storage wipe, 
 
 ## References
 
-- Existing logout implementation: [`lib/features/auth/presentation/view_models/auth_view_model.dart:45-58`](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/lib/features/auth/presentation/view_models/auth_view_model.dart#L45-L58)
-- Existing Hevy key storage: [`lib/features/workout/data/datasources/hevy_key_local_data_source.dart:15-68`](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/lib/features/workout/data/datasources/hevy_key_local_data_source.dart#L15-L68)
-- Mock storage helper: [`test/test_helpers/mocks.dart:44`](file:///Users/dimi/Desktop/10xdevs/bulk_tempo/test/test_helpers/mocks.dart#L44)
+- Existing logout implementation: [`lib/features/auth/presentation/view_models/auth_view_model.dart:45-58`](../../../lib/features/auth/presentation/view_models/auth_view_model.dart#L45-L58)
+- Existing Hevy key storage: [`lib/features/workout/data/datasources/hevy_key_local_data_source.dart:15-68`](../../../lib/features/workout/data/datasources/hevy_key_local_data_source.dart#L15-L68)
+- Mock storage helper: [`test/test_helpers/mocks.dart:44`](../../../test/test_helpers/mocks.dart#L44)
 
 ## Progress
 

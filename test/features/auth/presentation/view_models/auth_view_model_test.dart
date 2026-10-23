@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,7 @@ import 'package:bulk_tempo/features/weight/presentation/view_models/weight_entry
 import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_state.dart';
 import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_view_model.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/hevy_key_form_state.dart';
+import 'package:bulk_tempo/features/workout/data/datasources/workout_remote_data_source.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/hevy_key_view_model.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_state.dart';
 import 'package:bulk_tempo/features/workout/presentation/view_models/workout_progress_view_model.dart';
@@ -184,6 +186,140 @@ void main() {
   );
 
   test(
+    'signOut drains queued locale writes and blocks selections during deletion',
+    () async {
+      fakeRepository.setCurrentUser(testUser);
+      final persisted = <String, String>{};
+      final operations = <String>[];
+      final writeStarted = Completer<void>();
+      final finishWrite = Completer<void>();
+      final deletionStarted = Completer<void>();
+      final finishDeletion = Completer<void>();
+      when(
+        () => mockStorage.read(key: LocaleNotifier.storageKey),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockStorage.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((invocation) async {
+        final value = invocation.namedArguments[#value] as String;
+        if (value == 'pl') {
+          writeStarted.complete();
+          await finishWrite.future;
+        }
+        persisted[LocaleNotifier.storageKey] = value;
+        operations.add(value);
+      });
+      when(() => mockStorage.deleteAll()).thenAnswer((_) async {
+        operations.add('deleteAll');
+        deletionStarted.complete();
+        await finishDeletion.future;
+        persisted.clear();
+      });
+
+      final locale = container.read(localeProvider.notifier);
+      final polish = locale.setLocale(const Locale('pl'));
+      await writeStarted.future;
+      final english = locale.setLocale(const Locale('en'));
+      final logout = container.read(authViewModelProvider.notifier).signOut();
+      await Future<void>.delayed(Duration.zero);
+
+      verifyNever(() => mockStorage.deleteAll());
+      expect(fakeRepository.currentUser, testUser);
+      finishWrite.complete();
+      await Future.wait([polish, english]);
+      await deletionStarted.future;
+      await locale.setLocale(const Locale('pl'));
+      expect(operations, ['pl', 'en', 'deleteAll']);
+      expect(fakeRepository.currentUser, testUser);
+
+      finishDeletion.complete();
+      await logout;
+      expect(persisted, isEmpty);
+      expect(fakeRepository.currentUser, isNull);
+    },
+  );
+
+  test(
+    'signOut drains API-key validation and saving even after form disposal',
+    () async {
+      fakeRepository.setCurrentUser(testUser);
+      const apiKey = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      final remote = MockWorkoutRemoteDataSource();
+      final validation = Completer<int>();
+      final writeStarted = Completer<void>();
+      final finishWrite = Completer<void>();
+      final deletionStarted = Completer<void>();
+      final finishDeletion = Completer<void>();
+      final persisted = <String, String>{};
+      final operations = <String>[];
+      when(
+        () => remote.fetchWorkoutCount(apiKey: apiKey),
+      ).thenAnswer((_) => validation.future);
+      when(
+        () => mockStorage.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((invocation) async {
+        writeStarted.complete();
+        await finishWrite.future;
+        persisted[invocation.namedArguments[#key] as String] = apiKey;
+        operations.add('writeApiKey');
+      });
+      when(() => mockStorage.deleteAll()).thenAnswer((_) async {
+        operations.add('deleteAll');
+        deletionStarted.complete();
+        await finishDeletion.future;
+        persisted.clear();
+      });
+      final testContainer = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeRepository),
+          secureStorageProvider.overrideWithValue(mockStorage),
+          workoutRemoteDataSourceProvider.overrideWithValue(remote),
+        ],
+      );
+      addTearDown(testContainer.dispose);
+      final subscription = testContainer.listen(
+        hevyKeyViewModelProvider,
+        (_, _) {},
+      );
+      await Future<void>.delayed(Duration.zero);
+      final form = testContainer.read(hevyKeyViewModelProvider.notifier);
+      form.updateKey(apiKey);
+      final submission = form.submitKey();
+      subscription.close();
+      await testContainer.pump();
+      final logout = testContainer
+          .read(authViewModelProvider.notifier)
+          .signOut();
+      await Future<void>.delayed(Duration.zero);
+      verifyNever(() => mockStorage.deleteAll());
+
+      validation.complete(1);
+      await writeStarted.future;
+      verifyNever(() => mockStorage.deleteAll());
+      expect(fakeRepository.currentUser, testUser);
+      finishWrite.complete();
+      await deletionStarted.future;
+
+      final nextForm = testContainer.read(hevyKeyViewModelProvider.notifier);
+      nextForm.updateKey(apiKey);
+      expect(await nextForm.submitKey(), isFalse);
+      verify(() => remote.fetchWorkoutCount(apiKey: apiKey)).called(1);
+      finishDeletion.complete();
+      await logout;
+      expect(await submission, isFalse);
+      expect(operations, ['writeApiKey', 'deleteAll']);
+      expect(persisted, isEmpty);
+      expect(fakeRepository.currentUser, isNull);
+    },
+  );
+
+  test(
     'signOut proceeds with sign-out even if storage.deleteAll() throws (fail-open)',
     () async {
       fakeRepository.setCurrentUser(testUser);
@@ -303,7 +439,7 @@ void main() {
     },
   );
 
-  test('signOut sets errorMessage on failure', () async {
+  test('signOut sets errorMessage and resumes writes on failure', () async {
     fakeRepository.setCurrentUser(testUser);
     container.read(authViewModelProvider);
     await Future<void>.delayed(Duration.zero);
@@ -314,6 +450,17 @@ void main() {
 
     final state = container.read(authViewModelProvider);
     expect(state.errorMessage, equals('Sign out failed'));
+
+    when(
+      () => mockStorage.read(key: LocaleNotifier.storageKey),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockStorage.write(key: LocaleNotifier.storageKey, value: 'pl'),
+    ).thenAnswer((_) async {});
+    await container.read(localeProvider.notifier).setLocale(const Locale('pl'));
+    verify(
+      () => mockStorage.write(key: LocaleNotifier.storageKey, value: 'pl'),
+    ).called(1);
   });
 
   test('clearError resets errorMessage to null', () async {

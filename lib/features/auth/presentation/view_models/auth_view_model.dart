@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
@@ -53,11 +54,25 @@ class AuthViewModel extends Notifier<AuthState> {
   Future<void> signOut() async {
     state = state.copyWith(errorMessage: null);
 
+    final writes = ref.read(secureStorageWritesProvider);
+    await writes.pauseAndDrain();
+    try {
+      await _signOut();
+    } finally {
+      writes.resume();
+    }
+  }
+
+  Future<void> _signOut() async {
     try {
       final storage = ref.read(secureStorageProvider);
       await storage.deleteAll();
     } catch (_) {
-      // Fail-open: errors during storage wipe must not block sign-out.
+      developer.log(
+        'Secure storage cleanup failed during sign-out.',
+        name: 'AuthViewModel',
+        level: 900,
+      );
     }
 
     final repository = ref.read(authRepositoryProvider);
