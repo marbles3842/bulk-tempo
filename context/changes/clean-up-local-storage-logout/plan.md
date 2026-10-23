@@ -260,22 +260,22 @@ Add and update unit tests for `AuthViewModel` covering successful storage wipe, 
 
 #### Automated
 
-- [x] 2.1 Code compiles cleanly: `flutter analyze` passes with zero issues across `lib/features/auth/`
-- [x] 2.2 Unit tests run: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
+- [x] 2.1 Code compiles cleanly: `flutter analyze` passes with zero issues across `lib/features/auth/` — eca77a3
+- [x] 2.2 Unit tests run: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart` — eca77a3
 
 #### Manual
 
-- [x] 2.3 Code review: verify `deleteAll()` is called within a `try/catch` fail-open block before provider invalidations and Firebase sign-out
+- [x] 2.3 Code review: verify `deleteAll()` is called within a `try/catch` fail-open block before provider invalidations and Firebase sign-out — eca77a3
 
 ### Phase 3: Comprehensive Unit & Widget Testing
 
 #### Automated
 
-- [ ] 3.1 AuthViewModel tests pass: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
-- [ ] 3.2 HomeShellScreen widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
-- [ ] 3.3 Full project test suite passes: `flutter test`
-- [ ] 3.4 Static analysis clean: `flutter analyze` reports 0 issues
-- [ ] 3.5 Code formatted: `dart format --output=none --set-exit-if-changed lib test`
+- [x] 3.1 AuthViewModel tests pass: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
+- [x] 3.2 HomeShellScreen widget tests pass: `flutter test test/features/auth/presentation/views/home_shell_screen_test.dart`
+- [x] 3.3 Full project test suite passes: `flutter test`
+- [x] 3.4 Static analysis clean: `flutter analyze` reports 0 issues
+- [x] 3.5 Code formatted: `dart format --output=none --set-exit-if-changed lib test`
 
 #### Manual
 

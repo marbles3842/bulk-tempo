@@ -3,8 +3,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:bulk_tempo/core/localization/locale_provider.dart';
 import 'package:bulk_tempo/core/errors/failures.dart';
+import 'package:bulk_tempo/core/providers/secure_storage_provider.dart';
 import 'package:bulk_tempo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bulk_tempo/features/auth/domain/models/user_entity.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_state.dart';
@@ -33,6 +35,7 @@ import '../../../../test_helpers/fakes/fake_auth_repository.dart';
 import '../../../../test_helpers/fakes/fake_gain_target_repository.dart';
 import '../../../../test_helpers/fakes/fake_weight_repository.dart';
 import '../../../../test_helpers/fakes/fake_workout_repository.dart';
+import '../../../../test_helpers/mocks.dart';
 import '../../../../test_helpers/pump_app.dart';
 
 class FakeAuthViewModel extends AuthViewModel {
@@ -48,11 +51,26 @@ void main() {
   late FakeWeightRepository fakeWeightRepository;
   late FakeGainTargetRepository fakeGainTargetRepository;
   late FakeWorkoutRepository fakeWorkoutRepository;
+  late MockFlutterSecureStorage mockStorage;
   const testUser = UserEntity(id: 'u1', email: 'athlete@example.com');
   const validApiKey = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
+    mockStorage = MockFlutterSecureStorage();
+    when(() => mockStorage.deleteAll()).thenAnswer((_) async {});
+    when(
+      () => mockStorage.read(key: any(named: 'key')),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockStorage.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockStorage.delete(key: any(named: 'key')),
+    ).thenAnswer((_) async {});
     fakeRepository = FakeAuthRepository(initialUser: testUser);
     fakeWeightRepository = FakeWeightRepository();
     fakeGainTargetRepository = FakeGainTargetRepository();
@@ -72,6 +90,7 @@ void main() {
     weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
     workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
     gainTargetRepositoryProvider.overrideWithValue(fakeGainTargetRepository),
+    secureStorageProvider.overrideWithValue(mockStorage),
   ];
 
   WeightEntryEntity createEntry(String dateIso, double weightKg) {
@@ -212,21 +231,26 @@ void main() {
     expect(fakeRepository.currentUser, equals(testUser));
   });
 
-  testWidgets('confirming logout signs out user from repository', (
-    tester,
-  ) async {
-    await tester.pumpApp(const HomeShellScreen(), overrides: buildOverrides());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'confirming logout signs out user from repository and clears secure storage',
+    (tester) async {
+      await tester.pumpApp(
+        const HomeShellScreen(),
+        overrides: buildOverrides(),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('home_app_bar_logout_button')));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('confirm_logout_button')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('confirm_logout_button')));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(fakeRepository.currentUser, isNull);
-  });
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(fakeRepository.currentUser, isNull);
+      verify(() => mockStorage.deleteAll()).called(1);
+    },
+  );
 
   testWidgets(
     'Home tab marks cached target band outdated after a failed target refresh',
@@ -600,14 +624,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -635,14 +652,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -670,14 +680,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -722,14 +725,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -793,14 +789,7 @@ void main() {
 
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
@@ -836,14 +825,7 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           const HomeShellScreen(),
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeRepository),
-            weightRepositoryProvider.overrideWithValue(fakeWeightRepository),
-            workoutRepositoryProvider.overrideWithValue(fakeWorkoutRepository),
-            gainTargetRepositoryProvider.overrideWithValue(
-              fakeGainTargetRepository,
-            ),
-          ],
+          overrides: buildOverrides(),
         );
         await tester.pumpAndSettle();
 
