@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bulk_tempo/core/providers/secure_storage_provider.dart';
 import 'package:bulk_tempo/core/utils/hevy_key_validators.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/workout/data/repositories/workout_repository_impl.dart';
@@ -47,7 +48,8 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
   /// [WorkoutRepository.validateAndSaveApiKey], and triggers
   /// [WorkoutProgressViewModel.loadWorkouts] on success.
   Future<bool> submitKey() async {
-    if (state.status == FormStatus.submitting) {
+    final writes = ref.read(secureStorageWritesProvider);
+    if (writes.isPaused || state.status == FormStatus.submitting) {
       return false;
     }
 
@@ -81,12 +83,18 @@ class HevyKeyViewModel extends AutoDisposeNotifier<HevyKeyFormState> {
     );
 
     final repository = ref.read(workoutRepositoryProvider);
-    final result = await repository.validateAndSaveApiKey(
-      userId: targetUserId,
-      apiKey: normalizedKey,
+    final result = await writes.run(
+      () => repository.validateAndSaveApiKey(
+        userId: targetUserId,
+        apiKey: normalizedKey,
+      ),
     );
 
     if (_disposed) return false;
+    if (result == null || writes.isPaused) {
+      state = state.copyWith(status: FormStatus.initial);
+      return false;
+    }
     if (ref.read(authViewModelProvider).user?.id != targetUserId) {
       return false;
     }

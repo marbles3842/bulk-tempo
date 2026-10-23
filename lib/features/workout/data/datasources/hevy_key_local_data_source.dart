@@ -2,13 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bulk_tempo/core/constants/hevy_api_constants.dart';
 import 'package:bulk_tempo/core/errors/exceptions.dart';
+import 'package:bulk_tempo/core/providers/secure_storage_provider.dart';
 
-final flutterSecureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
-});
+@Deprecated(
+  'Use secureStorageProvider from core/providers/secure_storage_provider.dart instead',
+)
+final flutterSecureStorageProvider = secureStorageProvider;
 
 final hevyKeyLocalDataSourceProvider = Provider<HevyKeyLocalDataSource>((ref) {
-  final storage = ref.watch(flutterSecureStorageProvider);
+  final storage = ref.watch(secureStorageProvider);
   return HevyKeyLocalDataSourceImpl(storage);
 });
 
