@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -51,6 +52,7 @@ void main() {
   const validApiKey = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 
   setUp(() {
+    FlutterSecureStorage.setMockInitialValues({});
     fakeRepository = FakeAuthRepository(initialUser: testUser);
     fakeWeightRepository = FakeWeightRepository();
     fakeGainTargetRepository = FakeGainTargetRepository();

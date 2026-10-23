@@ -248,24 +248,24 @@ Add and update unit tests for `AuthViewModel` covering successful storage wipe, 
 
 #### Automated
 
-- [x] 1.1 New provider created: `lib/core/providers/secure_storage_provider.dart` exists and exports `secureStorageProvider`
-- [x] 1.2 Code compiles cleanly: `flutter analyze` reports zero errors or warnings in `lib/core/` and `lib/features/workout/data/datasources/`
-- [x] 1.3 Existing tests pass: `flutter test test/core/localization/locale_notifier_test.dart test/widget_test.dart`
+- [x] 1.1 New provider created: `lib/core/providers/secure_storage_provider.dart` exists and exports `secureStorageProvider` — 3d83b6e
+- [x] 1.2 Code compiles cleanly: `flutter analyze` reports zero errors or warnings in `lib/core/` and `lib/features/workout/data/datasources/` — 3d83b6e
+- [x] 1.3 Existing tests pass: `flutter test test/core/localization/locale_notifier_test.dart test/widget_test.dart` — 3d83b6e
 
 #### Manual
 
-- [x] 1.4 Verify imports in IDE resolve cleanly without circular dependencies
+- [x] 1.4 Verify imports in IDE resolve cleanly without circular dependencies — 3d83b6e
 
 ### Phase 2: Implement Storage Cleanup & Cache Invalidation in AuthViewModel
 
 #### Automated
 
-- [ ] 2.1 Code compiles cleanly: `flutter analyze` passes with zero issues across `lib/features/auth/`
-- [ ] 2.2 Unit tests run: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
+- [x] 2.1 Code compiles cleanly: `flutter analyze` passes with zero issues across `lib/features/auth/`
+- [x] 2.2 Unit tests run: `flutter test test/features/auth/presentation/view_models/auth_view_model_test.dart`
 
 #### Manual
 
-- [ ] 2.3 Code review: verify `deleteAll()` is called within a `try/catch` fail-open block before provider invalidations and Firebase sign-out
+- [x] 2.3 Code review: verify `deleteAll()` is called within a `try/catch` fail-open block before provider invalidations and Firebase sign-out
 
 ### Phase 3: Comprehensive Unit & Widget Testing
 
