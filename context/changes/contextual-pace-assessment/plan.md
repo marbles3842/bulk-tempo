@@ -507,25 +507,25 @@ Add English and Polish localization strings, build `PaceAssessmentCard` at the t
 
 #### Automated
 
-- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
-- [x] 2.2 Data source and repository unit tests pass: `flutter test test/features/dashboard/data/`
-- [x] 2.3 Static analysis passes: `flutter analyze`
+- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs` — 5df08c6
+- [x] 2.2 Data source and repository unit tests pass: `flutter test test/features/dashboard/data/` — 5df08c6
+- [x] 2.3 Static analysis passes: `flutter analyze` — 5df08c6
 
 #### Manual
 
-- [x] 2.4 Verify `database.rules.json` is valid JSON and `pace_assessment` rules sit cleanly under `users/$uid` alongside `weight_entries` and `gain_target`.
+- [x] 2.4 Verify `database.rules.json` is valid JSON and `pace_assessment` rules sit cleanly under `users/$uid` alongside `weight_entries` and `gain_target`. — 5df08c6
 
 ### Phase 3: Pace Assessment State Management & Dashboard ViewModel Integration
 
 #### Automated
 
-- [ ] 3.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
-- [ ] 3.2 ViewModel unit tests pass: `flutter test test/features/dashboard/presentation/view_models/`
-- [ ] 3.3 Static analysis passes: `flutter analyze`
+- [x] 3.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
+- [x] 3.2 ViewModel unit tests pass: `flutter test test/features/dashboard/presentation/view_models/`
+- [x] 3.3 Static analysis passes: `flutter analyze`
 
 #### Manual
 
-- [ ] 3.4 Confirm neither `pace_assessment_view_model.dart` nor `pace_assessment_state.dart` imports `package:flutter/material.dart` or `dart:ui`.
+- [x] 3.4 Confirm neither `pace_assessment_view_model.dart` nor `pace_assessment_state.dart` imports `package:flutter/material.dart` or `dart:ui`.
 
 ### Phase 4: Dashboard Assessment Card, Detailed Report Bottom Sheet & Localization
 
