@@ -495,25 +495,25 @@ Add English and Polish localization strings, build `PaceAssessmentCard` at the t
 
 #### Automated
 
-- [x] 1.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
-- [x] 1.2 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/pace_assessment_calculator_test.dart`
-- [x] 1.3 Static analysis passes with zero warnings: `flutter analyze`
+- [x] 1.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs` — 33d2382
+- [x] 1.2 Calculator unit tests pass: `flutter test test/features/dashboard/domain/calculators/pace_assessment_calculator_test.dart` — 33d2382
+- [x] 1.3 Static analysis passes with zero warnings: `flutter analyze` — 33d2382
 
 #### Manual
 
-- [x] 1.4 Confirm domain files under `lib/features/dashboard/domain/` have zero imports from `data/`, `presentation/`, `package:flutter/*`, or `package:firebase_ai/*`.
+- [x] 1.4 Confirm domain files under `lib/features/dashboard/domain/` have zero imports from `data/`, `presentation/`, `package:flutter/*`, or `package:firebase_ai/*`. — 33d2382
 
 ### Phase 2: Firebase AI Logic, RTDB Cache Data Sources & Repository
 
 #### Automated
 
-- [ ] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
-- [ ] 2.2 Data source and repository unit tests pass: `flutter test test/features/dashboard/data/`
-- [ ] 2.3 Static analysis passes: `flutter analyze`
+- [x] 2.1 Code generation succeeds: `dart run build_runner build --delete-conflicting-outputs`
+- [x] 2.2 Data source and repository unit tests pass: `flutter test test/features/dashboard/data/`
+- [x] 2.3 Static analysis passes: `flutter analyze`
 
 #### Manual
 
-- [ ] 2.4 Verify `database.rules.json` is valid JSON and `pace_assessment` rules sit cleanly under `users/$uid` alongside `weight_entries` and `gain_target`.
+- [x] 2.4 Verify `database.rules.json` is valid JSON and `pace_assessment` rules sit cleanly under `users/$uid` alongside `weight_entries` and `gain_target`.
 
 ### Phase 3: Pace Assessment State Management & Dashboard ViewModel Integration
 

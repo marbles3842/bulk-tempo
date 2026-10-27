@@ -16,6 +16,17 @@
           "$other": {
             ".validate": false
           }
+        },
+        "pace_assessment": {
+          ".validate": "newData.hasChildren(['status', 'baselineStatus', 'headlineSummary', 'weightTrendAnalysis', 'workoutContextAnalysis', 'actionableTakeaways', 'assessedWeekStartIso', 'isAssessedWeekPartial', 'currentPaceKgPerWeek', 'targetMinKgPerWeek', 'targetMaxKgPerWeek', 'priorWeightWeeksCount', 'localeCode', 'fingerprint', 'generatedAt']) && newData.child('status').isString() && newData.child('status').val().matches(/^(onTarget|tooFast|tooSlow|stagnant)$/) && newData.child('baselineStatus').isString() && newData.child('baselineStatus').val().matches(/^(onTarget|tooFast|tooSlow|stagnant)$/) && newData.child('headlineSummary').isString() && newData.child('headlineSummary').val().length > 0 && newData.child('weightTrendAnalysis').isString() && newData.child('weightTrendAnalysis').val().length > 0 && newData.child('workoutContextAnalysis').isString() && newData.child('workoutContextAnalysis').val().length > 0 && newData.child('assessedWeekStartIso').isString() && newData.child('assessedWeekStartIso').val().matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.child('isAssessedWeekPartial').isBoolean() && newData.child('currentPaceKgPerWeek').isNumber() && newData.child('targetMinKgPerWeek').isNumber() && newData.child('targetMaxKgPerWeek').isNumber() && newData.child('targetMinKgPerWeek').val() > 0 && newData.child('targetMaxKgPerWeek').val() > newData.child('targetMinKgPerWeek').val() && newData.child('priorWeightWeeksCount').isNumber() && newData.child('priorWeightWeeksCount').val() >= 2 && newData.child('localeCode').isString() && newData.child('localeCode').val().length > 0 && newData.child('fingerprint').isString() && newData.child('fingerprint').val().length > 0 && newData.child('generatedAt').isString() && newData.child('generatedAt').val().length > 0",
+          "actionableTakeaways": {
+            "$index": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
         }
       }
     }

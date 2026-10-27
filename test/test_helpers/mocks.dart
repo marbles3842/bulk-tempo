@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 import 'package:bulk_tempo/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:bulk_tempo/features/auth/domain/repositories/auth_repository.dart';
+import 'package:bulk_tempo/features/dashboard/data/datasources/pace_assessment_ai_data_source.dart';
+import 'package:bulk_tempo/features/dashboard/data/datasources/pace_assessment_cache_data_source.dart';
+import 'package:bulk_tempo/features/dashboard/domain/repositories/pace_assessment_repository.dart';
 import 'package:bulk_tempo/features/gain_target/data/datasources/gain_target_remote_data_source.dart';
 import 'package:bulk_tempo/features/gain_target/domain/repositories/gain_target_repository.dart';
 import 'package:bulk_tempo/features/weight/data/datasources/weight_remote_data_source.dart';
@@ -50,3 +53,15 @@ class MockWorkoutRemoteDataSource extends Mock
     implements WorkoutRemoteDataSource {}
 
 class MockWorkoutRepository extends Mock implements WorkoutRepository {}
+
+class MockGeminiContentGenerator extends Mock
+    implements GeminiContentGenerator {}
+
+class MockPaceAssessmentCacheDataSource extends Mock
+    implements PaceAssessmentCacheDataSource {}
+
+class MockPaceAssessmentAiDataSource extends Mock
+    implements PaceAssessmentAiDataSource {}
+
+class MockPaceAssessmentRepository extends Mock
+    implements PaceAssessmentRepository {}
