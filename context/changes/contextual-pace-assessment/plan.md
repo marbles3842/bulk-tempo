@@ -531,12 +531,12 @@ Add English and Polish localization strings, build `PaceAssessmentCard` at the t
 
 #### Automated
 
-- [x] 4.1 Localization generation and code formatting succeed: `flutter gen-l10n && dart format --output=none --set-exit-if-changed lib test`
-- [x] 4.2 All unit and widget tests pass: `flutter test`
-- [x] 4.3 Static analysis passes with zero issues: `flutter analyze`
+- [x] 4.1 Localization generation and code formatting succeed: `flutter gen-l10n && dart format --output=none --set-exit-if-changed lib test` — 4eaaf85
+- [x] 4.2 All unit and widget tests pass: `flutter test` — 4eaaf85
+- [x] 4.3 Static analysis passes with zero issues: `flutter analyze` — 4eaaf85
 
 #### Manual
 
-- [x] 4.4 Launch the app (`flutter run`), navigate to the Home tab, and verify `PaceAssessmentCard` appears at the top of the Dashboard above `DashboardKpiRow`.
-- [x] 4.5 Verify that missing target, disconnected Hevy, or `< 2` prior weight weeks show clear, non-misleading setup/empty messages.
-- [x] 4.6 With valid weight history (`>= 2` prior weeks + current/previous week), connected Hevy workouts, and a saved gain target, verify the AI status badge and headline summary load on the Dashboard, and tapping "View Full AI Report" opens the modal bottom sheet with Weight Trend, Workout Context, and Actionable Takeaways in both English and Polish.
+- [x] 4.4 Launch the app (`flutter run`), navigate to the Home tab, and verify `PaceAssessmentCard` appears at the top of the Dashboard above `DashboardKpiRow`. — 4eaaf85
+- [x] 4.5 Verify that missing target, disconnected Hevy, or `< 2` prior weight weeks show clear, non-misleading setup/empty messages. — 4eaaf85
+- [x] 4.6 With valid weight history (`>= 2` prior weeks + current/previous week), connected Hevy workouts, and a saved gain target, verify the AI status badge and headline summary load on the Dashboard, and tapping "View Full AI Report" opens the modal bottom sheet with Weight Trend, Workout Context, and Actionable Takeaways in both English and Polish. — 4eaaf85

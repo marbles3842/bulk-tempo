@@ -1,7 +1,7 @@
 ---
 change_id: contextual-pace-assessment
 title: Assess pace against recent weeks and workout context with Gemini
-status: implementing
+status: implemented
 created: 2026-10-24
 updated: 2026-10-28
 archived_at: null
