@@ -783,5 +783,91 @@
         "example": "1.40"
       }
     }
+  },
+  "dashboardAssessmentCardTitle": "AI Pace Assessment",
+  "@dashboardAssessmentCardTitle": {
+    "description": "Title for the AI Pace Assessment card on the dashboard"
+  },
+  "paceStatusOnTarget": "On target",
+  "@paceStatusOnTarget": {
+    "description": "Pace status label when weight gain is within target range"
+  },
+  "paceStatusTooFast": "Too fast",
+  "@paceStatusTooFast": {
+    "description": "Pace status label when weight gain exceeds target range"
+  },
+  "paceStatusTooSlow": "Too slow",
+  "@paceStatusTooSlow": {
+    "description": "Pace status label when weight gain is below target range"
+  },
+  "paceStatusStagnant": "Stagnation",
+  "@paceStatusStagnant": {
+    "description": "Pace status label when weight gain is stagnant or negative"
+  },
+  "paceAssessmentMissingTarget": "Set your weekly gain target in Profile to unlock AI pace assessment.",
+  "@paceAssessmentMissingTarget": {
+    "description": "Ineligibility message when weekly gain target is not set"
+  },
+  "paceAssessmentMissingHevy": "Connect your Hevy API key in Profile to include workout context in your pace assessment.",
+  "@paceAssessmentMissingHevy": {
+    "description": "Ineligibility message when Hevy API key is not configured"
+  },
+  "paceAssessmentNoWorkouts": "Log or import at least one workout in the last 12 weeks to assess your pace in training context.",
+  "@paceAssessmentNoWorkouts": {
+    "description": "Ineligibility message when no workouts exist in the 12-week window"
+  },
+  "paceAssessmentInsufficientWeights": "Log weight entries in the current (or previous) week and at least 2 earlier weeks ({priorWeeks}/2 prior weeks logged) to unlock pace assessment.",
+  "@paceAssessmentInsufficientWeights": {
+    "description": "Ineligibility message when fewer than 2 prior weight weeks are logged",
+    "placeholders": {
+      "priorWeeks": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "paceAssessmentPartialWeekBadge": "Partial week ({loggedDays}/7 days)",
+  "@paceAssessmentPartialWeekBadge": {
+    "description": "Badge indicating the assessed week is a partial week",
+    "placeholders": {
+      "loggedDays": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "paceAssessmentViewReportButton": "View Full AI Report",
+  "@paceAssessmentViewReportButton": {
+    "description": "Button label to open the full AI pace assessment report bottom sheet"
+  },
+  "paceAssessmentRefreshTooltip": "Refresh AI assessment",
+  "@paceAssessmentRefreshTooltip": {
+    "description": "Tooltip for refreshing the AI pace assessment"
+  },
+  "paceReportTitle": "AI Pace Assessment Report",
+  "@paceReportTitle": {
+    "description": "Header title in the AI pace assessment report modal bottom sheet"
+  },
+  "paceReportWeightTrendSection": "Weight Trend vs. Target",
+  "@paceReportWeightTrendSection": {
+    "description": "Section title for weight trend analysis in the AI report"
+  },
+  "paceReportWorkoutContextSection": "Workout & Strength Context",
+  "@paceReportWorkoutContextSection": {
+    "description": "Section title for workout context analysis in the AI report"
+  },
+  "paceReportTakeawaysSection": "Actionable Takeaways",
+  "@paceReportTakeawaysSection": {
+    "description": "Section title for actionable takeaways in the AI report"
+  },
+  "paceReportBaselineLabel": "Baseline pace status: {status}",
+  "@paceReportBaselineLabel": {
+    "description": "Label showing the deterministic baseline pace status when it differs from the final AI status",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Too slow"
+      }
+    }
   }
 }

@@ -29,10 +29,12 @@ abstract class GeminiContentGenerator {
   });
 }
 
-/// Production implementation of [GeminiContentGenerator] backed by `gemini-2.5-flash`
-/// via `FirebaseAI.googleAI()`.
+/// Production implementation of [GeminiContentGenerator] backed by
+/// `gemini-3.5-flash-lite` via `FirebaseAI.googleAI()`, with automatic fallback
+/// to `gemini-3.5-flash` if the primary model experiences transient errors.
 class FirebaseAiContentGenerator implements GeminiContentGenerator {
-  static const String modelName = 'gemini-2.5-flash';
+  static const String modelName = 'gemini-3.5-flash-lite';
+  static const String fallbackModelName = 'gemini-3.5-flash';
 
   @override
   Future<String?> generateJson({
@@ -40,12 +42,47 @@ class FirebaseAiContentGenerator implements GeminiContentGenerator {
     required Schema responseSchema,
     String? systemInstruction,
   }) async {
-    final model =
+    try {
+      return await _generateWithModel(
+        model: modelName,
+        prompt: prompt,
+        responseSchema: responseSchema,
+        systemInstruction: systemInstruction,
+      ).timeout(const Duration(seconds: 15));
+    } catch (e) {
+      final lower = e.toString().toLowerCase();
+      final isTransientModelOverload =
+          e is TimeoutException ||
+          lower.contains('high demand') ||
+          lower.contains('deadline expired') ||
+          lower.contains('500') ||
+          lower.contains('503') ||
+          lower.contains('overloaded') ||
+          lower.contains('unavailable');
+      if (!isTransientModelOverload) {
+        rethrow;
+      }
+      return _generateWithModel(
+        model: fallbackModelName,
+        prompt: prompt,
+        responseSchema: responseSchema,
+        systemInstruction: systemInstruction,
+      );
+    }
+  }
+
+  Future<String?> _generateWithModel({
+    required String model,
+    required String prompt,
+    required Schema responseSchema,
+    String? systemInstruction,
+  }) async {
+    final generativeModel =
         FirebaseAI.googleAI(
           auth: FirebaseAuth.instance,
           appCheck: FirebaseAppCheck.instance,
         ).generativeModel(
-          model: modelName,
+          model: model,
           generationConfig: GenerationConfig(
             responseMimeType: 'application/json',
             responseSchema: responseSchema,
@@ -55,7 +92,9 @@ class FirebaseAiContentGenerator implements GeminiContentGenerator {
               : null,
         );
 
-    final response = await model.generateContent([Content.text(prompt)]);
+    final response = await generativeModel.generateContent([
+      Content.text(prompt),
+    ]);
     return response.text;
   }
 }
@@ -211,7 +250,7 @@ class PaceAssessmentAiDataSourceImpl implements PaceAssessmentAiDataSource {
             systemInstruction: _systemInstruction,
           )
           .timeout(
-            const Duration(seconds: 30),
+            const Duration(seconds: 45),
             onTimeout: () =>
                 throw const ServerException(message: 'AI request timed out'),
           );
