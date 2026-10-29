@@ -576,4 +576,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String dashboardGainMetric(String sign, String value) {
     return '$sign$value kg';
   }
+
+  @override
+  String get dashboardAssessmentCardTitle => 'AI Pace Assessment';
+
+  @override
+  String get paceStatusOnTarget => 'On target';
+
+  @override
+  String get paceStatusTooFast => 'Too fast';
+
+  @override
+  String get paceStatusTooSlow => 'Too slow';
+
+  @override
+  String get paceStatusStagnant => 'Stagnation';
+
+  @override
+  String get paceAssessmentMissingTarget =>
+      'Set your weekly gain target in Profile to unlock AI pace assessment.';
+
+  @override
+  String get paceAssessmentMissingHevy =>
+      'Connect your Hevy API key in Profile to include workout context in your pace assessment.';
+
+  @override
+  String get paceAssessmentNoWorkouts =>
+      'Log or import at least one workout in the last 12 weeks to assess your pace in training context.';
+
+  @override
+  String paceAssessmentInsufficientWeights(int priorWeeks) {
+    return 'Log weight entries in the current (or previous) week and at least 2 earlier weeks ($priorWeeks/2 prior weeks logged) to unlock pace assessment.';
+  }
+
+  @override
+  String paceAssessmentPartialWeekBadge(int loggedDays) {
+    return 'Partial week ($loggedDays/7 days)';
+  }
+
+  @override
+  String get paceAssessmentViewReportButton => 'View Full AI Report';
+
+  @override
+  String get paceAssessmentRefreshTooltip => 'Refresh AI assessment';
+
+  @override
+  String get paceReportTitle => 'AI Pace Assessment Report';
+
+  @override
+  String get paceReportWeightTrendSection => 'Weight Trend vs. Target';
+
+  @override
+  String get paceReportWorkoutContextSection => 'Workout & Strength Context';
+
+  @override
+  String get paceReportTakeawaysSection => 'Actionable Takeaways';
+
+  @override
+  String paceReportBaselineLabel(String status) {
+    return 'Baseline pace status: $status';
+  }
 }

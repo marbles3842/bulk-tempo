@@ -3,6 +3,7 @@ import 'package:bulk_tempo/core/providers/clock_provider.dart';
 import 'package:bulk_tempo/features/auth/presentation/view_models/auth_view_model.dart';
 import 'package:bulk_tempo/features/dashboard/domain/calculators/weekly_progress_calculator.dart';
 import 'package:bulk_tempo/features/dashboard/presentation/view_models/dashboard_state.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/view_models/pace_assessment_view_model.dart';
 import 'package:bulk_tempo/features/gain_target/presentation/view_models/gain_target_view_model.dart';
 import 'package:bulk_tempo/features/weight/domain/models/weekly_weight_summary_entity.dart';
 import 'package:bulk_tempo/features/weight/presentation/view_models/weight_history_state.dart';
@@ -23,6 +24,7 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
   DashboardState build() {
     final user = ref.watch(authViewModelProvider.select((s) => s.user));
     final now = ref.watch(clockProvider)();
+    final paceAssessment = ref.watch(paceAssessmentViewModelProvider);
 
     if (user == null) {
       return DashboardState(
@@ -33,6 +35,7 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
           workoutSummaries: const [],
           now: now,
         ),
+        paceAssessment: paceAssessment,
       );
     }
 
@@ -123,6 +126,7 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
       gainTarget: gainTargetState.savedTarget,
       overview: overview,
       hasAnyWorkoutInWindow: hasAnyWorkoutInWindow,
+      paceAssessment: paceAssessment,
     );
   }
 
@@ -147,11 +151,13 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
     final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
     final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
     final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
+    final paceNotifier = ref.read(paceAssessmentViewModelProvider.notifier);
     await Future.wait([
       weightNotifier.loadEntries(showLoading: false),
       workoutNotifier.loadWorkouts(showLoading: false, now: now),
       gainTargetNotifier.loadTarget(showLoading: false, isRefresh: true),
     ]);
+    await paceNotifier.refresh();
   }
 
   /// Retries loading weight history entries.
@@ -175,5 +181,45 @@ class DashboardViewModel extends AutoDisposeNotifier<DashboardState> {
       weightNotifier.loadEntries(),
       gainTargetNotifier.loadTarget(),
     ]);
+  }
+
+  /// Retries any failed upstream data sources and triggers pace assessment retry.
+  Future<void> retryPaceAssessment() async {
+    final user = ref.read(authViewModelProvider).user;
+    if (user == null) return;
+
+    final now = ref.read(clockProvider)();
+    final weightState = ref.read(weightHistoryViewModelProvider);
+    final workoutState = ref.read(workoutProgressViewModelProvider);
+    final gainTargetState = ref.read(gainTargetViewModelProvider);
+    final weightNotifier = ref.read(weightHistoryViewModelProvider.notifier);
+    final workoutNotifier = ref.read(workoutProgressViewModelProvider.notifier);
+    final gainTargetNotifier = ref.read(gainTargetViewModelProvider.notifier);
+    final paceNotifier = ref.read(paceAssessmentViewModelProvider.notifier);
+
+    final futures = <Future<void>>[];
+
+    if (weightState is WeightHistoryError ||
+        (weightState is WeightHistoryLoaded &&
+            weightState.refreshErrorMessage != null)) {
+      futures.add(weightNotifier.loadEntries());
+    }
+
+    if (workoutState is WorkoutProgressError ||
+        (workoutState is WorkoutProgressLoaded &&
+            workoutState.refreshErrorMessage != null)) {
+      futures.add(workoutNotifier.loadWorkouts(now: now));
+    }
+
+    if (gainTargetState.errorMessage != null ||
+        gainTargetState.refreshErrorMessage != null) {
+      futures.add(gainTargetNotifier.loadTarget());
+    }
+
+    if (futures.isNotEmpty) {
+      await Future.wait(futures);
+    }
+
+    await paceNotifier.retry();
   }
 }

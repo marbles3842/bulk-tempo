@@ -890,7 +890,7 @@ void main() {
 
         await tester.drag(
           find.byKey(const Key('dashboard_scroll_view')),
-          const Offset(0, -300),
+          const Offset(0, -550),
         );
         await tester.pumpAndSettle();
         expect(find.text('Failed to load target'), findsOneWidget);

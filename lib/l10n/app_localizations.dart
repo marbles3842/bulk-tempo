@@ -1057,6 +1057,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{sign}{value} kg'**
   String dashboardGainMetric(String sign, String value);
+
+  /// Title for the AI Pace Assessment card on the dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'AI Pace Assessment'**
+  String get dashboardAssessmentCardTitle;
+
+  /// Pace status label when weight gain is within target range
+  ///
+  /// In en, this message translates to:
+  /// **'On target'**
+  String get paceStatusOnTarget;
+
+  /// Pace status label when weight gain exceeds target range
+  ///
+  /// In en, this message translates to:
+  /// **'Too fast'**
+  String get paceStatusTooFast;
+
+  /// Pace status label when weight gain is below target range
+  ///
+  /// In en, this message translates to:
+  /// **'Too slow'**
+  String get paceStatusTooSlow;
+
+  /// Pace status label when weight gain is stagnant or negative
+  ///
+  /// In en, this message translates to:
+  /// **'Stagnation'**
+  String get paceStatusStagnant;
+
+  /// Ineligibility message when weekly gain target is not set
+  ///
+  /// In en, this message translates to:
+  /// **'Set your weekly gain target in Profile to unlock AI pace assessment.'**
+  String get paceAssessmentMissingTarget;
+
+  /// Ineligibility message when Hevy API key is not configured
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your Hevy API key in Profile to include workout context in your pace assessment.'**
+  String get paceAssessmentMissingHevy;
+
+  /// Ineligibility message when no workouts exist in the 12-week window
+  ///
+  /// In en, this message translates to:
+  /// **'Log or import at least one workout in the last 12 weeks to assess your pace in training context.'**
+  String get paceAssessmentNoWorkouts;
+
+  /// Ineligibility message when fewer than 2 prior weight weeks are logged
+  ///
+  /// In en, this message translates to:
+  /// **'Log weight entries in the current (or previous) week and at least 2 earlier weeks ({priorWeeks}/2 prior weeks logged) to unlock pace assessment.'**
+  String paceAssessmentInsufficientWeights(int priorWeeks);
+
+  /// Badge indicating the assessed week is a partial week
+  ///
+  /// In en, this message translates to:
+  /// **'Partial week ({loggedDays}/7 days)'**
+  String paceAssessmentPartialWeekBadge(int loggedDays);
+
+  /// Button label to open the full AI pace assessment report bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'View Full AI Report'**
+  String get paceAssessmentViewReportButton;
+
+  /// Tooltip for refreshing the AI pace assessment
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh AI assessment'**
+  String get paceAssessmentRefreshTooltip;
+
+  /// Header title in the AI pace assessment report modal bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'AI Pace Assessment Report'**
+  String get paceReportTitle;
+
+  /// Section title for weight trend analysis in the AI report
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Trend vs. Target'**
+  String get paceReportWeightTrendSection;
+
+  /// Section title for workout context analysis in the AI report
+  ///
+  /// In en, this message translates to:
+  /// **'Workout & Strength Context'**
+  String get paceReportWorkoutContextSection;
+
+  /// Section title for actionable takeaways in the AI report
+  ///
+  /// In en, this message translates to:
+  /// **'Actionable Takeaways'**
+  String get paceReportTakeawaysSection;
+
+  /// Label showing the deterministic baseline pace status when it differs from the final AI status
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline pace status: {status}'**
+  String paceReportBaselineLabel(String status);
 }
 
 class _AppLocalizationsDelegate

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bulk_tempo/features/dashboard/domain/models/weekly_progress_overview_entity.dart';
+import 'package:bulk_tempo/features/dashboard/presentation/view_models/pace_assessment_state.dart';
 import 'package:bulk_tempo/features/gain_target/domain/models/gain_target_entity.dart';
 
 part 'dashboard_state.freezed.dart';
@@ -25,5 +26,6 @@ abstract class DashboardState with _$DashboardState {
     GainTargetEntity? gainTarget,
     required WeeklyProgressOverviewEntity overview,
     @Default(false) bool hasAnyWorkoutInWindow,
+    @Default(PaceAssessmentState()) PaceAssessmentState paceAssessment,
   }) = _DashboardState;
 }

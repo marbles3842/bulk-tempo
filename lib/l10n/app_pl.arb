@@ -159,5 +159,22 @@
   "dashboardWorkoutsTooltip": "{count, plural, one{1 trening} few{{count} treningi} many{{count} treningów} other{{count} treningu}}",
   "dashboardPaceMetric": "{sign}{value} {unit}",
   "dashboardWeightMetric": "{value} kg",
-  "dashboardGainMetric": "{sign}{value} kg"
+  "dashboardGainMetric": "{sign}{value} kg",
+  "dashboardAssessmentCardTitle": "Ocena tempa AI",
+  "paceStatusOnTarget": "Tempo prawidłowe",
+  "paceStatusTooFast": "Tempo za szybkie",
+  "paceStatusTooSlow": "Tempo za wolne",
+  "paceStatusStagnant": "Stagnacja",
+  "paceAssessmentMissingTarget": "Ustaw docelowy zakres przyrostu w Profilu, aby odblokować ocenę tempa AI.",
+  "paceAssessmentMissingHevy": "Połącz klucz API Hevy w Profilu, aby uwzględnić treningi w ocenie tempa.",
+  "paceAssessmentNoWorkouts": "Zapisz lub zaimportuj co najmniej jeden trening z ostatnich 12 tygodni, aby ocenić tempo w kontekście treningowym.",
+  "paceAssessmentInsufficientWeights": "Zapisz pomiary wagi w bieżącym (lub poprzednim) tygodniu oraz w co najmniej 2 wcześniejszych tygodniach (zapisano {priorWeeks}/2 wcześniejszych tygodni), aby odblokować ocenę tempa.",
+  "paceAssessmentPartialWeekBadge": "Niepełny tydzień ({loggedDays}/7 dni)",
+  "paceAssessmentViewReportButton": "Zobacz pełny raport AI",
+  "paceAssessmentRefreshTooltip": "Odśwież ocenę AI",
+  "paceReportTitle": "Raport oceny tempa AI",
+  "paceReportWeightTrendSection": "Trend masy względem celu",
+  "paceReportWorkoutContextSection": "Kontekst treningowy i siłowy",
+  "paceReportTakeawaysSection": "Wskazówki na kolejny tydzień",
+  "paceReportBaselineLabel": "Bazowy status z wagi: {status}"
 }

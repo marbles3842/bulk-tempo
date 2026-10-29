@@ -590,4 +590,64 @@ class AppLocalizationsPl extends AppLocalizations {
   String dashboardGainMetric(String sign, String value) {
     return '$sign$value kg';
   }
+
+  @override
+  String get dashboardAssessmentCardTitle => 'Ocena tempa AI';
+
+  @override
+  String get paceStatusOnTarget => 'Tempo prawidłowe';
+
+  @override
+  String get paceStatusTooFast => 'Tempo za szybkie';
+
+  @override
+  String get paceStatusTooSlow => 'Tempo za wolne';
+
+  @override
+  String get paceStatusStagnant => 'Stagnacja';
+
+  @override
+  String get paceAssessmentMissingTarget =>
+      'Ustaw docelowy zakres przyrostu w Profilu, aby odblokować ocenę tempa AI.';
+
+  @override
+  String get paceAssessmentMissingHevy =>
+      'Połącz klucz API Hevy w Profilu, aby uwzględnić treningi w ocenie tempa.';
+
+  @override
+  String get paceAssessmentNoWorkouts =>
+      'Zapisz lub zaimportuj co najmniej jeden trening z ostatnich 12 tygodni, aby ocenić tempo w kontekście treningowym.';
+
+  @override
+  String paceAssessmentInsufficientWeights(int priorWeeks) {
+    return 'Zapisz pomiary wagi w bieżącym (lub poprzednim) tygodniu oraz w co najmniej 2 wcześniejszych tygodniach (zapisano $priorWeeks/2 wcześniejszych tygodni), aby odblokować ocenę tempa.';
+  }
+
+  @override
+  String paceAssessmentPartialWeekBadge(int loggedDays) {
+    return 'Niepełny tydzień ($loggedDays/7 dni)';
+  }
+
+  @override
+  String get paceAssessmentViewReportButton => 'Zobacz pełny raport AI';
+
+  @override
+  String get paceAssessmentRefreshTooltip => 'Odśwież ocenę AI';
+
+  @override
+  String get paceReportTitle => 'Raport oceny tempa AI';
+
+  @override
+  String get paceReportWeightTrendSection => 'Trend masy względem celu';
+
+  @override
+  String get paceReportWorkoutContextSection => 'Kontekst treningowy i siłowy';
+
+  @override
+  String get paceReportTakeawaysSection => 'Wskazówki na kolejny tydzień';
+
+  @override
+  String paceReportBaselineLabel(String status) {
+    return 'Bazowy status z wagi: $status';
+  }
 }
