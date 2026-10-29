@@ -716,6 +716,115 @@ void main() {
         expect(freshState.refreshErrorMessage, isNull);
       },
     );
+
+    test(
+      'reloads unchanged workout data with showLoading enabled and verifies isRefreshing becomes false',
+      () async {
+        await seedAndLoadAll(
+          weights: createEligibleWeights(),
+          workouts: [createWorkout()],
+          gainTarget: defaultTarget,
+        );
+
+        final initialLoaded = container.read(paceAssessmentViewModelProvider);
+        expect(initialLoaded.status, equals(PaceAssessmentViewStatus.loaded));
+        expect(initialLoaded.assessment, isNotNull);
+        expect(initialLoaded.isRefreshing, isFalse);
+
+        final workoutsCompleter = Completer<void>();
+        fakeWorkoutRepository.getWorkoutsCompleter = workoutsCompleter;
+
+        final loadFuture = container
+            .read(workoutProgressViewModelProvider.notifier)
+            .loadWorkouts(now: refNow);
+        await pumpEventQueue();
+
+        // While workouts are loading with showLoading: true, pace assessment reflects isRefreshing
+        final inProgressState = container.read(paceAssessmentViewModelProvider);
+        expect(inProgressState.status, equals(PaceAssessmentViewStatus.loaded));
+        expect(inProgressState.isRefreshing, isTrue);
+
+        workoutsCompleter.complete();
+        await loadFuture;
+        await pumpEventQueue();
+
+        // When unchanged workout data finishes loading, isRefreshing must become false
+        final completedState = container.read(paceAssessmentViewModelProvider);
+        expect(completedState.status, equals(PaceAssessmentViewStatus.loaded));
+        expect(completedState.assessment, equals(initialLoaded.assessment));
+        expect(completedState.isRefreshing, isFalse);
+      },
+    );
+
+    test(
+      'refresh(forceRefresh: false) does not start duplicate evaluation when evaluation for same fingerprint is in flight',
+      () async {
+        final completer = Completer<Result<PaceAssessmentEntity, AppFailure>>();
+        PaceAssessmentInputEntity? capturedInput;
+
+        when(
+          () => mockPaceAssessmentRepository.getOrGenerateAssessment(
+            userId: any(named: 'userId'),
+            input: any(named: 'input'),
+            forceRefresh: any(named: 'forceRefresh'),
+          ),
+        ).thenAnswer((invocation) {
+          capturedInput =
+              invocation.namedArguments[#input] as PaceAssessmentInputEntity;
+          return completer.future;
+        });
+
+        fakeWeightRepository.seedEntries(testUser.id, createEligibleWeights());
+        fakeWorkoutRepository.seedApiKey(testUser.id, validApiKey);
+        fakeWorkoutRepository.seedWorkouts(testUser.id, [createWorkout()]);
+        fakeGainTargetRepository.seedTarget(testUser.id, defaultTarget);
+
+        await Future.wait([
+          container.read(weightHistoryViewModelProvider.notifier).loadEntries(),
+          container
+              .read(workoutProgressViewModelProvider.notifier)
+              .loadWorkouts(now: refNow),
+          container.read(gainTargetViewModelProvider.notifier).loadTarget(),
+        ]);
+        await pumpEventQueue();
+
+        expect(capturedInput, isNotNull);
+        verify(
+          () => mockPaceAssessmentRepository.getOrGenerateAssessment(
+            userId: testUser.id,
+            input: any(named: 'input'),
+            forceRefresh: false,
+          ),
+        ).called(1);
+
+        // Call refresh while the automatic evaluation is still in flight
+        final refreshFuture = container
+            .read(paceAssessmentViewModelProvider.notifier)
+            .refresh(forceRefresh: false);
+
+        await pumpEventQueue();
+
+        // Must not call repository again for the same in-flight fingerprint
+        verifyNever(
+          () => mockPaceAssessmentRepository.getOrGenerateAssessment(
+            userId: testUser.id,
+            input: any(named: 'input'),
+            forceRefresh: false,
+          ),
+        );
+
+        // Complete the in-flight evaluation
+        completer.complete(
+          Result.success(buildAssessmentFromInput(capturedInput!)),
+        );
+        await refreshFuture;
+
+        final state = container.read(paceAssessmentViewModelProvider);
+        expect(state.status, equals(PaceAssessmentViewStatus.loaded));
+        expect(state.assessment, isNotNull);
+        expect(state.isRefreshing, isFalse);
+      },
+    );
   });
 
   group('Account switch isolation & race/disposal guards', () {

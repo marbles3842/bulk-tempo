@@ -36,6 +36,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
   int _generation = 0;
   bool _disposed = false;
   String? _inFlightFingerprint;
+  Future<void>? _inFlightEvaluation;
   PaceAssessmentState _currentState = const PaceAssessmentState();
 
   @override
@@ -45,6 +46,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
     ref.onDispose(() {
       _disposed = true;
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
     });
 
     _clock = ref.watch(clockProvider);
@@ -85,11 +87,13 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
       _userId = newUserId;
       _generation++;
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       _currentState = const PaceAssessmentState();
     }
 
     if (newUserId == null || newUserId.trim().isEmpty) {
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       return _recordState(
         const PaceAssessmentState(
           status: PaceAssessmentViewStatus.ineligible,
@@ -115,6 +119,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
     final userId = _userId;
     if (userId == null || userId.trim().isEmpty) {
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       state = _recordState(
         const PaceAssessmentState(
           status: PaceAssessmentViewStatus.ineligible,
@@ -149,6 +154,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
     if (userId == null || userId.trim().isEmpty) {
       _generation++;
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       state = _recordState(
         const PaceAssessmentState(
           status: PaceAssessmentViewStatus.ineligible,
@@ -191,6 +197,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
       ):
         _generation++;
         _inFlightFingerprint = null;
+        _inFlightEvaluation = null;
         state = _recordState(
           PaceAssessmentState(
             status: PaceAssessmentViewStatus.ineligible,
@@ -202,6 +209,10 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
         return;
 
       case PaceAssessmentEligible(:final input):
+        if (!forceRefresh && _inFlightFingerprint == input.fingerprint) {
+          await _inFlightEvaluation;
+          return;
+        }
         final priorCount = _countPriorWeightWeeks(input);
         final recordedCount = priorCount + 1;
         _inFlightFingerprint = input.fingerprint;
@@ -229,7 +240,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
           );
         }
 
-        await _evaluate(
+        final evalFuture = _evaluate(
           input: input,
           userId: userId,
           generation: generation,
@@ -237,6 +248,8 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
           recordedWeightWeeksCount: recordedCount,
           priorWeightWeeksCount: priorCount,
         );
+        _inFlightEvaluation = evalFuture;
+        await evalFuture;
     }
   }
 
@@ -277,6 +290,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
       ):
         _generation++;
         _inFlightFingerprint = null;
+        _inFlightEvaluation = null;
         return _recordState(
           PaceAssessmentState(
             status: PaceAssessmentViewStatus.ineligible,
@@ -301,6 +315,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
               ineligibilityReason: null,
               recordedWeightWeeksCount: recordedCount,
               priorWeightWeeksCount: priorCount,
+              isRefreshing: _inFlightFingerprint != null,
               isOutdated: isSameEvaluated ? _currentState.isOutdated : false,
               errorMessage: null,
               refreshErrorMessage: isSameEvaluated
@@ -318,6 +333,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
               ineligibilityReason: null,
               recordedWeightWeeksCount: recordedCount,
               priorWeightWeeksCount: priorCount,
+              isRefreshing: _inFlightFingerprint != null,
             ),
           );
         }
@@ -326,7 +342,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
             _inFlightFingerprint != input.fingerprint) {
           _inFlightFingerprint = input.fingerprint;
           final generation = ++_generation;
-          Future.microtask(
+          _inFlightEvaluation = Future.microtask(
             () => _evaluate(
               input: input,
               userId: userId,
@@ -381,6 +397,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
         );
       }
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       return const PaceAssessmentState(
         status: PaceAssessmentViewStatus.loading,
       );
@@ -399,6 +416,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
     if (upstreamError != null) {
       _generation++;
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       if (_currentState.assessment != null) {
         return _currentState.copyWith(
           status: PaceAssessmentViewStatus.loaded,
@@ -423,6 +441,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
         return _currentState.copyWith(status: PaceAssessmentViewStatus.loaded);
       }
       _inFlightFingerprint = null;
+      _inFlightEvaluation = null;
       return const PaceAssessmentState(
         status: PaceAssessmentViewStatus.loading,
       );
@@ -485,6 +504,7 @@ class PaceAssessmentViewModel extends AutoDisposeNotifier<PaceAssessmentState> {
     }
 
     _inFlightFingerprint = null;
+    _inFlightEvaluation = null;
 
     result.when(
       success: (assessment) {

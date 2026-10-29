@@ -3,7 +3,7 @@ project: Bulk Tempo
 version: 1
 status: draft
 created: 2026-10-07
-updated: 2026-10-15
+updated: 2026-10-27
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -49,7 +49,7 @@ Osoba budująca beztłuszczową masę dziś przenosi pomiary do arkusza i osobno
 | S-04 | set-gain-target | użytkownik może ustawić i odczytać własny docelowy zakres przyrostu | F-01, S-01 | FR-007, FR-012 | in-progress |
 | S-05 | import-workout-progress | użytkownik może pobrać własne treningi z ciężarami i powtórzeniami | F-01, F-02, S-01 | FR-006, FR-012 | done |
 | S-06 | weekly-progress-overview | użytkownik może zobaczyć tygodniowe podsumowanie masy i liczbę treningów | S-02, S-05 | FR-008, US-01 | done |
-| S-07 | contextual-pace-assessment | użytkownik może zobaczyć ocenę tempa względem celu, wcześniejszych tygodni i treningów | S-04, S-06 | FR-008, FR-009, US-01, §Business Logic, §Non-Functional Requirements | blocked |
+| S-07 | contextual-pace-assessment | użytkownik może zobaczyć ocenę tempa względem celu, wcześniejszych tygodni i treningów | S-04, S-06 | FR-008, FR-009, US-01, §Business Logic, §Non-Functional Requirements | in-progress |
 
 ## Baseline
 
@@ -180,7 +180,7 @@ Stan aplikacji z 2026-10-07, sprawdzony w kodzie. Brak odpowiedzi korygującej p
   - Jaki wzór i granice rozstrzygają między czterema statusami tempa? — Owner: użytkownik. Block: yes.
   - Co aplikacja pokazuje, gdy brakuje pomiarów lub dwóch wcześniejszych tygodni? — Owner: użytkownik. Block: yes.
 - **Risk:** Bez obu odpowiedzi wynik może wyglądać na precyzyjny, choć obliczenie lub porównanie nie ma wystarczających danych.
-- **Status:** blocked
+- **Status:** in-progress
 
 ## Backlog Handoff
 
